@@ -32,7 +32,7 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <div className="flex items-center gap-2">
               <WaterDropIcon className="w-8 h-8 text-sky-500" />
-              <span className="text-xl font-bold text-gray-900">H-Redes</span>
+              <span className="text-xl font-bold text-gray-900">HidroAliaga</span>
             </div>
             <button onClick={() => setSidebarOpen(false)}>
               <XMarkIcon className="w-6 h-6 text-gray-500" />
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex items-center gap-2 h-16 px-6 border-b">
             <WaterDropIcon className="w-8 h-8 text-sky-500" />
-            <span className="text-xl font-bold text-gray-900">H-Redes Perú</span>
+            <span className="text-xl font-bold text-gray-900">HidroAliaga</span>
           </div>
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => (
@@ -86,7 +86,7 @@ export default function Layout({ children }) {
                 <span className="text-sm font-medium text-sky-700">HA</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">H-Redes Admin</p>
+                <p className="text-sm font-medium text-gray-900">HidroAliaga Admin</p>
                 <p className="text-xs text-gray-500">admin@hredes.pe</p>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function Layout({ children }) {
           </button>
           <div className="flex-1 flex justify-between items-center">
             <h1 className="text-lg font-semibold text-gray-900">
-              {navigation.find(item => item.href === location.pathname)?.name || 'H-Redes Perú'}
+              {navigation.find(item => item.href === location.pathname)?.name || 'HidroAliaga'}
             </h1>
             <div className="flex items-center gap-4">
               <Link

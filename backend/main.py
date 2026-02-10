@@ -1,8 +1,8 @@
 """
-H-Redes Perú - Backend Principal
+HidroAliaga - Backend Principal
 Sistema de Diseño, Análisis y Optimización de Redes de Distribución de Agua Potable
 
-Autor: H-Redes Perú Team
+Autor: HidroAliaga Team
 Licencia: MIT
 """
 
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 # Crear aplicación FastAPI
 app = FastAPI(
-    title="H-Redes Perú API",
+    title="HidroAliaga API",
     description="""
     ## Sistema de Diseño, Análisis y Optimización de Redes de Distribución de Agua Potable
     
@@ -72,7 +72,7 @@ app.include_router(reportes.router, prefix="/api/v1/reportes", tags=["Reportes"]
 async def root():
     """Endpoint raíz de la API"""
     return {
-        "mensaje": "Bienvenido a H-Redes Perú API",
+        "mensaje": "Bienvenido a HidroAliaga API",
         "version": "1.0.0",
         "documentacion": "/docs",
         "estado": "activo"

@@ -1,5 +1,5 @@
 """
-Configuración del Sistema H-Redes Perú
+Configuración del Sistema HidroAliaga
 """
 
 import os
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     """Configuración de la aplicación"""
     
     # Aplicación
-    APP_NAME: str = "H-Redes Perú"
+    APP_NAME: str = "HidroAliaga"
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8000

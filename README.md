@@ -1,4 +1,4 @@
-# H-Redes Perú
+# HidroAliaga
 ## Sistema de Diseño, Análisis y Optimización de Redes de Distribución de Agua Potable
 
 Aplicación web interactiva para el diseño, análisis y optimización de redes de distribución de agua potable (abiertas, cerradas y mixtas), integrando el marco normativo peruano vigente (RNE y RM 192-2018) y motores de cálculo robustos con transparencia académica.

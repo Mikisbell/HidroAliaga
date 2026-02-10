@@ -1,6 +1,6 @@
 # Guía de Instalación y Configuración
 
-## H-Redes Perú
+## HidroAliaga
 
 Sistema de Diseño, Análisis y Optimización de Redes de Distribución de Agua Potable
 
@@ -324,7 +324,7 @@ Crear archivo `.env` en `frontend/`:
 
 ```env
 VITE_API_URL=http://localhost:8000
-VITE_APP_NAME=H-Redes Perú
+VITE_APP_NAME=HidroAliaga
 ```
 
 ---
@@ -446,5 +446,5 @@ Para dudas o problemas:
 
 ---
 
-*Documentación generada para H-Redes Perú v1.0*
+*Documentación generada para HidroAliaga v1.0*
 *Fecha: 2024*
