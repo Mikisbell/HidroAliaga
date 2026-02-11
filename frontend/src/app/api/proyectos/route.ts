@@ -17,9 +17,13 @@ export async function GET() {
 
         const supabase = await createClient()
 
+        // Get current user for per-user filtering
+        const { data: { user } } = await supabase.auth.getUser()
+
         const { data, error } = await supabase
             .from('proyectos')
             .select('*')
+            .eq('usuario_id', user?.id || '')
             .order('updated_at', { ascending: false })
 
         if (error) {

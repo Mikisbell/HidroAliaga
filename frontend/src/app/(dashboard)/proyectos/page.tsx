@@ -7,9 +7,13 @@ import { createClient } from "@/lib/supabase/server"
 export default async function ProyectosPage() {
     const supabase = await createClient()
 
+    // Get authenticated user for per-user filtering
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { data: proyectos } = await supabase
         .from("proyectos")
         .select("*, nudos(count), tramos(count), calculos(count)")
+        .eq("usuario_id", user?.id || "")
         .order("updated_at", { ascending: false })
 
     return (
@@ -47,8 +51,8 @@ export default async function ProyectosPage() {
                                         <Badge
                                             variant="outline"
                                             className={`text-[10px] ${p.estado === 'borrador'
-                                                    ? 'border-muted-foreground/20 text-muted-foreground/60'
-                                                    : 'border-green-500/30 text-green-400'
+                                                ? 'border-muted-foreground/20 text-muted-foreground/60'
+                                                : 'border-green-500/30 text-green-400'
                                                 }`}
                                         >
                                             {p.estado || 'borrador'}

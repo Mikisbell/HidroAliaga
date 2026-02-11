@@ -7,19 +7,39 @@ import { createClient } from "@/lib/supabase/server"
 export default async function DashboardPage() {
   const supabase = await createClient()
 
+  // Get authenticated user
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id
+
+  // All queries filtered by the authenticated user
   const { count: totalProyectos } = await supabase
     .from("proyectos")
     .select("*", { count: "exact", head: true })
+    .eq("usuario_id", userId || "")
 
   const { data: ultimosProyectos } = await supabase
     .from("proyectos")
     .select("id, nombre, ambito, tipo_red, estado, updated_at")
+    .eq("usuario_id", userId || "")
     .order("updated_at", { ascending: false })
     .limit(5)
 
-  const { count: totalCalculos } = await supabase
-    .from("calculos")
-    .select("*", { count: "exact", head: true })
+  // Get user's project IDs to filter calculos
+  const { data: userProjects } = await supabase
+    .from("proyectos")
+    .select("id")
+    .eq("usuario_id", userId || "")
+
+  const projectIds = userProjects?.map(p => p.id) || []
+
+  let totalCalculos = 0
+  if (projectIds.length > 0) {
+    const { count } = await supabase
+      .from("calculos")
+      .select("*", { count: "exact", head: true })
+      .in("proyecto_id", projectIds)
+    totalCalculos = count || 0
+  }
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-7xl">
