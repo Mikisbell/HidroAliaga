@@ -154,7 +154,7 @@ class HydraulicSolver {
             }),
             nudos: Array.from(this.nodes.values()).map(n => ({
                 id: n.id,
-                presion_calc: n.head - n.cota_terreno
+                presion_calc: n.head - (n.cota_terreno || 0)
             })),
             iterations: iter,
             convergencia: maxError < tolerance,
