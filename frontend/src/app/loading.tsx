@@ -19,17 +19,9 @@ export default function Loading() {
             </div>
             
             {/* Progress bar */}
-            <div className="mt-8 w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-violet-500 via-pink-500 to-orange-500 animate-[loading_2s_ease-in-out_infinite]"></div>
+            <div className="mt-8 w-48 h-1 bg-slate-800 rounded-full overflow-hidden relative">
+                <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-violet-500 via-pink-500 to-orange-500 animate-shimmer"></div>
             </div>
-            
-            <style jsx>{`
-                @keyframes loading {
-                    0% { transform: translateX(-100%); }
-                    50% { transform: translateX(0%); }
-                    100% { transform: translateX(100%); }
-                }
-            `}</style>
         </div>
     )
 }

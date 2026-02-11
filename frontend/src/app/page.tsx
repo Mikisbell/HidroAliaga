@@ -12,6 +12,7 @@ import { Testimonials } from "@/components/testimonials"
 import { ProjectsShowcase } from "@/components/projects-showcase"
 import { ElegantContact } from "@/components/elegant-contact"
 import { ModernFooter } from "@/components/modern-footer"
+import { ModernNavbar } from "@/components/modern-navbar"
 import { FlaskConical, Map, Dna, ClipboardCheck, BarChart3, FileText } from "lucide-react"
 
 const features = [
@@ -90,48 +91,8 @@ export default async function HomePage() {
                 />
             ))}
 
-            {/* Navigation Bar */}
-            <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-cyan-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30 relative overflow-hidden">
-                        <span className="relative z-10">H</span>
-                        <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-lg font-bold tracking-tight text-gradient">Hidroaliaga</span>
-                        <span className="text-[10px] text-muted-foreground/50">by Jhonatan Aliaga</span>
-                    </div>
-                </div>
-                <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-                    <Link href="#perfil" className="hover:text-foreground transition-colors">Perfil</Link>
-                    <Link href="#servicios" className="hover:text-foreground transition-colors">Servicios</Link>
-                    <Link href="#capacidades" className="hover:text-foreground transition-colors">Software</Link>
-                    <Link href="#proyectos" className="hover:text-foreground transition-colors">Proyectos</Link>
-                    <Link href="#contacto" className="hover:text-foreground transition-colors">Contacto</Link>
-                </div>
-                <div className="flex items-center gap-3">
-                    {user ? (
-                        <Link href="/dashboard">
-                            <Button className="btn-primary text-white rounded-xl text-sm px-6 h-10 font-semibold shadow-md shadow-blue-500/20">
-                                Ir al Dashboard →
-                            </Button>
-                        </Link>
-                    ) : (
-                        <>
-                            <Link href="/login">
-                                <Button variant="ghost" className="text-sm text-muted-foreground hover:text-foreground">
-                                    Iniciar Sesión
-                                </Button>
-                            </Link>
-                            <Link href="/login">
-                                <Button className="btn-primary text-white rounded-xl text-sm px-5 h-9 font-semibold">
-                                    Registrarse
-                                </Button>
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </nav>
+            {/* Modern Navigation Bar */}
+            <ModernNavbar />
 
             {/* Hero Section */}
             <section className="relative z-10 px-6 md:px-12 pt-12 pb-16 max-w-7xl mx-auto">

@@ -55,14 +55,38 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         }
     }
 
-    // New Row State
     const [newRow, setNewRow] = useState<any>({
         nudo_origen_id: '',
         nudo_destino_id: '',
         longitud: '',
         diametro_comercial: '0.75',
-        material: 'pvc'
+        material: 'pvc',
+        clase_tuberia: 'CL-10'
     })
+
+    // Sort nodes for dropdown: Reservoirs first, then CRPs, then alphanumeric
+    const sortedNodes = [...nudos].sort((a, b) => {
+        // Reservoirs first
+        if (a.tipo === 'reservorio' && b.tipo !== 'reservorio') return -1
+        if (a.tipo !== 'reservorio' && b.tipo === 'reservorio') return 1
+
+        // CRPs second
+        const isC_A = a.codigo.includes('CRP') || a.tipo === 'camara_rompe_presion'
+        const isC_B = b.codigo.includes('CRP') || b.tipo === 'camara_rompe_presion'
+        if (isC_A && !isC_B) return -1
+        if (!isC_A && isC_B) return 1
+
+        // Then alphabetic code
+        return a.codigo.localeCompare(b.codigo, undefined, { numeric: true })
+    })
+
+    const PIPE_CLASSES = [
+        { value: 'CL-5', label: 'Clase 5' },
+        { value: 'CL-7.5', label: 'Clase 7.5 (CRP)' },
+        { value: 'CL-10', label: 'Clase 10 (Std)' },
+        { value: 'CL-15', label: 'Clase 15' },
+        { value: 'S-25', label: 'Sch 40' }
+    ]
 
     const handleCreateTramo = async () => {
         if (!newRow.nudo_origen_id || !newRow.nudo_destino_id) {
@@ -79,21 +103,26 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
             ...newRow,
             proyecto_id: proyectoId,
             longitud: parseFloat(newRow.longitud) || 0,
-            diametro_comercial: parseFloat(newRow.diametro_comercial) || 0.75
+            diametro_comercial: parseFloat(newRow.diametro_comercial) || 0.75,
+            clase_tuberia: newRow.clase_tuberia || 'CL-10'
         })
 
         if (res.error) {
             toast.error(res.error)
         } else {
             toast.success("Tramo creado")
+            // Auto-chain: Set Start Node of next row to End Node of this row
             setNewRow({
-                nudo_origen_id: '',
+                nudo_origen_id: newRow.nudo_destino_id, // Chain the end node to start
                 nudo_destino_id: '',
                 longitud: '',
-                diametro_comercial: '0.75',
-                material: 'pvc'
+                diametro_comercial: newRow.diametro_comercial, // Keep diameter
+                material: newRow.material, // Keep material
+                clase_tuberia: newRow.clase_tuberia // Keep class
             })
             router.refresh()
+
+            // Focus on destination select (optional, requires ref)
         }
     }
 
@@ -109,6 +138,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                         <TableHead className="text-right">Cota Fin (m)</TableHead>
                         <TableHead className="text-center w-[120px]">Longitud (m)</TableHead>
                         <TableHead className="text-center w-[100px]">Ø (pulg)</TableHead>
+                        <TableHead className="text-center w-[100px]">Clase</TableHead>
                         <TableHead className="text-center w-[100px]">Mat.</TableHead>
                         <TableHead className="text-center w-[100px]">Viviendas (Dest)</TableHead>
                         <TableHead className="text-right text-xs">Presión (m)</TableHead>
@@ -156,6 +186,9 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                                     />
                                 </TableCell>
                                 <TableCell>
+                                    <span className="text-xs text-muted-foreground">{t.clase_tuberia || 'CL-10'}</span>
+                                </TableCell>
+                                <TableCell>
                                     <Input
                                         defaultValue={t.material}
                                         className="h-8 text-center text-xs uppercase"
@@ -188,22 +221,30 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                         <TableCell colSpan={1} className="font-semibold text-primary text-xs uppercase tracking-wider pl-4">Nuevo Tramo</TableCell>
                         <TableCell>
                             <select
-                                className="h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                                className="h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs font-mono"
                                 value={newRow.nudo_origen_id}
                                 onChange={(e) => setNewRow({ ...newRow, nudo_origen_id: e.target.value })}
                             >
                                 <option value="">Origen...</option>
-                                {nudos.map(n => <option key={n.id} value={n.id}>{n.codigo}</option>)}
+                                {sortedNodes.map(n => (
+                                    <option key={n.id} value={n.id}>
+                                        {n.tipo === 'reservorio' ? '💧 ' : (n.codigo.includes('CRP') ? '⚡ ' : '')}{n.codigo}
+                                    </option>
+                                ))}
                             </select>
                         </TableCell>
                         <TableCell>
                             <select
-                                className="h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                                className="h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs font-mono"
                                 value={newRow.nudo_destino_id}
                                 onChange={(e) => setNewRow({ ...newRow, nudo_destino_id: e.target.value })}
                             >
                                 <option value="">Destino...</option>
-                                {nudos.map(n => <option key={n.id} value={n.id}>{n.codigo}</option>)}
+                                {sortedNodes.map(n => (
+                                    <option key={n.id} value={n.id}>
+                                        {n.tipo === 'reservorio' ? '💧 ' : (n.codigo.includes('CRP') ? '⚡ ' : '')}{n.codigo}
+                                    </option>
+                                ))}
                             </select>
                         </TableCell>
                         <TableCell colSpan={2} className="text-center text-xs text-muted-foreground italic">
