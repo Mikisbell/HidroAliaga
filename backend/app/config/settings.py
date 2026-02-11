@@ -17,13 +17,18 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8000
+    API_V1_STR: str = "/api/v1"
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "https://*.vercel.app"]
+    
+    # Supabase
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
     
     # Base de Datos
-    DATABASE_URL: str = "postgresql+asyncpg://hredes:hredes@localhost:5432/hredes_peru"
-    DATABASE_URL_SYNC: str = "postgresql://hredes:hredes@localhost:5432/hredes_peru"
+    DATABASE_URL: str = ""
+    DATABASE_URL_SYNC: str = ""
     
     # PostGIS
     POSTGIS_ENABLED: bool = True
@@ -66,10 +71,10 @@ class Settings(BaseSettings):
     DEFAULT_CRS: str = "EPSG:4326"
     ELEVATION_API_URL: str = "https://api.open-elevation.com/api/v1/lookup"
     
-    # LLM/Normativa
-    LLM_MODEL: str = "gpt-4"
+    # LLM/Normativa (Moonshot Kimi K2.5)
+    LLM_MODEL: str = "kimi-k2.5"
     LLM_API_KEY: str = ""
-    RAG_ENABLED: bool = True
+    LLM_PROVEEDOR: str = "moonshot"  # "moonshot" o "openai"
     
     # Exportación
     EXPORT_PATH: Path = Path("./exports")

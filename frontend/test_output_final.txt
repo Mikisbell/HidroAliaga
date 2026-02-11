@@ -1,0 +1,56 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] ÔÇ║ tests\e2e\hydraulics.spec.ts:18:9 ÔÇ║ Hydraulic Analysis Flow ÔÇ║ should create network, set properties, and calculate hydraulics
+[1A[2K[chromium] ÔÇ║ tests\e2e\hydraulics.spec.ts:18:9 ÔÇ║ Hydraulic Analysis Flow ÔÇ║ should create network, set properties, and calculate hydraulics
+BROWSER: error: TypeError: Failed to fetch
+    at http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:10012:23
+    at _handleRequest (http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:10366:24)
+    at _request (http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:10353:24)
+    at http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:13613:220
+    at SupabaseAuthClient._useSession (http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:13482:26)
+    at async SupabaseAuthClient._getUser (http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:13598:20)
+    at async http://localhost:3002/_next/static/chunks/node_modules_8f8f6191._.js:13582:20
+
+[1A[2KBROWSER: info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER: log: [HMR] connected
+
+[1A[2KBROWSER: error: Failed to load resource: the server responded with a status of 404 (Not Found)
+
+[1A[2KBROWSER: log: Initializing Project Store for: Hydraulic Test 1770839872939
+
+[1A[2KBROWSER: warning: The resource http://localhost:3002/_next/static/chunks/%5Broot-of-the-server%5D__7a4435ad._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+
+[1A[2K  1) [chromium] ÔÇ║ tests\e2e\hydraulics.spec.ts:18:9 ÔÇ║ Hydraulic Analysis Flow ÔÇ║ should create network, set properties, and calculate hydraulics 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('text=Mapa Visual')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Mapa Visual')[22m
+    [2m    8 ├ù locator resolved to <button role="tab" type="button" tabindex="-1" data-state="active" aria-selected="true" data-slot="tabs-trigger" id="radix-_r_5_-trigger-mapa" data-orientation="horizontal" data-radix-collection-item="" aria-controls="radix-_r_5_-content-mapa" class="focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring text-foreground/60 hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-mÔÇª>Mapa Visual</button>[22m
+    [2m      - unexpected value "hidden"[22m
+
+
+      32 |
+      33 |         // Wait for Map text
+    > 34 |         await expect(page.locator('text=Mapa Visual')).toBeVisible();
+         |                                                        ^
+      35 |
+      36 |         // Debug Map Loading
+      37 |         try {
+        at E:\FREECLOUD\FREECLOUD-IA\PROYECTOS\HidroAliaga\frontend\tests\e2e\hydraulics.spec.ts:34:56
+
+    Error Context: test-results\hydraulics-Hydraulic-Analy-8d611-es-and-calculate-hydraulics-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ÔÇ║ tests\e2e\hydraulics.spec.ts:18:9 ÔÇ║ Hydraulic Analysis Flow ÔÇ║ should create network, set properties, and calculate hydraulics 
+
+[36m  Serving HTML report at http://localhost:54978. Press Ctrl+C to quit.[39m

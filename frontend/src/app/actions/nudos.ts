@@ -1,0 +1,69 @@
+"use server"
+
+import { createClient } from "@/lib/supabase/server"
+import { revalidatePath } from "next/cache"
+import { Nudo } from "@/types/models"
+
+export async function updateNudoCoordinates(id: string, latitud: number, longitud: number) {
+    const supabase = await createClient()
+
+    const { error } = await supabase
+        .from("nudos")
+        .update({ latitud, longitud, updated_at: new Date().toISOString() })
+        .eq("id", id)
+
+    if (error) {
+        throw new Error(`Error updating nudo ${id}: ${error.message}`)
+    }
+
+    revalidatePath("/proyectos/[id]", "page")
+    return { success: true }
+}
+
+export async function updateNudo(id: string, data: Partial<Nudo>) {
+    const supabase = await createClient()
+
+    // Filter allowed fields
+    const updates: any = { updated_at: new Date().toISOString() }
+    if (data.cota_terreno !== undefined) updates.cota_terreno = data.cota_terreno
+    if (data.demanda_base !== undefined) updates.demanda_base = data.demanda_base
+    // Add other fields as needed
+
+    const { error } = await supabase
+        .from("nudos")
+        .update(updates)
+        .eq("id", id)
+
+    if (error) {
+        throw new Error(`Error updating nudo ${id}: ${error.message}`)
+    }
+
+    revalidatePath("/proyectos/[id]", "page")
+    return { success: true }
+}
+
+export async function createNudo(proyectoId: string, latitud: number, longitud: number) {
+    const supabase = await createClient()
+
+    // Generar código automático (N-X)
+    const { count } = await supabase.from("nudos").select("*", { count: "exact", head: true }).eq("proyecto_id", proyectoId)
+    const codigo = `N-${(count || 0) + 1}`
+
+    const { data, error } = await supabase.from("nudos").insert({
+        proyecto_id: proyectoId,
+        codigo,
+        tipo: "union", // Default
+        latitud,
+        longitud,
+        cota_terreno: 0, // Default, usuario debe editar
+        demanda_base: 0,
+        elevacion: 0
+    }).select().single()
+
+    if (error) {
+        throw new Error(`Error creating nudo: ${error.message}`)
+    }
+
+    revalidatePath("/proyectos/[id]", "page")
+    return { success: true, nudo: data }
+}

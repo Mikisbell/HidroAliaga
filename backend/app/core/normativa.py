@@ -295,10 +295,11 @@ class BaseConocimientoNormativo(BaseModel):
 class CopilotoNormativo:
     """Copiloto Normativo con integración LLM"""
     
-    def __init__(self, api_key: str = "", modelo: str = "gpt-4"):
+    def __init__(self, api_key: str = "", modelo: str = "kimi-k2.5", proveedor: str = "moonshot"):
         self.base_conocimiento = BaseConocimientoNormativo()
         self.api_key = api_key
         self.modelo = modelo
+        self.proveedor = proveedor
         self.habilitado = bool(api_key)
     
     async def responder(
@@ -335,7 +336,7 @@ class CopilotoNormativo:
             return resultado
     
     async def _consultar_llm(self, pregunta: str, contexto: Optional[str] = None) -> Dict:
-        """Consulta LLM con contexto RAG"""
+        """Consulta LLM (Kimi K2.5 de Moonshot o OpenAI)"""
         # Obtener contexto de normas relevantes
         normas_relevantes = self.base_conocimiento.buscar_normativa(pregunta)
         
@@ -366,23 +367,43 @@ INSTRUCCIONES:
 RESPUESTA:
 """
         
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": self.modelo,
-                    "messages": [
-                        {"role": "system", "content": "Eres un ingeniero sanitario experto en normativa peruana."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.3,
-                    "max_tokens": 1500
-                }
-            )
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            if self.proveedor == "moonshot":
+                # Kimi K2 de Moonshot AI
+                response = await client.post(
+                    "https://api.moonshot.cn/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": self.modelo,  # "kimi-k2-turbo-preview"
+                        "messages": [
+                            {"role": "system", "content": "Eres un ingeniero sanitario experto en normativa peruana de agua potable y saneamiento. Responde en español de manera precisa y técnica."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.3,
+                        "max_tokens": 2000
+                    }
+                )
+            else:
+                # OpenAI (GPT-4)
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": self.modelo,
+                        "messages": [
+                            {"role": "system", "content": "Eres un ingeniero sanitario experto en normativa peruana."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.3,
+                        "max_tokens": 1500
+                    }
+                )
             
             data = response.json()
             respuesta_texto = data["choices"][0]["message"]["content"]
@@ -394,7 +415,7 @@ RESPUESTA:
                     for n in normas_relevantes
                 ],
                 "normas_aplicables": [n["codigo"] for n in normas_relevantes],
-                "confidence_score": 0.85  # Score alto cuando usa LLM
+                "confidence_score": 0.85
             }
     
     def validar_parametro(

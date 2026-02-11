@@ -13,10 +13,11 @@ from app.config.settings import settings
 
 router = APIRouter()
 
-# Instancia del copiloto
+# Instancia del copiloto (usa Moonshot Kimi K2.5 por defecto)
 copiloto = CopilotoNormativo(
     api_key=settings.LLM_API_KEY,
-    modelo=settings.LLM_MODEL
+    modelo=settings.LLM_MODEL,
+    proveedor=settings.LLM_PROVEEDOR
 )
 
 
