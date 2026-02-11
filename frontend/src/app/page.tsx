@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/server"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 import { HeroNetwork } from "@/components/hero-network"
 import { FeatureCard } from "@/components/feature-card"
-import { AboutCreator } from "@/components/about-creator"
+import { ProfessionalProfile } from "@/components/professional-profile"
 import { ProfessionalServices } from "@/components/professional-services"
 import { WhyChooseUs } from "@/components/why-choose-us"
 import { Testimonials } from "@/components/testimonials"
 import { ProjectsShowcase } from "@/components/projects-showcase"
-import { ProfessionalContact } from "@/components/professional-contact"
-import { ProfessionalFooter } from "@/components/professional-footer"
+import { ElegantContact } from "@/components/elegant-contact"
+import { ModernFooter } from "@/components/modern-footer"
 
 const features = [
     {
@@ -102,8 +102,9 @@ export default async function HomePage() {
                     </div>
                 </div>
                 <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+                    <Link href="#perfil" className="hover:text-foreground transition-colors">Perfil</Link>
                     <Link href="#servicios" className="hover:text-foreground transition-colors">Servicios</Link>
-                    <Link href="#capacidades" className="hover:text-foreground transition-colors">Capacidades</Link>
+                    <Link href="#capacidades" className="hover:text-foreground transition-colors">Software</Link>
                     <Link href="#proyectos" className="hover:text-foreground transition-colors">Proyectos</Link>
                     <Link href="#contacto" className="hover:text-foreground transition-colors">Contacto</Link>
                 </div>
@@ -186,8 +187,8 @@ export default async function HomePage() {
                 </ScrollReveal>
             </section>
 
-            {/* Sobre el Creador */}
-            <AboutCreator />
+            {/* Perfil Profesional Tipo LinkedIn */}
+            <ProfessionalProfile />
 
             {/* Servicios Profesionales */}
             <div id="servicios">
@@ -309,13 +310,13 @@ export default async function HomePage() {
                 </ScrollReveal>
             </section>
 
-            {/* Contacto */}
+            {/* Contacto Elegante */}
             <div id="contacto">
-                <ProfessionalContact />
+                <ElegantContact />
             </div>
 
-            {/* Footer */}
-            <ProfessionalFooter />
+            {/* Footer Moderno */}
+            <ModernFooter />
         </div>
     )
 }
