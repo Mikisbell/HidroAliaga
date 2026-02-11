@@ -19,9 +19,9 @@ export default async function DashboardPage() {
 
   const { data: ultimosProyectos } = await supabase
     .from("proyectos")
-    .select("id, nombre, ambito, tipo_red, estado, updated_at")
+    .select("id, nombre, ambito, tipo_red, estado, created_at")
     .eq("usuario_id", userId || "")
-    .order("updated_at", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(5)
 
   // Get user's project IDs to filter calculos
@@ -221,7 +221,7 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   <span className="text-[10px] text-muted-foreground/40 font-mono">
-                    {new Date(proyecto.updated_at).toLocaleDateString("es-PE")}
+                    {new Date(proyecto.created_at).toLocaleDateString("es-PE")}
                   </span>
                 </Link>
               ))}

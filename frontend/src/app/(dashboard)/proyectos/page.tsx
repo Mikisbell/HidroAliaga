@@ -14,7 +14,7 @@ export default async function ProyectosPage() {
         .from("proyectos")
         .select("*, nudos(count), tramos(count), calculos(count)")
         .eq("usuario_id", user?.id || "")
-        .order("updated_at", { ascending: false })
+        .order("created_at", { ascending: false })
 
     return (
         <div className="p-6 md:p-8 space-y-6 max-w-7xl">

@@ -20,7 +20,7 @@ type Project = {
     id: string
     nombre: string
     ubicacion: string | null
-    updated_at: string
+    created_at: string
     estado: string
     usuario_id: string
 }
@@ -94,7 +94,7 @@ export default function ProjectsPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-xs text-muted-foreground">
-                                        {formatDistanceToNow(new Date(project.updated_at), { addSuffix: true, locale: es })}
+                                        {formatDistanceToNow(new Date(project.created_at), { addSuffix: true, locale: es })}
                                     </TableCell>
                                     <TableCell className="text-right pr-6 space-x-1">
                                         <Link href={`/proyectos/${project.id}`}>
