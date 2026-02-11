@@ -52,7 +52,7 @@ export default async function DashboardPage() {
             Panel de Control
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
-            H-Redes <span className="text-gradient">Perú</span>
+            <span className="text-gradient">Hidroaliaga</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Diseño, análisis y optimización de redes de agua potable

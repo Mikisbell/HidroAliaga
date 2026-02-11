@@ -105,8 +105,8 @@ export default function LoginPage() {
                             <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20" />
                         </div>
                         <div>
-                            <p className="text-white/90 font-semibold text-lg tracking-tight">HidroAliaga</p>
-                            <p className="text-white/30 text-[10px] font-medium tracking-[0.2em] uppercase">H-Redes Perú</p>
+                            <p className="text-white/90 font-semibold text-lg tracking-tight">Hidroaliaga</p>
+                            <p className="text-white/30 text-[10px] font-medium tracking-[0.15em] uppercase">by Jhonata Aliaga</p>
                         </div>
                     </div>
 
@@ -158,7 +158,7 @@ export default function LoginPage() {
                                 </span>
                             ))}
                         </div>
-                        <p className="text-white/20 text-[10px]">© 2026 HidroAliaga</p>
+                        <p className="text-white/20 text-[10px]">© 2026 Hidroaliaga — by Jhonata Aliaga</p>
                     </div>
                 </div>
             </div>
@@ -183,8 +183,8 @@ export default function LoginPage() {
                             H
                         </div>
                         <div>
-                            <p className="text-white/90 font-semibold">HidroAliaga</p>
-                            <p className="text-white/30 text-[10px] tracking-widest uppercase">H-Redes Perú</p>
+                            <p className="text-white/90 font-semibold">Hidroaliaga</p>
+                            <p className="text-white/30 text-[10px] tracking-widest uppercase">by Jhonata Aliaga</p>
                         </div>
                     </div>
 
