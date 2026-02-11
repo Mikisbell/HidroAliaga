@@ -66,9 +66,8 @@ export async function createTramo(proyectoId: string, origenId: string, destinoI
         longitud, // Auto-calculated
         codigo,
         diametro_interior: 25.4, // Default 1 inch
-        rugosidad: 150, // PVC default
-        material: 'PVC',
-        estado: 'activo'
+        coef_hazen_williams: 150, // PVC default
+        material: 'pvc'
     }).select().single()
 
     if (error) {
@@ -85,7 +84,10 @@ export async function updateTramo(id: string, data: Partial<any>) {
     const updates: any = { updated_at: new Date().toISOString() }
     if (data.diametro_interior !== undefined) updates.diametro_interior = data.diametro_interior
     if (data.material !== undefined) updates.material = data.material
-    if (data.rugosidad !== undefined) updates.rugosidad = data.rugosidad
+    if (data.coeficiente_rugosidad !== undefined) updates.coeficiente_rugosidad = data.coeficiente_rugosidad
+    if (data.coef_hazen_williams !== undefined) updates.coef_hazen_williams = data.coef_hazen_williams
+    if (data.clase_tuberia !== undefined) updates.clase_tuberia = data.clase_tuberia
+    if (data.longitud !== undefined) updates.longitud = data.longitud
 
     const { error } = await supabase
         .from("tramos")

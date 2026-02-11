@@ -27,7 +27,12 @@ export async function updateNudo(id: string, data: Partial<Nudo>) {
     const updates: any = { updated_at: new Date().toISOString() }
     if (data.cota_terreno !== undefined) updates.cota_terreno = data.cota_terreno
     if (data.demanda_base !== undefined) updates.demanda_base = data.demanda_base
-    // Add other fields as needed
+    if (data.elevacion !== undefined) updates.elevacion = data.elevacion
+    if (data.cota_lamina !== undefined) updates.cota_lamina = data.cota_lamina
+    if (data.tipo !== undefined) updates.tipo = data.tipo
+    if (data.nombre !== undefined) updates.nombre = data.nombre
+    if (data.notas !== undefined) updates.notas = data.notas
+    if (data.es_critico !== undefined) updates.es_critico = data.es_critico
 
     const { error } = await supabase
         .from("nudos")

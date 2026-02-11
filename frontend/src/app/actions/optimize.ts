@@ -77,7 +77,7 @@ export async function applyOptimization(proyectoId: string, optimizedDiameters: 
         updates.push(
             supabase.from("tramos").update({
                 diametro_interior: data.diametro_mm,
-                diametro_nominal: data.diametro_pulg // Assuming we have this column or we store it appropriately
+                diametro_comercial: data.diametro_pulg
             }).eq("id", tramoId)
         )
     }

@@ -2,17 +2,18 @@ import { OpenAI } from "openai"
 import { createClient } from "@/lib/supabase/server"
 import { NORMAS, getLimitesNormativos } from "@/lib/constants"
 
-export const runtime = 'edge' // Optional: Use edge for faster cold starts if using appropriate provider
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '',
+// Initialize Moonshot (Kimi) client — OpenAI-compatible API
+const client = new OpenAI({
+    apiKey: process.env.MOONSHOT_API_KEY || '',
+    baseURL: 'https://api.moonshot.cn/v1',
 })
+
+const LLM_MODEL = process.env.LLM_MODEL || 'kimi-k2-turbo-preview'
 
 export async function POST(req: Request) {
     // Check API Key
-    if (!process.env.OPENAI_API_KEY) {
-        return new Response(JSON.stringify({ error: "OPENAI_API_KEY no configurada. Por favor añádela a .env.local" }), { status: 500 })
+    if (!process.env.MOONSHOT_API_KEY) {
+        return new Response(JSON.stringify({ error: "MOONSHOT_API_KEY no configurada. Por favor añádela a .env.local" }), { status: 500 })
     }
 
     try {
@@ -69,8 +70,8 @@ export async function POST(req: Request) {
             }
         }
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o", // Or gpt-3.5-turbo if 4o unavailable
+        const response = await client.chat.completions.create({
+            model: LLM_MODEL,
             stream: true,
             messages: [
                 { role: "system", content: systemContext },
