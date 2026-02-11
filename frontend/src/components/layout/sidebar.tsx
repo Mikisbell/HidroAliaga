@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -27,10 +28,20 @@ import {
     Settings,
     Moon,
     Sun,
-    Laptop
+    Laptop,
+    ChevronDown,
+    Droplets,
+    ArrowRight
 } from "lucide-react"
 
 import { useProfile } from "@/hooks/use-profile"
+
+interface SidebarProject {
+    id: string
+    nombre: string
+    estado: string | null
+    updated_at: string
+}
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -43,12 +54,37 @@ function NavContent() {
     const router = useRouter()
     const { profile, loading, isAdmin } = useProfile()
     const { setTheme, theme } = useTheme()
+    const [projects, setProjects] = useState<SidebarProject[]>([])
+    const [projectsOpen, setProjectsOpen] = useState(true)
+    const [projectsLoading, setProjectsLoading] = useState(true)
+
+    const fetchProjects = useCallback(async () => {
+        try {
+            const res = await fetch("/api/proyectos")
+            if (res.ok) {
+                const data = await res.json()
+                setProjects(data.slice(0, 6)) // Show max 6 recent projects
+            }
+        } catch {
+            // Silently fail — sidebar projects are non-critical
+        } finally {
+            setProjectsLoading(false)
+        }
+    }, [])
+
+    // Fetch projects on mount and when pathname changes (e.g., after creating a new project)
+    useEffect(() => {
+        fetchProjects()
+    }, [fetchProjects, pathname])
 
     const handleSignOut = async () => {
         await fetch("/api/auth/signout", { method: "POST" })
         router.push("/login")
         router.refresh()
     }
+
+    // Extract current project ID from URL if on a project page
+    const activeProjectId = pathname.match(/\/proyectos\/([a-f0-9-]+)/)?.[1]
 
     return (
         <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
@@ -88,10 +124,10 @@ function NavContent() {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 py-2 space-y-1">
+            <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
                 <p className="px-4 text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider mb-2 mt-4">Navegación</p>
                 {navItems.map((item) => {
-                    const isActive = pathname.startsWith(item.href)
+                    const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
                     const Icon = item.icon
                     return (
                         <Link
@@ -109,6 +145,74 @@ function NavContent() {
                         </Link>
                     )
                 })}
+
+                {/* === Mis Proyectos (Dynamic) === */}
+                <div className="my-3 px-3">
+                    <Separator className="opacity-30" />
+                </div>
+                <button
+                    onClick={() => setProjectsOpen(!projectsOpen)}
+                    className="flex items-center justify-between w-full px-4 py-1 group"
+                >
+                    <p className="text-[10px] font-medium text-blue-500/70 uppercase tracking-wider">Mis Proyectos</p>
+                    <ChevronDown className={cn(
+                        "w-3 h-3 text-muted-foreground/40 transition-transform duration-200",
+                        projectsOpen ? "rotate-0" : "-rotate-90"
+                    )} />
+                </button>
+
+                {projectsOpen && (
+                    <div className="mt-1 space-y-0.5">
+                        {projectsLoading ? (
+                            // Skeleton loader
+                            Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="flex items-center gap-2.5 px-3 py-2 animate-pulse">
+                                    <div className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-700" />
+                                    <div className="h-3 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+                                </div>
+                            ))
+                        ) : projects.length === 0 ? (
+                            <p className="px-4 py-2 text-[11px] text-muted-foreground/40 italic">
+                                Sin proyectos aún
+                            </p>
+                        ) : (
+                            <>
+                                {projects.map((project) => {
+                                    const isActive = activeProjectId === project.id
+                                    return (
+                                        <Link
+                                            key={project.id}
+                                            href={`/proyectos/${project.id}`}
+                                            className={cn(
+                                                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-150",
+                                                isActive
+                                                    ? "bg-blue-50 text-blue-700 font-medium dark:bg-blue-900/20 dark:text-blue-300"
+                                                    : "text-muted-foreground hover:bg-slate-50 hover:text-slate-800 dark:hover:bg-slate-800/40 dark:hover:text-slate-200"
+                                            )}
+                                        >
+                                            <Droplets className={cn(
+                                                "w-3.5 h-3.5 flex-shrink-0",
+                                                isActive ? "text-blue-500" : "text-muted-foreground/40"
+                                            )} />
+                                            <span className="truncate flex-1">{project.nombre}</span>
+                                            <span className={cn(
+                                                "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                                                project.estado === 'calculado' ? "bg-green-400" : "bg-slate-300 dark:bg-slate-600"
+                                            )} />
+                                        </Link>
+                                    )
+                                })}
+                                <Link
+                                    href="/proyectos"
+                                    className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-muted-foreground/50 hover:text-blue-500 transition-colors"
+                                >
+                                    <ArrowRight className="w-3 h-3" />
+                                    Ver todos
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                )}
 
                 {/* Admin Link */}
                 {isAdmin && (
