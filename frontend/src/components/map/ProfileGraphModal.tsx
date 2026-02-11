@@ -74,7 +74,7 @@ export function ProfileGraphModal({ isOpen, onOpenChange, data, targetNodeCode }
                             />
                             <Tooltip
                                 contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                                formatter={(value: number, name: string) => [
+                                formatter={(value: any, name: any) => [
                                     (typeof value === 'number' ? value.toFixed(2) : value) + ' m',
                                     name === 'landSurface' ? 'Terreno' : name === 'hydraulicHead' ? 'Línea Piezométrica' : name
                                 ]}
