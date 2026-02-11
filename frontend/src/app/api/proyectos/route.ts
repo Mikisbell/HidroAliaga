@@ -10,6 +10,11 @@ import { proyectoCreateSchema } from '@/lib/schemas'
 
 export async function GET() {
     try {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.error('[GET /api/proyectos] Missing Supabase env vars')
+            return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
+        }
+
         const supabase = await createClient()
 
         const { data, error } = await supabase
@@ -22,10 +27,13 @@ export async function GET() {
             return NextResponse.json({ error: error?.message || 'Unknown error', details: error }, { status: 500 })
         }
 
-        return NextResponse.json(data)
-    } catch (err) {
+        return NextResponse.json(data || [])
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err)
+        const stack = err instanceof Error ? err.stack : undefined
+        console.error('[GET /api/proyectos] Unexpected error:', message, stack)
         return NextResponse.json(
-            { error: 'Internal Server Error' },
+            { error: 'Internal Server Error', message },
             { status: 500 }
         )
     }
