@@ -29,7 +29,7 @@ export async function GET() {
             .from('proyectos')
             .select('*')
             .eq('usuario_id', user.id)
-            .order('created_at', { ascending: false })
+            .order('updated_at', { ascending: false })
 
         if (error) {
             console.error('[GET /api/proyectos] Supabase error:', error)

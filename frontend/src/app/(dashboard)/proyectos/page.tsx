@@ -16,7 +16,7 @@ export default async function ProyectosPage() {
             .from("proyectos")
             .select("*, nudos(count), tramos(count), calculos(count)")
             .eq("usuario_id", user.id)
-            .order("created_at", { ascending: false })
+            .order("updated_at", { ascending: false })
         proyectos = data || []
     }
 

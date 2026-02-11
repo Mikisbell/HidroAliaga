@@ -136,11 +136,11 @@ export async function getAllProjects() {
             id, 
             nombre, 
             ubicacion:distrito, 
-            created_at, 
+            updated_at, 
             estado,
             usuario_id
         `)
-        .order('created_at', { ascending: false })
+        .order('updated_at', { ascending: false })
 
     if (error) throw error
 
