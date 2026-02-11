@@ -119,3 +119,88 @@ export function getLimitesNormativos(ambito: 'urbano' | 'rural') {
         diametro_minimo: DIAMETRO_MINIMO_RURAL,
     }
 }
+
+// ============ BRANDING Y EMPRESA ============
+
+export const BRAND = {
+    name: "Hidroaliaga",
+    tagline: "by Jhonata Aliaga",
+    fullName: "Hidroaliaga by Jhonata Aliaga",
+    shortName: "Hidroaliaga",
+    
+    // Contacto
+    email: "jhonata@hidroaliaga.com",
+    phone: "+51 999 888 777",
+    location: "Lima, Perú",
+    
+    // Redes sociales
+    social: {
+        linkedin: "#",
+        twitter: "#",
+        instagram: "#",
+        youtube: "#",
+    },
+    
+    // Meta información
+    founded: "2018",
+    version: "v0.1.0",
+    get copyright() {
+        return `© ${new Date().getFullYear()} Hidroaliaga by Jhonata Aliaga`
+    },
+    
+    // Descripciones
+    description: "Software profesional de ingeniería hidráulica desarrollado para cumplir con las normativas peruanas RNE OS.050, RM 192-2018 y RM 107-2025.",
+    shortDescription: "Diseña redes de agua potable con precisión normativa",
+    
+    // Estadísticas del negocio
+    stats: {
+        yearsExperience: 12,
+        projectsCompleted: 80,
+        happyClients: 300,
+        departments: 15,
+        dailyLiters: "30M+",
+    },
+    
+    // Autor
+    author: {
+        name: "Jhonata Aliaga",
+        role: "Ingeniero Civil",
+        specialization: "Especialista en Sistemas Hidráulicos",
+        initials: "JA",
+    },
+    
+    // Normativas
+    regulations: [
+        "RNE OS.050",
+        "RM 192-2018", 
+        "RM 107-2025",
+        "Reglamento Nacional de Edificaciones"
+    ],
+} as const
+
+export const COMPANY = {
+    name: BRAND.name,
+    legalName: BRAND.fullName,
+    email: BRAND.email,
+    phone: BRAND.phone,
+    address: BRAND.location,
+    founded: BRAND.founded,
+} as const
+
+export const META = {
+    get title() {
+        return `${BRAND.name} — ${BRAND.shortDescription}`
+    },
+    description: BRAND.description,
+    keywords: [
+        "ingeniería hidráulica",
+        "diseño redes agua potable",
+        "Hardy Cross",
+        "RNE OS.050",
+        "software ingeniería",
+        "Perú",
+        "Jhonata Aliaga"
+    ],
+    author: BRAND.author.name,
+    robots: "index, follow",
+} as const

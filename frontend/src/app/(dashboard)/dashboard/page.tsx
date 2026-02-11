@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/server"
+import { cn } from "@/lib/utils"
+import { BRAND } from "@/lib/constants"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -52,10 +54,10 @@ export default async function DashboardPage() {
             Panel de Control
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
-            <span className="text-gradient">Hidroaliaga</span>
+            <span className="text-gradient">{BRAND.name}</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Diseño, análisis y optimización de redes de agua potable
+            {BRAND.shortDescription}
           </p>
         </div>
         <Link href="/proyectos/nuevo">
@@ -270,8 +272,4 @@ export default async function DashboardPage() {
       </div>
     </div>
   )
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ")
 }

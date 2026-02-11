@@ -29,12 +29,14 @@ import {
     Moon,
     Sun,
     Laptop,
-    ChevronDown,
     Droplets,
-    ArrowRight
+    ArrowRight,
+    ChevronDown
 } from "lucide-react"
 
 import { useProfile } from "@/hooks/use-profile"
+import { handleApiError } from "@/lib/error-handler"
+import { BRAND } from "@/lib/constants"
 
 interface SidebarProject {
     id: string
@@ -64,9 +66,12 @@ function NavContent() {
             if (res.ok) {
                 const data = await res.json()
                 setProjects(data.slice(0, 6)) // Show max 6 recent projects
+            } else {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`)
             }
-        } catch {
-            // Silently fail — sidebar projects are non-critical
+        } catch (error) {
+            // Show non-intrusive error — sidebar projects are non-critical
+            handleApiError(error, "cargar proyectos")
         } finally {
             setProjectsLoading(false)
         }
@@ -78,9 +83,18 @@ function NavContent() {
     }, [fetchProjects, pathname])
 
     const handleSignOut = async () => {
-        await fetch("/api/auth/signout", { method: "POST" })
-        router.push("/login")
-        router.refresh()
+        if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+            try {
+                const res = await fetch("/api/auth/signout", { method: "POST" })
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+                }
+                router.push("/login")
+                router.refresh()
+            } catch (error) {
+                handleApiError(error, "cerrar sesión")
+            }
+        }
     }
 
     // Extract current project ID from URL if on a project page
