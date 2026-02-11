@@ -10,11 +10,15 @@ export default async function ProyectosPage() {
     // Get authenticated user for per-user filtering
     const { data: { user } } = await supabase.auth.getUser()
 
-    const { data: proyectos } = await supabase
-        .from("proyectos")
-        .select("*, nudos(count), tramos(count), calculos(count)")
-        .eq("usuario_id", user?.id || "")
-        .order("created_at", { ascending: false })
+    let proyectos: any[] = []
+    if (user) {
+        const { data } = await supabase
+            .from("proyectos")
+            .select("*, nudos(count), tramos(count), calculos(count)")
+            .eq("usuario_id", user.id)
+            .order("created_at", { ascending: false })
+        proyectos = data || []
+    }
 
     return (
         <div className="p-6 md:p-8 space-y-6 max-w-7xl">

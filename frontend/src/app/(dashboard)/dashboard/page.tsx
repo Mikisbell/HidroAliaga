@@ -11,34 +11,36 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   const userId = user?.id
 
-  // All queries filtered by the authenticated user
-  const { count: totalProyectos } = await supabase
-    .from("proyectos")
-    .select("*", { count: "exact", head: true })
-    .eq("usuario_id", userId || "")
-
-  const { data: ultimosProyectos } = await supabase
-    .from("proyectos")
-    .select("id, nombre, ambito, tipo_red, estado, created_at")
-    .eq("usuario_id", userId || "")
-    .order("created_at", { ascending: false })
-    .limit(5)
-
-  // Get user's project IDs to filter calculos
-  const { data: userProjects } = await supabase
-    .from("proyectos")
-    .select("id")
-    .eq("usuario_id", userId || "")
-
-  const projectIds = userProjects?.map(p => p.id) || []
-
+  // Default values for unauthenticated state
+  let totalProyectos = 0
+  let ultimosProyectos: any[] = []
   let totalCalculos = 0
-  if (projectIds.length > 0) {
-    const { count } = await supabase
-      .from("calculos")
+
+  if (userId) {
+    // All queries filtered by the authenticated user
+    const { count: pc } = await supabase
+      .from("proyectos")
       .select("*", { count: "exact", head: true })
-      .in("proyecto_id", projectIds)
-    totalCalculos = count || 0
+      .eq("usuario_id", userId)
+    totalProyectos = pc || 0
+
+    const { data: up } = await supabase
+      .from("proyectos")
+      .select("id, nombre, ambito, tipo_red, estado, created_at")
+      .eq("usuario_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5)
+    ultimosProyectos = up || []
+
+    // Get user's project IDs to filter calculos
+    const projectIds = ultimosProyectos.map((p: any) => p.id)
+    if (projectIds.length > 0) {
+      const { count } = await supabase
+        .from("calculos")
+        .select("*", { count: "exact", head: true })
+        .in("proyecto_id", projectIds)
+      totalCalculos = count || 0
+    }
   }
 
   return (

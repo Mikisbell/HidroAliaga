@@ -20,10 +20,15 @@ export async function GET() {
         // Get current user for per-user filtering
         const { data: { user } } = await supabase.auth.getUser()
 
+        // If no authenticated user, return empty list
+        if (!user) {
+            return NextResponse.json([])
+        }
+
         const { data, error } = await supabase
             .from('proyectos')
             .select('*')
-            .eq('usuario_id', user?.id || '')
+            .eq('usuario_id', user.id)
             .order('created_at', { ascending: false })
 
         if (error) {
