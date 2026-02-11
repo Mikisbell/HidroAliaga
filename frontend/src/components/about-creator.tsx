@@ -28,7 +28,7 @@ export function AboutCreator() {
                                         <div className="absolute -inset-2 rounded-full border-2 border-blue-400/30 animate-pulse" />
                                     </div>
                                     
-                                    <h3 className="text-2xl md:text-3xl font-bold mb-2">Jhonata Aliaga</h3>
+                                    <h3 className="text-2xl md:text-3xl font-bold mb-2">Jhonatan Aliaga</h3>
                                     <p className="text-primary font-medium mb-4">Ingeniero Civil & Desarrollador de Software</p>
                                     
                                     <div className="flex gap-3 mb-6">
@@ -71,7 +71,7 @@ export function AboutCreator() {
                             
                             <div className="space-y-4 text-muted-foreground leading-relaxed">
                                 <p>
-                                    Soy <strong className="text-foreground">Jhonata Aliaga</strong>, ingeniero civil con especialización en 
+                                    Soy <strong className="text-foreground">Jhonatan Aliaga</strong>, ingeniero civil con especialización en 
                                     sistemas de agua potable y saneamiento. A lo largo de mi carrera, he identificado las 
                                     necesidades reales de los profesionales peruanos en el diseño de redes hidráulicas.
                                 </p>

@@ -91,7 +91,7 @@ export function ProfessionalProfile() {
                                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                         <div>
                                             <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
-                                                Jhonata Aliaga
+                                                Jhonatan Aliaga
                                             </h1>
                                             <p className="text-lg text-purple-300 mb-2">Ingeniero Civil | Especialista en Sistemas Hidráulicos</p>
                                             <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">

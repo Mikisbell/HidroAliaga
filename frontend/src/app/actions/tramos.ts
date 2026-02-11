@@ -1,105 +1,91 @@
-"use server"
+'use server'
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
 
-// Calculate distance between two points in meters
-function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
-    const R = 6371e3 // Earth radius in meters
-    const φ1 = lat1 * Math.PI / 180
-    const φ2 = lat2 * Math.PI / 180
-    const Δφ = (lat2 - lat1) * Math.PI / 180
-    const Δλ = (lon2 - lon1) * Math.PI / 180
+const updateTramoSchema = z.object({
+    id: z.string().uuid(),
+    longitud: z.number().positive().optional(),
+    diametro_comercial: z.number().positive().optional(),
+    material: z.string().optional(),
+    diametro_interior: z.number().positive().optional(),
+})
 
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-        Math.cos(φ1) * Math.cos(φ2) *
-        Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+const updateNudoSchema = z.object({
+    id: z.string().uuid(),
+    numero_viviendas: z.number().int().min(0).optional(),
+})
 
-    return R * c
-}
-
-export async function createTramo(proyectoId: string, origenId: string, destinoId: string) {
+export async function updateTramoAction(data: any) {
     const supabase = await createClient()
 
-    // 1. Validation: Self-loop
-    if (origenId === destinoId) {
-        throw new Error("No se puede conectar un nudo consigo mismo")
+    // Validate
+    const parsed = updateTramoSchema.safeParse(data)
+    if (!parsed.success) {
+        return { error: "Datos inválidos: " + parsed.error.issues.map(i => i.message).join(", ") }
     }
 
-    // 2. Validation: Existing pipe
-    const { data: existing } = await supabase
-        .from("tramos")
-        .select("id")
-        .or(`and(nudo_origen_id.eq.${origenId},nudo_destino_id.eq.${destinoId}),and(nudo_origen_id.eq.${destinoId},nudo_destino_id.eq.${origenId})`)
-        .single()
-
-    if (existing) {
-        throw new Error("Ya existe un tramo entre estos nudos")
-    }
-
-    // 3. Get node coordinates
-    const { data: nudos } = await supabase
-        .from("nudos")
-        .select("id, latitud, longitud")
-        .in("id", [origenId, destinoId])
-
-    if (!nudos || nudos.length < 2) {
-        throw new Error("No se encontraron los nudos seleccionados")
-    }
-
-    const n1 = nudos.find(n => n.id === origenId)!
-    const n2 = nudos.find(n => n.id === destinoId)!
-
-    // 4. Calculate length
-    const longitud = haversine(n1.latitud, n1.longitud, n2.latitud, n2.longitud)
-
-    // 5. Generate Code
-    const { count } = await supabase.from("tramos").select("*", { count: "exact", head: true }).eq("proyecto_id", proyectoId)
-    const codigo = `T-${(count || 0) + 1}`
-
-    // 6. Insert
-    const { data, error } = await supabase.from("tramos").insert({
-        proyecto_id: proyectoId,
-        nudo_origen_id: origenId,
-        nudo_destino_id: destinoId,
-        longitud, // Auto-calculated
-        codigo,
-        diametro_interior: 25.4, // Default 1 inch
-        coef_hazen_williams: 150, // PVC default
-        material: 'pvc'
-    }).select().single()
-
-    if (error) {
-        throw new Error(`Error creando tramo: ${error.message}`)
-    }
-
-    revalidatePath(`/proyectos/${proyectoId}`)
-    return { success: true, tramo: data }
-}
-
-export async function updateTramo(id: string, data: Partial<any>) {
-    const supabase = await createClient()
-
-    const updates: any = { updated_at: new Date().toISOString() }
-    if (data.diametro_interior !== undefined) updates.diametro_interior = data.diametro_interior
-    if (data.material !== undefined) updates.material = data.material
-    if (data.coeficiente_rugosidad !== undefined) updates.coeficiente_rugosidad = data.coeficiente_rugosidad
-    if (data.coef_hazen_williams !== undefined) updates.coef_hazen_williams = data.coef_hazen_williams
-    if (data.clase_tuberia !== undefined) updates.clase_tuberia = data.clase_tuberia
-    if (data.longitud !== undefined) updates.longitud = data.longitud
+    const { id, ...updates } = parsed.data
 
     const { error } = await supabase
-        .from("tramos")
+        .from('tramos')
         .update(updates)
-        .eq("id", id)
+        .eq('id', id)
 
-    if (error) {
-        throw new Error(`Error updating tramo ${id}: ${error.message}`)
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
+    return { success: true }
+}
+
+// Create a new Tramo
+export async function createTramoAction(data: any) {
+    const supabase = await createClient()
+
+    // Basic validation
+    if (!data.nudo_origen_id || !data.nudo_destino_id || !data.proyecto_id) {
+        return { error: "Faltan datos requeridos (Nudos o Proyecto)" }
     }
 
-    revalidatePath("/proyectos/[id]", "page") // We don't have project ID here easily without fetch, but generic revalidate might work or we pass it
-    // Actually, revalidatePath matches based on route, not query params for [id] unless specific?
-    // "page" type revalidates the layout.
+    // Generate code if not provided
+    let codigo = data.codigo
+    if (!codigo) {
+        const { count } = await supabase.from('tramos').select('*', { count: 'exact', head: true }).eq('proyecto_id', data.proyecto_id)
+        codigo = `T-${(count || 0) + 1}`
+    }
+
+    const { error } = await supabase
+        .from('tramos')
+        .insert({
+            ...data,
+            codigo,
+            coef_hazen_williams: 150 // Default
+        })
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
+    return { success: true }
+}
+
+// Alias for backwards compatibility - export both names
+export { createTramoAction }
+export { createTramoAction as createTramo }
+
+export async function updateNudoViviendasAction(nudoId: string, viviendas: number) {
+    const supabase = await createClient()
+
+    // Simple validation
+    if (!nudoId || viviendas < 0) return { error: "Datos inválidos" }
+
+    const { error } = await supabase
+        .from('nudos')
+        .update({ numero_viviendas: viviendas })
+        .eq('id', nudoId)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }

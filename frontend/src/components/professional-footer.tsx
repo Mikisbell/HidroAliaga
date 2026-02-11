@@ -25,7 +25,7 @@ const footerLinks = {
         { label: "Soporte", href: "#" },
     ],
     empresa: [
-        { label: "Sobre Jhonata", href: "#" },
+        { label: "Sobre Jhonatan", href: "#" },
         { label: "Proyectos", href: "#" },
         { label: "Blog", href: "#" },
         { label: "Prensa", href: "#" },
@@ -63,7 +63,7 @@ export function ProfessionalFooter() {
                                 </div>
                             </div>
                             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-                                Software profesional de ingeniería hidráulica desarrollado por Jhonata Aliaga. 
+                                Software profesional de ingeniería hidráulica desarrollado por Jhonatan Aliaga. 
                                 Diseñado para ingenieros civiles y sanitarios del Perú.
                             </p>
                             
@@ -144,7 +144,7 @@ export function ProfessionalFooter() {
             <div className="border-t border-border/20 px-6 md:px-12 py-6">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-muted-foreground text-center md:text-left">
-                        © 2026 Hidroaliaga by Jhonata Aliaga. Todos los derechos reservados. 
+                        © 2026 Hidroaliaga by Jhonatan Aliaga. Todos los derechos reservados. 
                         Reglamento Nacional de Edificaciones · OS.050 · RM 192-2018 · RM 107-2025
                     </p>
                     

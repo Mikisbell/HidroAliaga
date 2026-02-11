@@ -124,12 +124,12 @@ export function getLimitesNormativos(ambito: 'urbano' | 'rural') {
 
 export const BRAND = {
     name: "Hidroaliaga",
-    tagline: "by Jhonata Aliaga",
-    fullName: "Hidroaliaga by Jhonata Aliaga",
+    tagline: "by Jhonatan Aliaga",
+    fullName: "Hidroaliaga by Jhonatan Aliaga",
     shortName: "Hidroaliaga",
     
     // Contacto
-    email: "jhonata@hidroaliaga.com",
+    email: "jhonatan@hidroaliaga.com",
     phone: "+51 999 888 777",
     location: "Lima, Perú",
     
@@ -145,7 +145,7 @@ export const BRAND = {
     founded: "2018",
     version: "v0.1.0",
     get copyright() {
-        return `© ${new Date().getFullYear()} Hidroaliaga by Jhonata Aliaga`
+        return `© ${new Date().getFullYear()} Hidroaliaga by Jhonatan Aliaga`
     },
     
     // Descripciones
@@ -163,7 +163,7 @@ export const BRAND = {
     
     // Autor
     author: {
-        name: "Jhonata Aliaga",
+        name: "Jhonatan Aliaga",
         role: "Ingeniero Civil",
         specialization: "Especialista en Sistemas Hidráulicos",
         initials: "JA",
@@ -199,7 +199,7 @@ export const META = {
         "RNE OS.050",
         "software ingeniería",
         "Perú",
-        "Jhonata Aliaga"
+        "Jhonatan Aliaga"
     ],
     author: BRAND.author.name,
     robots: "index, follow",

@@ -12,45 +12,46 @@ import { Testimonials } from "@/components/testimonials"
 import { ProjectsShowcase } from "@/components/projects-showcase"
 import { ElegantContact } from "@/components/elegant-contact"
 import { ModernFooter } from "@/components/modern-footer"
+import { FlaskConical, Map, Dna, ClipboardCheck, BarChart3, FileText } from "lucide-react"
 
 const features = [
     {
-        icon: "🔬",
+        icon: FlaskConical,
         title: "Motor Hidráulico Híbrido",
         description: "Redes cerradas con Hardy Cross, abiertas por balance de masa, y mixtas con algoritmo híbrido. Ecuación de Hazen-Williams con exponente N=1.852.",
         badges: ["Mallas", "Ramales", "Mixtas"],
         color: "blue" as const,
     },
     {
-        icon: "🗺️",
+        icon: Map,
         title: "GIS + Cotas Automáticas",
         description: "Trazado interactivo con Leaflet, obtención de cotas por DEM, y mapa de calor de presiones y velocidades en la red.",
         badges: ["Leaflet", "DEM", "PostGIS"],
         color: "green" as const,
     },
     {
-        icon: "🧬",
+        icon: Dna,
         title: "Optimización + Copiloto IA",
         description: "Algoritmo Genético para diámetros óptimos y copiloto normativo con LLM para consultas técnicas en tiempo real.",
         badges: ["AG", "LLM/RAG", "Copiloto"],
         color: "purple" as const,
     },
     {
-        icon: "📋",
+        icon: ClipboardCheck,
         title: "Validación Normativa",
         description: "Verificación automática contra RNE OS.050, RM 192-2018 y RM 107-2025. Alertas por presión, velocidad, diámetro y cobertura.",
         badges: ["OS.050", "RM 192", "RM 107"],
         color: "amber" as const,
     },
     {
-        icon: "📊",
+        icon: BarChart3,
         title: "Transparencia Académica",
         description: "Tabla de iteraciones Hardy Cross con evolución de ΔQ, error acumulado y convergencia. Ideal para validación y enseñanza.",
         badges: ["Iteraciones", "ΔQ", "Convergencia"],
         color: "cyan" as const,
     },
     {
-        icon: "📄",
+        icon: FileText,
         title: "Reportes y Exportación",
         description: "Expediente técnico digital en PDF, exportación Excel compatible con plantillas, formato INP para EPANET, GeoJSON/DXF.",
         badges: ["PDF", "Excel", "EPANET"],
@@ -98,7 +99,7 @@ export default async function HomePage() {
                     </div>
                     <div className="flex flex-col">
                         <span className="text-lg font-bold tracking-tight text-gradient">Hidroaliaga</span>
-                        <span className="text-[10px] text-muted-foreground/50">by Jhonata Aliaga</span>
+                        <span className="text-[10px] text-muted-foreground/50">by Jhonatan Aliaga</span>
                     </div>
                 </div>
                 <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">

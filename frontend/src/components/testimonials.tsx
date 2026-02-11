@@ -26,7 +26,7 @@ const testimonials = [
         role: "Director de Obras",
         company: "Ingeniería San Marcos E.I.R.L.",
         avatar: "LR",
-        content: "La capacitación que recibimos de Jhonata fue excelente. No solo implementamos el software, sino que mejoramos todo nuestro proceso de diseño hidráulico. Totalmente recomendado.",
+        content: "La capacitación que recibimos de Jhonatan fue excelente. No solo implementamos el software, sino que mejoramos todo nuestro proceso de diseño hidráulico. Totalmente recomendado.",
         rating: 5,
     },
     {
@@ -34,7 +34,7 @@ const testimonials = [
         role: "Jefa de Proyectos",
         company: "Agua Potable Rural - Cajamarca",
         avatar: "DQ",
-        content: "El soporte personalizado marca la diferencia. Cualquier duda que tengo, Jhonata responde rápidamente. Se nota que conoce a fondo tanto la ingeniería como el desarrollo.",
+        content: "El soporte personalizado marca la diferencia. Cualquier duda que tengo, Jhonatan responde rápidamente. Se nota que conoce a fondo tanto la ingeniería como el desarrollo.",
         rating: 5,
     },
 ]

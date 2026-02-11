@@ -1,9 +1,10 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { LucideIcon } from "lucide-react"
 
 interface FeatureCardProps {
-    icon: string
+    icon: LucideIcon
     title: string
     description: string
     badges: string[]
@@ -55,7 +56,7 @@ const colorMap = {
     },
 }
 
-export function FeatureCard({ icon, title, description, badges, color }: FeatureCardProps) {
+export function FeatureCard({ icon: Icon, title, description, badges, color }: FeatureCardProps) {
     const colors = colorMap[color]
     
     return (
@@ -64,8 +65,8 @@ export function FeatureCard({ icon, title, description, badges, color }: Feature
             <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} opacity-0 group-hover:opacity-100 transition-all duration-500`} />
             
             {/* Icono animado */}
-            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${colors.bg} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                {icon}
+            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${colors.bg} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                <Icon className="w-8 h-8" />
                 {/* Brillo */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>

@@ -18,37 +18,32 @@ const footerLinks = {
     producto: {
         title: "Producto",
         links: [
-            { label: "Características", href: "#capacidades" },
-            { label: "Precios", href: "#" },
-            { label: "Roadmap", href: "#" },
-            { label: "Changelog", href: "#" },
+            { label: "Características", href: "/#capacidades" },
+            { label: "Software", href: "/#perfil" },
+            { label: "Demo", href: "/login" },
         ]
     },
     recursos: {
         title: "Recursos",
         links: [
-            { label: "Documentación", href: "#" },
-            { label: "Tutoriales", href: "#" },
-            { label: "Blog", href: "#" },
-            { label: "API", href: "#" },
+            { label: "Documentación", href: "/normativa" },
+            { label: "Normativa", href: "/normativa" },
+            { label: "Tutoriales", href: "https://youtube.com", target: "_blank" },
         ]
     },
     empresa: {
         title: "Empresa",
         links: [
-            { label: "Sobre Jhonata", href: "#" },
-            { label: "Proyectos", href: "#" },
-            { label: "Carreras", href: "#" },
-            { label: "Prensa", href: "#" },
+            { label: "Sobre Jhonatan", href: "/#perfil" },
+            { label: "Proyectos", href: "/#proyectos" },
+            { label: "Contacto", href: "/#contacto" },
         ]
     },
     legal: {
         title: "Legal",
         links: [
-            { label: "Privacidad", href: "#" },
-            { label: "Términos", href: "#" },
-            { label: "Cookies", href: "#" },
-            { label: "Licencias", href: "#" },
+            { label: "Privacidad", href: "/privacy" },
+            { label: "Términos", href: "/terms" },
         ]
     },
 }
@@ -105,7 +100,7 @@ export function ModernFooter() {
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-pink-500/30 transition-colors">
                                     <Mail className="w-8 h-8 text-pink-400 mb-3" />
                                     <p className="text-xs text-slate-500 mb-1">Email</p>
-                                    <p className="font-semibold text-slate-200 text-sm">jhonata@hidroaliaga.com</p>
+                                    <p className="font-semibold text-slate-200 text-sm">jhonatan@hidroaliaga.com</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-colors">
                                     <MapPin className="w-8 h-8 text-violet-400 mb-3" />
@@ -119,7 +114,7 @@ export function ModernFooter() {
                                         ))}
                                     </div>
                                     <p className="text-xs text-slate-500 mb-1">Redes Sociales</p>
-                                    <p className="font-semibold text-slate-200">@jhonataaliaga</p>
+                                    <p className="font-semibold text-slate-200">@jhonatanaliaga</p>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +136,7 @@ export function ModernFooter() {
                                     <span className="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
                                         Hidroaliaga
                                     </span>
-                                    <p className="text-xs text-slate-500">by Jhonata Aliaga</p>
+                                    <p className="text-xs text-slate-500">by Jhonatan Aliaga</p>
                                 </div>
                             </div>
                             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
@@ -169,15 +164,27 @@ export function ModernFooter() {
                             <div key={key}>
                                 <h4 className="font-semibold text-slate-200 mb-4">{section.title}</h4>
                                 <ul className="space-y-3">
-                                    {section.links.map((link) => (
+                                    {section.links.map((link: any) => (
                                         <li key={link.label}>
-                                            <Link 
-                                                href={link.href} 
-                                                className="text-sm text-slate-500 hover:text-orange-400 transition-colors inline-flex items-center gap-1 group"
-                                            >
-                                                {link.label}
-                                                <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
-                                            </Link>
+                                            {link.href.startsWith('http') ? (
+                                                <a 
+                                                    href={link.href}
+                                                    target={link.target || "_blank"}
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm text-slate-500 hover:text-orange-400 transition-colors inline-flex items-center gap-1 group"
+                                                >
+                                                    {link.label}
+                                                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
+                                                </a>
+                                            ) : (
+                                                <Link 
+                                                    href={link.href} 
+                                                    className="text-sm text-slate-500 hover:text-orange-400 transition-colors inline-flex items-center gap-1 group"
+                                                >
+                                                    {link.label}
+                                                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
+                                                </Link>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -191,7 +198,7 @@ export function ModernFooter() {
             <div className="px-6 md:px-12 py-6 bg-slate-950 border-t border-slate-800/50">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-slate-600 text-center md:text-left">
-                        © 2026 Hidroaliaga by Jhonata Aliaga. Todos los derechos reservados.
+                        © 2026 Hidroaliaga by Jhonatan Aliaga. Todos los derechos reservados.
                         <span className="hidden md:inline mx-2">|</span>
                         <br className="md:hidden" />
                         RNE OS.050 · RM 192-2018 · RM 107-2025
