@@ -19,8 +19,7 @@ export async function GET() {
 
         if (error) {
             console.error('[GET /api/proyectos] Supabase error:', error)
-            return NextResponse.json({ error: error.message, details: error }, { status: 500 })
-            return NextResponse.json({ error: error.message }, { status: 500 })
+            return NextResponse.json({ error: error?.message || 'Unknown error', details: error }, { status: 500 })
         }
 
         return NextResponse.json(data)
@@ -67,7 +66,7 @@ export async function POST(request: NextRequest) {
 
         if (error) {
             console.error('[POST /api/proyectos] Supabase error:', JSON.stringify(error, null, 2))
-            return NextResponse.json({ error: error.message, details: error }, { status: 500 })
+            return NextResponse.json({ error: error?.message || 'Unknown error', details: error }, { status: 500 })
         }
 
         return NextResponse.json(data, { status: 201 })
