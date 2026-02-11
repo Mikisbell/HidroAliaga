@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 export const tipoRedSchema = z.enum(['abierta', 'cerrada', 'mixta'])
 export const ambitoSchema = z.enum(['urbano', 'rural'])
-export const tipoNudoSchema = z.enum(['cisterna', 'tanque_elevado', 'union', 'consumo', 'valvula', 'bomba', 'reservorio'])
+export const tipoNudoSchema = z.enum(['cisterna', 'tanque_elevado', 'union', 'consumo', 'valvula', 'bomba', 'reservorio', 'camara_rompe_presion'])
 export const tipoTramoSchema = z.enum(['tuberia', 'valvula', 'bomba', 'accesorio'])
 export const materialSchema = z.enum(['pvc', 'hdpe', 'hdde', 'concreto', 'acero', 'cobre'])
 
