@@ -20,7 +20,7 @@ interface WorkspaceSplitViewProps {
     onNodeDragStop?: (id: string, x: number, y: number) => void
     onConnect?: (sourceId: string, targetId: string) => void
     onNodeClick?: (nudo: Nudo) => void
-    onAddNode?: (x: number, y: number) => void
+    onAddNode?: (x: number, y: number, tipo?: string) => void
 }
 
 export function WorkspaceSplitView({

@@ -69,11 +69,12 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
         }
     }
 
-    // Adding a new node on canvas click
-    const handleAddNode = async (x: number, y: number) => {
+    // Adding a new node on canvas click OR drag & drop
+    const handleAddNode = async (x: number, y: number, tipo?: string) => {
         if (!proyectoId) return
         try {
-            const typeToCreate = activeComponentType || 'union'
+            // Priority: explicit tipo from drag&drop > activeComponentType from palette click > fallback 'union'
+            const typeToCreate = (tipo || activeComponentType || 'union') as Nudo['tipo']
             // Store canvas position as lat/lng (scaled)
             await createNudo(proyectoId, y / 1000, x / 1000, typeToCreate)
             setActiveTool('select')

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Nudo } from "@/types/models"
 import { useHydraulicSimulation } from "@/lib/hydraulics/engine/useHydraulicSimulation"
+import { DragEvent } from "react"
 
 export function MapBottomPalette() {
     const activeTool = useProjectStore(state => state.activeTool)
@@ -25,6 +26,15 @@ export function MapBottomPalette() {
 
     const isLoading = isCalculating
 
+    // Drag Start Handler - sets the component type being dragged
+    const onDragStart = (event: DragEvent, nodeType: Nudo['tipo']) => {
+        event.dataTransfer.setData('application/reactflow-nodetype', nodeType)
+        event.dataTransfer.effectAllowed = 'move'
+        // Also activate tool mode as fallback
+        setActiveTool('node')
+        setActiveComponentType(nodeType)
+    }
+
     // Palette Items
     const paletteItems = [
         {
@@ -32,21 +42,24 @@ export function MapBottomPalette() {
             label: 'Reservorio',
             icon: Droplets,
             shortcut: 'R',
-            color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+            color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+            dragColor: 'border-blue-400'
         },
         {
             type: 'camara_rompe_presion' as Nudo['tipo'],
             label: 'C. Rompe Presión',
             icon: Zap,
             shortcut: 'C',
-            color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'
+            color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+            dragColor: 'border-yellow-400'
         },
         {
             type: 'union' as Nudo['tipo'],
             label: 'Nudo / Unión',
             icon: CircleDashed,
             shortcut: 'N',
-            color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+            color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+            dragColor: 'border-gray-400'
         }
     ]
 
@@ -74,19 +87,21 @@ export function MapBottomPalette() {
                 </TooltipProvider>
             </div>
 
-            {/* Components Palette */}
+            {/* Components Palette - DRAGGABLE */}
             <div className="flex items-center gap-2">
                 <TooltipProvider delayDuration={0}>
                     {paletteItems.map((item) => (
                         <Tooltip key={item.type}>
                             <TooltipTrigger asChild>
-                                <button
+                                <div
+                                    draggable
+                                    onDragStart={(e) => onDragStart(e, item.type)}
                                     onClick={() => {
                                         setActiveTool('node')
                                         setActiveComponentType(item.type)
                                     }}
                                     className={cn(
-                                        "flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl transition-all duration-200 gap-1 border border-transparent",
+                                        "flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl transition-all duration-200 gap-1 border border-transparent cursor-grab active:cursor-grabbing select-none",
                                         activeTool === 'node' && activeComponentType === item.type
                                             ? `bg-primary/10 border-primary/20 shadow-inner scale-95`
                                             : "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105"
@@ -98,10 +113,10 @@ export function MapBottomPalette() {
                                     <span className="text-[10px] font-medium text-muted-foreground whitespace-nowrap hidden sm:block">
                                         {item.label}
                                     </span>
-                                </button>
+                                </div>
                             </TooltipTrigger>
                             <TooltipContent side="top">
-                                <span className="font-bold">{item.label}</span> <span className="text-muted-foreground opacity-70">({item.shortcut})</span>
+                                <span className="font-bold">{item.label}</span> — <span className="text-muted-foreground opacity-70">Arrastra o haz clic ({item.shortcut})</span>
                             </TooltipContent>
                         </Tooltip>
                     ))}

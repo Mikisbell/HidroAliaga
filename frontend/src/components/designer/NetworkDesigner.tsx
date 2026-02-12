@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef, DragEvent } from 'react'
 import {
     ReactFlow,
     Controls,
@@ -21,10 +21,10 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import ReservoirNode from './nodes/ReservoirNode' // Default import
+import ReservoirNode from './nodes/ReservoirNode'
 import CRPNode from './nodes/CRPNode'
 import JunctionNode from './nodes/JunctionNode'
-import { PipeEdge } from './edges/PipeEdge' // This one is named export
+import { PipeEdge } from './edges/PipeEdge'
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 
@@ -33,7 +33,7 @@ const nodeTypes: NodeTypes = {
     reservorio: ReservoirNode,
     camara_rompe_presion: CRPNode,
     union: JunctionNode,
-    cisterna: ReservoirNode, // Reuse same visual for now
+    cisterna: ReservoirNode,
     consumo: JunctionNode,
     tanque_elevado: ReservoirNode,
     valvula: JunctionNode,
@@ -55,7 +55,6 @@ function nudosToNodes(nudos: Nudo[]): Node[] {
     return nudos.map((nudo, index) => ({
         id: nudo.id,
         type: nudoToNodeType(nudo.tipo),
-        // Use latitud/longitud as X/Y canvas position (or default grid layout)
         position: {
             x: nudo.longitud ? nudo.longitud * 1000 : (index % 5) * 200 + 100,
             y: nudo.latitud ? nudo.latitud * 1000 : Math.floor(index / 5) * 200 + 100,
@@ -67,7 +66,7 @@ function nudosToNodes(nudos: Nudo[]): Node[] {
             demanda_base: nudo.demanda_base,
             numero_viviendas: nudo.numero_viviendas,
             altura_agua: nudo.altura_agua,
-            tipo: nudo.tipo, // Pass type for CRP logic
+            tipo: nudo.tipo,
         },
     }))
 }
@@ -94,7 +93,7 @@ interface NetworkDesignerProps {
     onNodeDragStop?: (id: string, x: number, y: number) => void
     onConnect?: (sourceId: string, targetId: string) => void
     onNodeClick?: (nudo: Nudo) => void
-    onAddNode?: (x: number, y: number) => void
+    onAddNode?: (x: number, y: number, tipo?: string) => void
 }
 
 export default function NetworkDesigner({
@@ -106,6 +105,9 @@ export default function NetworkDesigner({
     onAddNode,
 }: NetworkDesignerProps) {
     const activeTool = useProjectStore(state => state.activeTool)
+    const activeComponentType = useProjectStore(state => state.activeComponentType)
+    const setActiveTool = useProjectStore(state => state.setActiveTool)
+    const setActiveComponentType = useProjectStore(state => state.setActiveComponentType)
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const reactFlowRef = useRef<ReactFlowInstance | null>(null)
 
@@ -120,9 +122,7 @@ export default function NetworkDesigner({
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
             if (connection.source && connection.target) {
-                // Call server action to create the tramo
                 onConnectProp?.(connection.source, connection.target)
-                // Optimistically add edge
                 setEdges((eds) =>
                     addEdge({ ...connection, type: 'pipe', data: {} }, eds)
                 )
@@ -159,7 +159,48 @@ export default function NetworkDesigner({
         [setSelectedElement]
     )
 
-    // Handle pane click → deselect or add node
+    // ========== DRAG & DROP HANDLERS ==========
+
+    // Allow drop on the canvas
+    const handleDragOver = useCallback((event: DragEvent) => {
+        event.preventDefault()
+        event.dataTransfer.dropEffect = 'move'
+    }, [])
+
+    // Handle drop: create a new node at the drop position
+    const handleDrop = useCallback(
+        (event: DragEvent) => {
+            event.preventDefault()
+
+            const nodeType = event.dataTransfer.getData('application/reactflow-nodetype')
+
+            // If no valid type was dragged, ignore
+            if (!nodeType || !reactFlowRef.current) return
+
+            // Convert screen coordinates to flow position
+            const position = reactFlowRef.current.screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY,
+            })
+
+            // Set the active component type for the server action
+            setActiveComponentType(nodeType as Nudo['tipo'])
+            setActiveTool('node')
+
+            // Call the onAddNode handler with position and type
+            onAddNode?.(position.x, position.y, nodeType)
+
+            // Reset tool after placing
+            setTimeout(() => {
+                setActiveTool('select')
+                setActiveComponentType(null)
+            }, 100)
+        },
+        [onAddNode, setActiveTool, setActiveComponentType]
+    )
+
+    // ========== PANE CLICK (fallback for click-to-place) ==========
+
     const handlePaneClick = useCallback(
         (event: React.MouseEvent) => {
             if (activeTool === 'node' && onAddNode && reactFlowRef.current) {
@@ -167,12 +208,15 @@ export default function NetworkDesigner({
                     x: event.clientX,
                     y: event.clientY,
                 })
-                onAddNode(position.x, position.y)
+                onAddNode(position.x, position.y, activeComponentType || undefined)
+                // Reset tool after placing
+                setActiveTool('select')
+                setActiveComponentType(null)
             } else {
                 setSelectedElement(null)
             }
         },
-        [activeTool, onAddNode, setSelectedElement]
+        [activeTool, activeComponentType, onAddNode, setSelectedElement, setActiveTool, setActiveComponentType]
     )
 
     return (
@@ -187,6 +231,8 @@ export default function NetworkDesigner({
                 onNodeClick={handleNodeClick}
                 onEdgeClick={handleEdgeClick}
                 onPaneClick={handlePaneClick}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
                 onInit={(instance) => { reactFlowRef.current = instance }}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
