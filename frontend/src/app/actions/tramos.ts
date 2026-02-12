@@ -71,6 +71,7 @@ export async function createTramoAction(data: any) {
 
 // Alias for backwards compatibility
 export { createTramoAction as createTramo }
+export { updateTramoAction as updateTramo }
 
 export async function updateNudoViviendasAction(nudoId: string, viviendas: number) {
     const supabase = await createClient()
