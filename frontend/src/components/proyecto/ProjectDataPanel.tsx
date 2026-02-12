@@ -31,9 +31,8 @@ export function ProjectDataPanel({
     const nudos = storeNudos.length > 0 ? storeNudos : initialNudos
     const tramos = storeTramos.length > 0 ? storeTramos : initialTramos
 
-    if (selectedElement) {
-        return <PropertiesPanel />
-    }
+    // selectedElement is handled inline by HydraulicTablePanel (row highlight)
+    // No more full-screen PropertiesPanel hijack
 
     return (
         <Tabs defaultValue="mapa" className="animate-fade-in-up-delay-3 h-full flex flex-col">

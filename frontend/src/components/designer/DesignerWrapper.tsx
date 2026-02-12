@@ -28,7 +28,7 @@ interface DesignerWrapperProps {
     proyectoId: string
 }
 
-export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerWrapperProps) {
+export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTramos, proyectoId }: DesignerWrapperProps) {
     const activeComponentType = useProjectStore(state => state.activeComponentType)
     const setActiveTool = useProjectStore(state => state.setActiveTool)
     const setActiveComponentType = useProjectStore(state => state.setActiveComponentType)
@@ -38,6 +38,12 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
     const addTramo = useProjectStore(state => state.addTramo)
     const removeTramo = useProjectStore(state => state.removeTramo)
     const storeNudos = useProjectStore(state => state.nudos)
+    const storeTramos = useProjectStore(state => state.tramos)
+
+    // Game-loop pattern: Store is the SINGLE source of truth
+    // Server props only used as fallback before hydration
+    const nudos = storeNudos.length > 0 ? storeNudos : serverNudos
+    const tramos = storeTramos.length > 0 ? storeTramos : serverTramos
 
     // ========== OPTIMISTIC: Node position save (debounced, no blocking) ==========
     const handleNodeDragStop = async (id: string, x: number, y: number) => {
@@ -140,7 +146,7 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     tramos={tramos}
                     onNodeDragStop={handleNodeDragStop}
                     onConnect={handleConnect}
-                    onNodeClick={() => setActiveTool('select')}
+                    onNodeClick={() => { }} // Selection handled by NetworkDesigner via store
                     onAddNode={handleAddNode}
                 />
                 {/* Property Inspector integrated in Side Panel */}
