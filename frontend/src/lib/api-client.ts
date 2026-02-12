@@ -5,7 +5,7 @@
  * incluyendo automáticamente el token JWT de Supabase en el header Authorization.
  */
 
-import { createClient } from "./client"
+import { createClient } from "./supabase/client"
 
 // URL base del backend
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
@@ -39,14 +39,14 @@ export async function apiRequest<T>(
 ): Promise<T> {
     // Obtener token de autenticación
     const token = await getAuthToken()
-    
+
     if (!token) {
         throw new Error("No autenticado. Por favor inicia sesión.")
     }
-    
+
     // Construir URL con query params
     let url = `${BACKEND_URL}/api/v1${endpoint}`
-    
+
     if (options.params) {
         const searchParams = new URLSearchParams()
         Object.entries(options.params).forEach(([key, value]) => {
@@ -59,25 +59,25 @@ export async function apiRequest<T>(
             url += `?${queryString}`
         }
     }
-    
+
     // Configurar headers
     const headers: HeadersInit = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
         ...options.headers,
     }
-    
+
     // Realizar petición
     const response = await fetch(url, {
         ...options,
         headers,
     })
-    
+
     // Manejar errores
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         const errorMessage = errorData.detail || `Error ${response.status}: ${response.statusText}`
-        
+
         if (response.status === 401) {
             throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.")
         } else if (response.status === 403) {
@@ -85,15 +85,15 @@ export async function apiRequest<T>(
         } else if (response.status === 404) {
             throw new Error("Recurso no encontrado.")
         }
-        
+
         throw new Error(errorMessage)
     }
-    
+
     // Parsear respuesta
     if (response.status === 204) {
         return {} as T
     }
-    
+
     return response.json()
 }
 
@@ -106,25 +106,25 @@ export const api = {
      */
     get: <T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>) =>
         apiRequest<T>(endpoint, { method: "GET", params }),
-    
+
     /**
      * POST request
      */
     post: <T>(endpoint: string, body: unknown) =>
-        apiRequest<T>(endpoint, { 
-            method: "POST", 
-            body: JSON.stringify(body) 
+        apiRequest<T>(endpoint, {
+            method: "POST",
+            body: JSON.stringify(body)
         }),
-    
+
     /**
      * PUT request
      */
     put: <T>(endpoint: string, body: unknown) =>
-        apiRequest<T>(endpoint, { 
-            method: "PUT", 
-            body: JSON.stringify(body) 
+        apiRequest<T>(endpoint, {
+            method: "PUT",
+            body: JSON.stringify(body)
         }),
-    
+
     /**
      * DELETE request
      */
