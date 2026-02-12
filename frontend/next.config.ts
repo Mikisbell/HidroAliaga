@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Silence Turbopack vs Webpack error in Next.js 16
+  turbopack: {},
   webpack: (config, { isServer }) => {
     // Fix for epanet-js / emscripten requiring node modules
     if (!isServer) {

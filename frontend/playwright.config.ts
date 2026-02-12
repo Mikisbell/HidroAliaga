@@ -44,7 +44,7 @@ export default defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'npm run dev',
+        command: 'npx next dev -p 3002 --webpack',
         url: 'http://localhost:3002',
         reuseExistingServer: !process.env.CI,
     },
