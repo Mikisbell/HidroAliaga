@@ -7,7 +7,6 @@ import { createTramo } from "@/app/actions/tramos"
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
 import { ValidationPanel } from "./ValidationPanel"
-import PropertyInspector from "./inspector/PropertyInspector"
 import { toast } from "sonner"
 
 // Dynamic import of the Workspace (Client Only because of React Flow)

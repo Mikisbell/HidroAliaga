@@ -100,7 +100,7 @@ export function WorkspaceSplitView({
                     style={{ height: `${100 - splitPercentage}%` }}
                     className="bg-background min-h-0 flex flex-col"
                 >
-                    <HydraulicTablePanel nudos={nudos} tramos={tramos} />
+                    <HydraulicTablePanel />
                 </div>
             )}
         </div>
