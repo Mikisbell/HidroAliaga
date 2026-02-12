@@ -7,6 +7,7 @@ import { createTramo } from "@/app/actions/tramos"
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
 import { ValidationPanel } from "./ValidationPanel"
+import PropertyInspector from "./inspector/PropertyInspector"
 import { toast } from "sonner"
 
 // Dynamic import of the Workspace (Client Only because of React Flow)
@@ -143,6 +144,8 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     onNodeClick={() => setActiveTool('select')}
                     onAddNode={handleAddNode}
                 />
+                {/* Property Inspector (Floating Request) */}
+                <PropertyInspector />
                 {/* The Referee - Validation Panel INSIDE Provider for Zoom capabilities */}
                 <ValidationPanel />
             </ReactFlowProvider>

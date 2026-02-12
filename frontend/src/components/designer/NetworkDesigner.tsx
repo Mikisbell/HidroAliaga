@@ -245,6 +245,10 @@ export default function NetworkDesigner({
                 connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
                 defaultEdgeOptions={{ type: 'pipe' }}
                 proOptions={{ hideAttribution: true }}
+                panOnDrag={activeTool === 'select'}
+                panOnScroll={true}
+                zoomOnScroll={true}
+                preventScrolling={true}
             >
                 <Background
                     variant={BackgroundVariant.Dots}

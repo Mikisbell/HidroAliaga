@@ -16,7 +16,7 @@ export async function updateNudoCoordinates(id: string, latitud: number, longitu
         throw new Error(`Error updating nudo ${id}: ${error.message}`)
     }
 
-    revalidatePath("/proyectos/[id]", "page")
+    // No revalidatePath — position is managed optimistically by the Zustand store
     return { success: true }
 }
 
@@ -73,6 +73,7 @@ export async function createNudo(proyectoId: string, latitud: number, longitud: 
         throw new Error(`Error creating nudo: ${error.message}`)
     }
 
-    revalidatePath("/proyectos/[id]", "page")
+    // No revalidatePath — node is managed optimistically by the Zustand store.
+    // The store uses replaceNudo(tempId, realNudo) to swap the temp ID with the DB record.
     return { success: true, nudo: data }
 }

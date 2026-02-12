@@ -50,6 +50,7 @@ interface ProjectState {
     updateNudo: (nudo: Nudo) => void;
     addTramo: (tramo: Tramo) => void;
     removeTramo: (id: string) => void;
+    updateTramo: (tramo: Tramo) => void;
     updateProjectSettings: (settings: import('@/types/models').ProjectSettings) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
@@ -117,6 +118,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     })),
     addTramo: (tramo) => set((state) => ({ tramos: [...state.tramos, tramo] })),
     removeTramo: (id) => set((state) => ({ tramos: state.tramos.filter(t => t.id !== id) })),
+    updateTramo: (tramo) => set((state) => ({
+        tramos: state.tramos.map((t) => (t.id === tramo.id ? { ...t, ...tramo } : t))
+    })),
     updateProjectSettings: (settings) => set((state) => ({
         currentProject: state.currentProject ? { ...state.currentProject, settings } : null
     })),

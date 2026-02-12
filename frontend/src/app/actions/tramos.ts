@@ -40,33 +40,35 @@ export async function updateTramoAction(data: any) {
 }
 
 // Create a new Tramo
-export async function createTramoAction(data: any) {
+export async function createTramoAction(input: any) {
     const supabase = await createClient()
 
     // Basic validation
-    if (!data.nudo_origen_id || !data.nudo_destino_id || !data.proyecto_id) {
+    if (!input.nudo_origen_id || !input.nudo_destino_id || !input.proyecto_id) {
         return { error: "Faltan datos requeridos (Nudos o Proyecto)" }
     }
 
     // Generate code if not provided
-    let codigo = data.codigo
+    let codigo = input.codigo
     if (!codigo) {
-        const { count } = await supabase.from('tramos').select('*', { count: 'exact', head: true }).eq('proyecto_id', data.proyecto_id)
+        const { count } = await supabase.from('tramos').select('*', { count: 'exact', head: true }).eq('proyecto_id', input.proyecto_id)
         codigo = `T-${(count || 0) + 1}`
     }
 
-    const { error } = await supabase
+    const { data: created, error } = await supabase
         .from('tramos')
         .insert({
-            ...data,
+            ...input,
             codigo,
             coef_hazen_williams: 150 // Default
         })
+        .select()
+        .single()
 
     if (error) return { error: error.message }
 
-    revalidatePath('/proyectos/[id]/tramos')
-    return { success: true }
+    // No revalidatePath — tramo is managed optimistically by the Zustand store
+    return { success: true, tramo: created }
 }
 
 // Alias for backwards compatibility
@@ -144,7 +146,7 @@ export async function createBatchTramos(data: any[], proyectoId: string) {
 
     if (error) return { error: error.message }
 
-    revalidatePath('/proyectos/[id]/tramos')
+    // No revalidatePath — tramos managed optimistically by the Zustand store
     return { success: true, count: rows.length }
 }
 
