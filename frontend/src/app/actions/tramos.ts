@@ -89,3 +89,77 @@ export async function updateNudoViviendasAction(nudoId: string, viviendas: numbe
     revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }
+// ... existing exports
+
+const createTramoSchema = z.object({
+    nudo_origen_id: z.string().uuid(),
+    nudo_destino_id: z.string().uuid(),
+    proyecto_id: z.string().uuid(),
+    longitud: z.number().nonnegative().default(0),
+    diametro_comercial: z.number().positive().default(0.75),
+    material: z.string().default("pvc"),
+    clase_tuberia: z.string().default("CL-10"),
+    codigo: z.string().optional(),
+})
+
+const createBatchTramosSchema = z.array(createTramoSchema)
+
+export async function createBatchTramos(data: any[], proyectoId: string) {
+    const supabase = await createClient()
+
+    // Validate input
+    // Ensure all items have the project ID
+    const dataWithProject = data.map(d => ({ ...d, proyecto_id: proyectoId }))
+    const parsed = createBatchTramosSchema.safeParse(dataWithProject)
+
+    if (!parsed.success) {
+        return { error: "Datos inválidos: " + parsed.error.issues.map(i => i.message).join(", ") }
+    }
+
+    const tramosToInsert = parsed.data
+
+    // Get current count for code generation
+    const { count, error: countError } = await supabase
+        .from('tramos')
+        .select('*', { count: 'exact', head: true })
+        .eq('proyecto_id', proyectoId)
+
+    if (countError) return { error: "Error al obtener conteo de tramos" }
+
+    let currentCount = count || 0
+
+    // Assign codes and default values
+    const rows = tramosToInsert.map((t) => {
+        currentCount++
+        return {
+            ...t,
+            codigo: t.codigo || `T-${currentCount}`,
+            coef_hazen_williams: 150
+        }
+    })
+
+    const { error } = await supabase
+        .from('tramos')
+        .insert(rows)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
+    return { success: true, count: rows.length }
+}
+
+export async function deleteBatchTramos(ids: string[]) {
+    const supabase = await createClient()
+
+    if (!ids || ids.length === 0) return { error: "No se seleccionaron tramos" }
+
+    const { error } = await supabase
+        .from('tramos')
+        .delete()
+        .in('id', ids)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
+    return { success: true }
+}

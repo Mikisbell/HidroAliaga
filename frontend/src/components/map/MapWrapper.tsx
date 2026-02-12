@@ -4,7 +4,9 @@ import dynamic from "next/dynamic"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudoCoordinates, createNudo } from "@/app/actions/nudos"
 import { createTramo } from "@/app/actions/tramos"
-import { MapToolbar } from "./MapToolbar"
+import { MapBottomPalette } from "./MapBottomPalette"
+import { MapSideTools } from "./MapSideTools"
+import { useProjectStore } from "@/store/project-store"
 
 const MapEditor = dynamic(() => import("./MapEditor"), {
     ssr: false,
@@ -31,6 +33,8 @@ interface MapWrapperProps {
 }
 
 export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConfig }: MapWrapperProps) {
+    const activeComponentType = useProjectStore(state => state.activeComponentType)
+
     const handleDragEnd = async (id: string, lat: number, lng: number) => {
         try {
             console.log(`Updating node ${id} to ${lat}, ${lng}`)
@@ -45,8 +49,9 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
     const handleMapClick = async (lat: number, lng: number) => {
         if (!proyectoId) return
         try {
-            console.log(`Creating node at ${lat}, ${lng}`)
-            await createNudo(proyectoId, lat, lng)
+            const typeToCreate = activeComponentType || 'union'
+            console.log(`Creating node (${typeToCreate}) at ${lat}, ${lng}`)
+            await createNudo(proyectoId, lat, lng, typeToCreate)
             console.log("Node created successfully")
         } catch (error) {
             console.error("Failed to create node:", error)
@@ -78,7 +83,10 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
 
     return (
         <div className="relative w-full h-full">
-            <MapToolbar />
+            {/* New Layout: Bottom Palette + Side Tools */}
+            <MapBottomPalette />
+            <MapSideTools />
+
             <MapEditor
                 nudos={nudos}
                 tramos={tramos}

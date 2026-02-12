@@ -47,7 +47,7 @@ export async function updateNudo(id: string, data: Partial<Nudo>) {
     return { success: true }
 }
 
-export async function createNudo(proyectoId: string, latitud: number, longitud: number) {
+export async function createNudo(proyectoId: string, latitud: number, longitud: number, tipo: Nudo['tipo'] = 'union') {
     const supabase = await createClient()
 
     // Generar código automático (N-X)
@@ -57,7 +57,7 @@ export async function createNudo(proyectoId: string, latitud: number, longitud: 
     const { data, error } = await supabase.from("nudos").insert({
         proyecto_id: proyectoId,
         codigo,
-        tipo: "union", // Default
+        tipo, // Use passed type or default to union
         latitud,
         longitud,
         cota_terreno: 0, // Default, usuario debe editar

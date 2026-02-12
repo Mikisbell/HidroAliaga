@@ -61,6 +61,52 @@ const cornerIcon = L.divIcon({
 
 L.Marker.prototype.options.icon = defaultIcon
 
+// Custom Icons Definition using pure CSS/HTML markers for performance and flexibility
+const createCustomIcon = (type: string, code: string, isSelected: boolean) => {
+    let iconHtml = ''
+    let containerClass = ''
+    let labelClass = "absolute left-6 top-0 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-xs font-bold border border-gray-200 shadow-sm whitespace-nowrap dark:bg-black/90 dark:border-gray-800 pointer-events-none"
+
+    switch (type) {
+        case 'reservorio':
+            // Square Blue with R
+            containerClass = 'bg-blue-600 rounded-sm' // Square
+            iconHtml = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-[10px]">R</div>`
+            break
+        case 'camara_rompe_presion':
+            // Small Yellow Square
+            containerClass = 'bg-yellow-500 rounded-sm'
+            iconHtml = `<div class="w-full h-full flex items-center justify-center text-white font-bold text-[8px]">CRP</div>`
+            break
+        default: // union/consumo
+            // Small Circle or Dot
+            containerClass = 'bg-white border-2 border-black dark:border-white rounded-full'
+            iconHtml = ``
+            // Label is bigger for nodes
+            labelClass = "absolute left-4 -top-2 text-sm font-bold text-black drop-shadow-md bg-white/60 px-1 rounded dark:text-white dark:bg-black/60 pointer-events-none"
+            break
+    }
+
+    const sizeClass = type === 'reservorio' || type === 'camara_rompe_presion' ? 'w-6 h-6' : 'w-3 h-3'
+    const ringClass = isSelected ? 'ring-4 ring-primary/40' : ''
+
+    return L.divIcon({
+        className: 'bg-transparent border-none',
+        html: `
+            <div class="relative group">
+                <div class="${sizeClass} ${containerClass} flex items-center justify-center shadow-md transform transition-transform hover:scale-110 ${ringClass}">
+                    ${iconHtml}
+                </div>
+                <div class="${labelClass}">
+                    ${code}
+                </div>
+            </div>
+        `,
+        iconSize: [24, 24], // Base size, content flows out
+        iconAnchor: [12, 12], // Centered
+    })
+}
+
 interface MapEditorProps {
     nudos: Nudo[]
     tramos: Tramo[]
@@ -107,9 +153,6 @@ function MapFlyTo({ center, zoom }: { center: [number, number] | null, zoom?: nu
 
 
 // Helper: Calculate Static Pressure
-// Returns a map of NodeID -> Static Pressure (mca)
-// Helper: Calculate Static Pressure & Parent Map for Path Tracing
-// Returns { pressures, parents }
 function calculateStaticPressures(nudos: Nudo[], tramos: Tramo[]): { pressures: Record<string, number>, parents: Record<string, string>, heads: Record<string, number> } {
     const pressures: Record<string, number> = {}
     const heads: Record<string, number> = {}
@@ -326,11 +369,6 @@ export default function MapEditor({
     }
 
     // Handlers para esquinas de calibración
-    // bounds: [[lat1, lng1], [lat2, lng2]]
-    // Usaremos esquina 0 como SW y esquina 1 como NE para simplificar logic de Leaflet bounds
-    // O mejor: Esquina 0: Top-Left, Esquina 1: Bottom-Right (Visualmente)
-    // Leaflet Bounds: [SouthWest, NorthEast]
-
     const updateCorner = (index: 0 | 1, lat: number, lng: number) => {
         if (!planoConfig || !planoConfig.bounds) return
 
@@ -341,9 +379,6 @@ export default function MapEditor({
 
     return (
         <div className="relative w-full h-full min-h-[500px] rounded-xl overflow-hidden border border-border/30 z-0 group">
-
-
-
             {/* Plano Manager UI */}
             <div className="absolute bottom-6 left-4 z-[400] pointer-events-auto">
                 <PlanoManager
@@ -384,8 +419,6 @@ export default function MapEditor({
                     targetNodeCode={nudos.find(n => n.id === profileNode)?.codigo || 'Red'}
                 />
 
-
-
                 {/* IMAGE OVERLAY */}
                 {planoConfig && planoConfig.bounds && (
                     <>
@@ -395,8 +428,7 @@ export default function MapEditor({
                             opacity={planoConfig.opacity}
                             zIndex={1}
                         />
-                        {/* Calibration Handles (Only if opacity > 0 to avoid clutter?) - Always show if config present so user can adjust */}
-                        {/* Corner 1 */}
+                        {/* Calibration Handles */}
                         <Marker
                             position={planoConfig.bounds[0]}
                             icon={cornerIcon}
@@ -408,7 +440,6 @@ export default function MapEditor({
                                 }
                             }}
                         />
-                        {/* Corner 2 */}
                         <Marker
                             position={planoConfig.bounds[1]}
                             icon={cornerIcon}
@@ -569,17 +600,17 @@ function DraggableMarker({
     // Determine color based on dynamic pressure if check result is available
     const hasResult = dynamicPressure !== undefined
     const p = dynamicPressure || staticPressure || 0
-    // Color logic:
-    // Green: 15 <= p <= 50
-    // Yellow: p < 15 and p > 0
-    // Red: p > 50 or p < 0
-    let statusColor = '#3b82f6' // Default Blue
+
+    // Icon generation (Updated to use code)
+    const customIcon = useMemo(() => createCustomIcon(nudo.tipo, nudo.codigo, !!isSelected), [nudo.tipo, nudo.codigo, isSelected])
+
+    // Label for dynamic pressure status
+    let statusColor = '#3b82f6'
     if (hasResult) {
         if (p < 0 || p > 50) statusColor = '#ef4444' // Red
         else if (p < 15) statusColor = '#eab308' // Yellow
         else statusColor = '#22c55e' // Green
     } else {
-        // Static check only high
         if ((staticPressure || 0) > 50) statusColor = '#ef4444'
     }
 
@@ -592,22 +623,10 @@ function DraggableMarker({
                     pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2, dashArray: '5, 5' }}
                 />
             )}
-            {isSelected && (
-                <Circle
-                    center={position}
-                    radius={20}
-                    pathOptions={{ color: '#3b82f6', fillOpacity: 0.2, weight: 2 }}
-                />
-            )}
-            {hasResult && (
-                <Circle
-                    center={position}
-                    radius={10}
-                    pathOptions={{ color: statusColor, fillOpacity: 0.8, weight: 0 }}
-                />
-            )}
+
             <Marker
                 position={position}
+                icon={customIcon}
                 draggable={!!onDragEnd}
                 eventHandlers={eventHandlers}
                 autoPan={true}
@@ -615,9 +634,11 @@ function DraggableMarker({
             >
                 <Popup>
                     <div className="text-sm">
-                        <strong>{nudo.codigo}</strong><br />
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-base">{nudo.codigo}</span>
+                            <span className="text-[10px] uppercase bg-muted px-1.5 py-0.5 rounded border">{nudo.tipo.replace('_', ' ')}</span>
+                        </div>
                         Cota: {nudo.cota_terreno} m.s.n.m.<br />
-                        Tipo: {nudo.tipo}
 
                         {hasResult ? (
                             <>

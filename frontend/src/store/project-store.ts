@@ -25,6 +25,8 @@ interface ProjectState {
     // Interaction State
     activeTool: 'select' | 'node' | 'pipe';
     setActiveTool: (tool: 'select' | 'node' | 'pipe') => void;
+    activeComponentType: Nudo['tipo'] | null;
+    setActiveComponentType: (type: Nudo['tipo'] | null) => void;
     startNodeId: string | null;
     setStartNodeId: (id: string | null) => void;
     selectedElement: { id: string; type: 'nudo' | 'tramo' } | null;
@@ -51,6 +53,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     // Interaction State
     activeTool: 'select',
     setActiveTool: (tool) => set({ activeTool: tool }),
+    activeComponentType: null,
+    setActiveComponentType: (type) => set({ activeComponentType: type }),
     startNodeId: null,
     setStartNodeId: (id) => set({ startNodeId: id }),
     selectedElement: null,

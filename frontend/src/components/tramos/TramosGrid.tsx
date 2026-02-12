@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { updateTramo, updateNudoViviendasAction, createTramo } from "@/app/actions/tramos"
+import { Checkbox } from "@/components/ui/checkbox"
+import { updateTramo, updateNudoViviendasAction, createTramo, createBatchTramos, deleteBatchTramos } from "@/app/actions/tramos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { Plus, Save } from "lucide-react"
+import { Plus, Save, Trash2, Copy, AlertCircle } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface TramosGridProps {
     tramos: any[]
@@ -18,16 +20,19 @@ interface TramosGridProps {
 
 export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
     const router = useRouter()
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+    const [isPasting, setIsPasting] = useState(false)
+    const tableRef = useRef<HTMLDivElement>(null)
 
-    // Helper to find node by ID
+    // Helper to find node by ID or Code
     const getNode = (id: string) => nudos.find(n => n.id === id)
+    const findNodeByCode = (code: string) => nudos.find(n => n.codigo.trim().toLowerCase() === code.trim().toLowerCase())
 
     const handleTramoUpdate = async (id: string, field: string, value: any) => {
-        // Convert string inputs to numbers
         let numValue = value
         if (field === 'longitud' || field === 'diametro_comercial') {
             numValue = parseFloat(value)
-            if (isNaN(numValue)) return // Don't save invalid numbers
+            if (isNaN(numValue)) return
         }
 
         const payload: any = { id }
@@ -45,11 +50,9 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
     const handleViviendasUpdate = async (nudoId: string, value: string) => {
         const num = parseInt(value)
         if (isNaN(num)) return
-
         const res = await updateNudoViviendasAction(nudoId, num)
-        if (res.error) {
-            toast.error(res.error)
-        } else {
+        if (res.error) toast.error(res.error)
+        else {
             toast.success("Viviendas actualizadas")
             router.refresh()
         }
@@ -64,36 +67,17 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         clase_tuberia: 'CL-10'
     })
 
-    // Sort nodes for dropdown: Reservoirs first, then CRPs, then alphanumeric
     const sortedNodes = [...nudos].sort((a, b) => {
-        // Reservoirs first
         if (a.tipo === 'reservorio' && b.tipo !== 'reservorio') return -1
         if (a.tipo !== 'reservorio' && b.tipo === 'reservorio') return 1
-
-        // CRPs second
-        const isC_A = a.codigo.includes('CRP') || a.tipo === 'camara_rompe_presion'
-        const isC_B = b.codigo.includes('CRP') || b.tipo === 'camara_rompe_presion'
-        if (isC_A && !isC_B) return -1
-        if (!isC_A && isC_B) return 1
-
-        // Then alphabetic code
         return a.codigo.localeCompare(b.codigo, undefined, { numeric: true })
     })
-
-    const PIPE_CLASSES = [
-        { value: 'CL-5', label: 'Clase 5' },
-        { value: 'CL-7.5', label: 'Clase 7.5 (CRP)' },
-        { value: 'CL-10', label: 'Clase 10 (Std)' },
-        { value: 'CL-15', label: 'Clase 15' },
-        { value: 'S-25', label: 'Sch 40' }
-    ]
 
     const handleCreateTramo = async () => {
         if (!newRow.nudo_origen_id || !newRow.nudo_destino_id) {
             toast.error("Selecciona Nudo Origen y Destino")
             return
         }
-
         if (newRow.nudo_origen_id === newRow.nudo_destino_id) {
             toast.error("Origen y Destino deben ser distintos")
             return
@@ -111,26 +95,163 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
             toast.error(res.error)
         } else {
             toast.success("Tramo creado")
-            // Auto-chain: Set Start Node of next row to End Node of this row
             setNewRow({
-                nudo_origen_id: newRow.nudo_destino_id, // Chain the end node to start
+                nudo_origen_id: newRow.nudo_destino_id,
                 nudo_destino_id: '',
                 longitud: '',
-                diametro_comercial: newRow.diametro_comercial, // Keep diameter
-                material: newRow.material, // Keep material
-                clase_tuberia: newRow.clase_tuberia // Keep class
+                diametro_comercial: newRow.diametro_comercial,
+                material: newRow.material,
+                clase_tuberia: newRow.clase_tuberia
             })
             router.refresh()
-
-            // Focus on destination select (optional, requires ref)
         }
     }
 
+    // --- Bulk Selection ---
+    const toggleSelectAll = () => {
+        if (selectedIds.size === tramos.length) {
+            setSelectedIds(new Set())
+        } else {
+            setSelectedIds(new Set(tramos.map(t => t.id)))
+        }
+    }
+
+    const toggleSelectRow = (id: string) => {
+        const newSet = new Set(selectedIds)
+        if (newSet.has(id)) newSet.delete(id)
+        else newSet.add(id)
+        setSelectedIds(newSet)
+    }
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`¿Estás seguro de eliminar ${selectedIds.size} tramos?`)) return
+
+        const ids = Array.from(selectedIds)
+        const res = await deleteBatchTramos(ids)
+
+        if (res.error) {
+            toast.error(res.error)
+        } else {
+            toast.success("Tramos eliminados")
+            setSelectedIds(new Set())
+            router.refresh()
+        }
+    }
+
+    // --- Paste Logic ---
+    const handlePaste = async (e: React.ClipboardEvent) => {
+        e.preventDefault()
+        const text = e.clipboardData.getData('text')
+        if (!text) return
+
+        setIsPasting(true)
+        const rows = text.split(/\r?\n/).filter(line => line.trim() !== '')
+
+        if (rows.length === 0) {
+            setIsPasting(false)
+            return
+        }
+
+        toast.info(`Procesando ${rows.length} filas del portapapeles...`)
+
+        const newTramos = []
+        let errors = 0
+
+        // Heuristic: Try to match standard columns
+        // Expected: [Code?] [NodeA] [NodeB] [Len] [Dia] [Mat] [Class]
+        // Or simplified: [NodeA] [NodeB] [Len] ...
+
+        for (const row of rows) {
+            const cols = row.split('\t').map(c => c.trim())
+
+            // Try to identify Node A and Node B
+            // If col[0] looks like a node code, assume simplified format
+            // If col[1] looks like a node code, assume col[0] is Code
+
+            let nudoOrigen = findNodeByCode(cols[0])
+            let nudoDestino = findNodeByCode(cols[1])
+            let startIndex = 0
+
+            // If first col isn't a node, check if second is
+            if (!nudoOrigen && cols.length > 2) {
+                const altOrigen = findNodeByCode(cols[1])
+                const altDestino = findNodeByCode(cols[2])
+                if (altOrigen && altDestino) {
+                    nudoOrigen = altOrigen
+                    nudoDestino = altDestino
+                    startIndex = 1 // Offset for length/dia
+                }
+            }
+
+            if (nudoOrigen && nudoDestino) {
+                // Determine other fields based on remaining columns
+                // Expected after nodes: [Longitud] [Diametro] [Material] [Clase]
+                const longitud = parseFloat(cols[startIndex + 2]?.replace(',', '.') || '0')
+                const diametro = parseFloat(cols[startIndex + 3]?.replace(',', '.') || '0.75')
+                const material = cols[startIndex + 4] || 'pvc'
+                const clase = cols[startIndex + 5] || 'CL-10'
+
+                newTramos.push({
+                    nudo_origen_id: nudoOrigen.id,
+                    nudo_destino_id: nudoDestino.id,
+                    longitud: isNaN(longitud) ? 0 : longitud,
+                    diametro_comercial: isNaN(diametro) ? 0.75 : diametro,
+                    material,
+                    clase_tuberia: clase,
+                    codigo: startIndex === 1 ? cols[0] : undefined // Use explicit code if found
+                })
+            } else {
+                errors++
+            }
+        }
+
+        if (newTramos.length > 0) {
+            const res = await createBatchTramos(newTramos, proyectoId)
+            if (res.error) {
+                toast.error(`Error al importar: ${res.error}`)
+            } else {
+                toast.success(`Importados ${res.count} tramos correctamente`)
+                if (errors > 0) toast.warning(`${errors} filas se ignoraron (nudos no encontrados)`)
+                router.refresh()
+            }
+        } else {
+            toast.error("No se encontraron tramos válidos. Verifica los códigos de los nudos.")
+        }
+        setIsPasting(false)
+    }
+
     return (
-        <div className="rounded-md border bg-card shadow-sm">
+        <div
+            className="relative rounded-md border bg-card shadow-sm outline-none focus:ring-1 focus:ring-primary/20"
+            tabIndex={0}
+            onPaste={handlePaste}
+            ref={tableRef}
+        >
+            {/* Bulk Actions Toolbar */}
+            {selectedIds.size > 0 && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-foreground/90 text-background px-4 py-2 rounded-full shadow-lg flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+                    <span className="text-sm font-medium">{selectedIds.size} seleccionados</span>
+                    <div className="h-4 w-px bg-background/20" />
+                    <Button size="icon" variant="ghost" className="h-6 w-6 hover:bg-white/20 hover:text-white rounded-full text-red-300"
+                        onClick={handleBulkDelete} title="Borrar selección">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-6 w-6 hover:bg-white/20 hover:text-white rounded-full"
+                        onClick={() => setSelectedIds(new Set())} title="Cancelar">
+                        <span className="text-xs">✕</span>
+                    </Button>
+                </div>
+            )}
+
             <Table>
                 <TableHeader>
                     <TableRow className="bg-muted/50">
+                        <TableHead className="w-[40px]">
+                            <Checkbox
+                                checked={tramos.length > 0 && selectedIds.size === tramos.length}
+                                onCheckedChange={toggleSelectAll}
+                            />
+                        </TableHead>
                         <TableHead className="w-[80px]">Tramo</TableHead>
                         <TableHead>Nudo Inicio</TableHead>
                         <TableHead>Nudo Fin</TableHead>
@@ -149,9 +270,16 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                     {tramos.map((t) => {
                         const nInicio = getNode(t.nudo_origen_id)
                         const nFin = getNode(t.nudo_destino_id)
+                        const isSelected = selectedIds.has(t.id)
 
                         return (
-                            <TableRow key={t.id}>
+                            <TableRow key={t.id} className={cn(isSelected && "bg-primary/5")}>
+                                <TableCell>
+                                    <Checkbox
+                                        checked={isSelected}
+                                        onCheckedChange={() => toggleSelectRow(t.id)}
+                                    />
+                                </TableCell>
                                 <TableCell className="font-medium bg-muted/20">
                                     {t.codigo}
                                 </TableCell>
@@ -171,7 +299,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                                     <Input
                                         type="number"
                                         defaultValue={t.longitud}
-                                        className="h-8 text-right font-mono"
+                                        className="h-8 text-right font-mono focus-visible:ring-primary/50"
                                         onBlur={(e) => handleTramoUpdate(t.id, 'longitud', e.target.value)}
                                         step="0.01"
                                     />
@@ -180,7 +308,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                                     <Input
                                         type="number"
                                         defaultValue={t.diametro_comercial}
-                                        className="h-8 text-right font-mono"
+                                        className="h-8 text-right font-mono focus-visible:ring-primary/50"
                                         onBlur={(e) => handleTramoUpdate(t.id, 'diametro_comercial', e.target.value)}
                                         step="0.1"
                                     />
@@ -191,7 +319,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                                 <TableCell>
                                     <Input
                                         defaultValue={t.material}
-                                        className="h-8 text-center text-xs uppercase"
+                                        className="h-8 text-center text-xs uppercase focus-visible:ring-primary/50"
                                         onBlur={(e) => handleTramoUpdate(t.id, 'material', e.target.value)}
                                     />
                                 </TableCell>
@@ -199,18 +327,16 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                                     <Input
                                         type="number"
                                         defaultValue={nFin?.numero_viviendas || 0}
-                                        className="h-8 text-center"
+                                        className="h-8 text-center focus-visible:ring-primary/50"
                                         onBlur={(e) => nFin && handleViviendasUpdate(nFin.id, e.target.value)}
                                         min="0"
                                     />
                                 </TableCell>
                                 <TableCell className="text-right font-mono text-xs">
                                     {nFin?.presion_calc?.toFixed(2) || '-'}
-                                    {nFin?.presion_diseno && <span className="text-[10px] text-muted-foreground block text-emerald-600/70">Ref: {nFin.presion_diseno}</span>}
                                 </TableCell>
                                 <TableCell className="text-right font-mono text-xs">
                                     {t.velocidad?.toFixed(2) || '-'}
-                                    {t.velocidad_diseno && <span className="text-[10px] text-muted-foreground block text-emerald-600/70">Ref: {t.velocidad_diseno}</span>}
                                 </TableCell>
                             </TableRow>
                         )
@@ -218,7 +344,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                 </TableBody>
                 <TableFooter className="bg-muted/10 border-t-2 border-primary/20">
                     <TableRow>
-                        <TableCell colSpan={1} className="font-semibold text-primary text-xs uppercase tracking-wider pl-4">Nuevo Tramo</TableCell>
+                        <TableCell colSpan={2} className="font-semibold text-primary text-xs uppercase tracking-wider pl-4">Nuevo Tramo</TableCell>
                         <TableCell>
                             <select
                                 className="h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs font-mono"
@@ -248,7 +374,9 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
                             </select>
                         </TableCell>
                         <TableCell colSpan={2} className="text-center text-xs text-muted-foreground italic">
-                            Cotas automáticas
+                            <span className="flex items-center justify-center gap-2">
+                                <Copy className="w-3 h-3" /> Pega desde Excel
+                            </span>
                         </TableCell>
                         <TableCell>
                             <Input
