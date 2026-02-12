@@ -53,7 +53,7 @@ export default function NodePropertiesForm({ nudo }: NodePropertiesFormProps) {
             // For now, let's see if the existing action triggers a reload that might be annoying.
             // If so, we might need a specific 'updateNudoProperties' action without revalidate.
 
-            await updateNudo(updatedNudo) // This currently has revalidatePath according to previous edits check?
+            await updateNudo(updatedNudo.id, updatedNudo) // This currently has revalidatePath according to previous edits check?
             // Actually, we checked nudos.ts and updateNudo HAS revalidatePath because it's used by DataGrid.
             // We might need to handle this.
 

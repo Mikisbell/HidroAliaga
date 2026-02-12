@@ -53,7 +53,7 @@ export default function PipePropertiesForm({ tramo }: PipePropertiesFormProps) {
             useProjectStore.getState().updateTramo?.(updatedTramo)
 
             // 2. Server Action
-            await updateTramoAction(updatedTramo)
+            await updateTramo(updatedTramo)
 
         } catch (error) {
             console.error("Error updating pipe:", error)
