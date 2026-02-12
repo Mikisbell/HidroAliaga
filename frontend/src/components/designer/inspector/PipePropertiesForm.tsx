@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react"
 import { Tramo } from "@/types/models"
 import { useProjectStore } from "@/store/project-store"
-import { updateTramoAction } from "@/app/actions/tramos"
+import { updateTramo } from "@/app/actions/tramos"
 import { Loader2 } from "lucide-react"
 
 interface PipePropertiesFormProps {
@@ -12,11 +12,7 @@ interface PipePropertiesFormProps {
 }
 
 export default function PipePropertiesForm({ tramo }: PipePropertiesFormProps) {
-    const updateTramoStore = useProjectStore(state => state.updateTramo) // We need to add this action to store if missing
-    // Actually, looking at store/project-store.ts, `updateTramo` is NOT exported in the interface or implementation yet?
-    // Let me check project-store.ts content again later. Assuming it exists or I will add it.
-    // Wait, I recall seeing `addTramo` and `removeTramo`. Let me double check if `updateTramo` exists.
-    // If not, I will add it. For now I will assume I need to add it.
+    const updateTramoStore = useProjectStore(state => state.updateTramo)
 
     const [formData, setFormData] = useState({
         codigo: tramo.codigo,
@@ -47,7 +43,6 @@ export default function PipePropertiesForm({ tramo }: PipePropertiesFormProps) {
         setIsSaving(true)
         try {
             // 1. Optimistic Update (Zustand)
-            // We need to implement updateTramo in store if it's missing
             const updatedTramo = { ...tramo, ...formData }
             // @ts-ignore - will implement in store next
             useProjectStore.getState().updateTramo?.(updatedTramo)
