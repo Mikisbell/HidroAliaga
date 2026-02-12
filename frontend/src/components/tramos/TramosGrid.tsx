@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFoo
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { updateTramoAction, updateNudoViviendasAction, createTramoAction } from "@/app/actions/tramos"
+import { updateTramoAction, updateNudoViviendasAction, createTramo } from "@/app/actions/tramos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Plus, Save } from "lucide-react"
@@ -99,7 +99,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
             return
         }
 
-        const res = await createTramoAction({
+        const res = await createTramo({
             ...newRow,
             proyecto_id: proyectoId,
             longitud: parseFloat(newRow.longitud) || 0,
