@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFoo
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { updateTramoAction, updateNudoViviendasAction, createTramo } from "@/app/actions/tramos"
+import { updateTramo, updateNudoViviendasAction, createTramo } from "@/app/actions/tramos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Plus, Save } from "lucide-react"
@@ -33,7 +33,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         const payload: any = { id }
         payload[field] = numValue
 
-        const res = await updateTramoAction(payload)
+        const res = await updateTramo(payload)
         if (res.error) {
             toast.error(res.error)
         } else {

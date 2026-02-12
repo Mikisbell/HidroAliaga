@@ -69,12 +69,7 @@ export default async function ProyectoPage({ params }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                     <ExcelImportButton proyectoId={id} />
-                    <Button variant="outline" size="sm" asChild className="hidden sm:flex gap-2">
-                        <Link href={`/proyectos/${id}/tramos`}>
-                            <FileSpreadsheet className="h-4 w-4" />
-                            Editor Tramos
-                        </Link>
-                    </Button>
+                    {/* Button Removed: Editor Tramos integrated in Dashboard */}
                     <ReportButton
                         proyecto={proyecto}
                         nudos={nudos || []}

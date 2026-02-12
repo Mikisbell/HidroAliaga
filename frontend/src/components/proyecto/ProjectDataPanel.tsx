@@ -1,16 +1,6 @@
-"use client"
+import { TramosGrid } from "@/components/tramos/TramosGrid"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { useProjectStore } from "@/store/project-store"
-import { PropertiesPanel } from "@/components/properties/PropertiesPanel"
-import MapWrapper from "@/components/map/MapWrapper"
-import OptimizationPanel from "@/components/optimization/OptimizationPanel"
-import TransparencyPanel from "@/components/results/TransparencyPanel"
-import { Nudo, Tramo, Calculo } from "@/types/models"
-import { useEffect, useState } from "react"
+// ... existing imports
 
 interface ProjectDataPanelProps {
     proyectoId: string
@@ -24,10 +14,7 @@ interface ProjectDataPanelProps {
 export function ProjectDataPanel({
     proyectoId, nudos: initialNudos, tramos: initialTramos, initialCost, ultimoCalculo, initialPlanoConfig
 }: ProjectDataPanelProps) {
-    const selectedElement = useProjectStore(state => state.selectedElement)
-    // We can use store data or props. Store is better if we want to reflect client-side adds immediately.
-    // But for now, let's use the props to ensure initial render matches server, and then sync.
-    // Actually, ProjectInitializer syncs store. So let's use store for Nudos/Tramos to support optimistic updates.
+    // ... existing hook logic
 
     const storeNudos = useProjectStore(state => state.nudos)
     const storeTramos = useProjectStore(state => state.tramos)
@@ -41,14 +28,14 @@ export function ProjectDataPanel({
     }
 
     return (
-        <Tabs defaultValue="mapa" className="animate-fade-in-up-delay-3 h-full flex flex-col">
+        <Tabs defaultValue="tramos" className="animate-fade-in-up-delay-3 h-full flex flex-col">
             <TabsList className="bg-card/60 border border-border/30 w-full justify-start overflow-x-auto">
+                <TabsTrigger value="tramos">Editor de Tramos ({tramos?.length || 0})</TabsTrigger>
+                <TabsTrigger value="nudos">Nudos ({nudos?.length || 0})</TabsTrigger>
                 <TabsTrigger value="mapa">
                     <span className="hidden lg:inline">Mapa Visual</span>
                     <span className="lg:hidden">Mapa</span>
                 </TabsTrigger>
-                <TabsTrigger value="nudos">Nudos ({nudos?.length || 0})</TabsTrigger>
-                <TabsTrigger value="tramos">Tramos ({tramos?.length || 0})</TabsTrigger>
                 <TabsTrigger value="transparencia">Resultados</TabsTrigger>
                 <TabsTrigger value="optimizacion">Optimización</TabsTrigger>
             </TabsList>
@@ -122,44 +109,10 @@ export function ProjectDataPanel({
                 </TabsContent>
 
                 <TabsContent value="tramos" className="mt-0 h-full">
-                    <Card className="bg-card/60 border-border/30 h-full border-none shadow-none">
-                        <CardContent className="p-0">
-                            {tramos && tramos.length > 0 ? (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-border/20 hover:bg-transparent">
-                                            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold w-[80px]">Código</TableHead>
-                                            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Mat.</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">L (m)</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Ø (mm)</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">V (m/s)</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {tramos.map((t) => (
-                                            <TableRow key={t.id} className="table-row-hover border-border/10 cursor-pointer hover:bg-muted/50"
-                                                onClick={() => useProjectStore.getState().setSelectedElement({ id: t.id, type: 'tramo' })}
-                                            >
-                                                <TableCell className="font-mono text-xs font-semibold">{t.codigo}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline" className="text-[10px] border-border/30">{t.material}</Badge>
-                                                </TableCell>
-                                                <TableCell className="text-right font-mono text-xs">{t.longitud?.toFixed(2)}</TableCell>
-                                                <TableCell className="text-right font-mono text-xs">{t.diametro_interior?.toFixed(1)}</TableCell>
-                                                <TableCell className="text-right font-mono text-xs" style={{ color: t.velocidad != null ? 'oklch(0.70 0.16 160)' : undefined }}>
-                                                    {t.velocidad != null ? t.velocidad.toFixed(3) : '—'}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            ) : (
-                                <div className="py-16 text-center text-muted-foreground/50">
-                                    <p className="text-sm">No hay tramos definidos</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                    {/* Integrated Editable Grid */}
+                    <div className="h-full overflow-hidden">
+                        <TramosGrid tramos={tramos || []} nudos={nudos || []} proyectoId={proyectoId} />
+                    </div>
                 </TabsContent>
             </div>
         </Tabs>
