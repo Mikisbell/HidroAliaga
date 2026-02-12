@@ -58,7 +58,11 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
         if (!proyectoId) return
         try {
             console.log(`Creating pipe from ${origenId} to ${destinoId}`)
-            await createTramo(proyectoId, origenId, destinoId)
+            await createTramo({
+                proyecto_id: proyectoId,
+                nudo_origen_id: origenId,
+                nudo_destino_id: destinoId
+            })
             console.log("Pipe created successfully")
         } catch (error) {
             console.error("Failed to create pipe:", error)
