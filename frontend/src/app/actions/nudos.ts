@@ -77,3 +77,21 @@ export async function createNudo(proyectoId: string, latitud: number, longitud: 
     // The store uses replaceNudo(tempId, realNudo) to swap the temp ID with the DB record.
     return { success: true, nudo: data }
 }
+
+export async function deleteNudo(id: string) {
+    const supabase = await createClient()
+
+    if (!id) return { error: "ID requerido" }
+
+    const { error } = await supabase
+        .from("nudos")
+        .delete()
+        .eq("id", id)
+
+    if (error) {
+        return { error: `Error deleting nudo: ${error.message}` }
+    }
+
+    revalidatePath("/proyectos/[id]", "page")
+    return { success: true }
+}

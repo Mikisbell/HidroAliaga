@@ -2,16 +2,12 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { useProjectStore } from "@/store/project-store"
 import { PropertiesPanel } from "@/components/properties/PropertiesPanel"
 import DesignerWrapper from "@/components/designer/DesignerWrapper"
 import OptimizationPanel from "@/components/optimization/OptimizationPanel"
 import TransparencyPanel from "@/components/results/TransparencyPanel"
 import { Nudo, Tramo, Calculo } from "@/types/models"
-import { useEffect, useState } from "react"
-import { TramosGrid } from "@/components/tramos/TramosGrid"
 import { BlueprintUpload } from "@/components/setup/BlueprintUpload"
 
 interface ProjectDataPanelProps {
@@ -40,69 +36,17 @@ export function ProjectDataPanel({
     }
 
     return (
-        <Tabs defaultValue="inicio" className="animate-fade-in-up-delay-3 h-full flex flex-col">
+        <Tabs defaultValue="mapa" className="animate-fade-in-up-delay-3 h-full flex flex-col">
             <TabsList className="bg-card/60 border border-border/30 w-full justify-start overflow-x-auto">
-                <TabsTrigger value="inicio">Configuración (Opcional)</TabsTrigger>
-                <TabsTrigger value="tramos">Editor de Tramos ({tramos?.length || 0})</TabsTrigger>
-                <TabsTrigger value="nudos">Nudos ({nudos?.length || 0})</TabsTrigger>
-                <TabsTrigger value="mapa">Diseñador de Red</TabsTrigger>
+                <TabsTrigger value="mapa">Diseñador y Datos</TabsTrigger>
                 <TabsTrigger value="transparencia">Resultados</TabsTrigger>
                 <TabsTrigger value="optimizacion">Optimización</TabsTrigger>
+                <TabsTrigger value="inicio">Configuración</TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-y-auto min-h-0 mt-4">
-                <TabsContent value="inicio" className="mt-0 h-full">
-                    <BlueprintUpload />
-                </TabsContent>
 
-                <TabsContent value="tramos" className="mt-0 h-full">
-                    {/* Integrated Editable Grid */}
-                    <div className="h-full overflow-hidden">
-                        <TramosGrid tramos={tramos || []} nudos={nudos || []} proyectoId={proyectoId} />
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="nudos" className="mt-0 h-full">
-                    <Card className="bg-card/60 border-border/30 h-full border-none shadow-none">
-                        <CardContent className="p-0">
-                            {nudos && nudos.length > 0 ? (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-border/20 hover:bg-transparent">
-                                            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold w-[80px]">Código</TableHead>
-                                            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Tipo</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Elev. (m)</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">Q (l/s)</TableHead>
-                                            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">P (mca)</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {nudos.map((n) => (
-                                            <TableRow key={n.id} className="table-row-hover border-border/10 cursor-pointer hover:bg-muted/50"
-                                                onClick={() => useProjectStore.getState().setSelectedElement({ id: n.id, type: 'nudo' })}
-                                            >
-                                                <TableCell className="font-mono text-xs font-semibold">{n.codigo}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline" className="text-[10px] border-border/30">{n.tipo}</Badge>
-                                                </TableCell>
-                                                <TableCell className="text-right font-mono text-xs">{n.elevacion?.toFixed(2)}</TableCell>
-                                                <TableCell className="text-right font-mono text-xs">{n.demanda_base?.toFixed(3)}</TableCell>
-                                                <TableCell className="text-right font-mono text-xs font-semibold" style={{ color: n.presion_calc != null ? 'oklch(0.70 0.18 230)' : undefined }}>
-                                                    {n.presion_calc != null ? n.presion_calc.toFixed(2) : '—'}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            ) : (
-                                <div className="py-16 text-center text-muted-foreground/50">
-                                    <p className="text-sm">No hay nudos definidos</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
+                {/* UNIFIED DESIGN TAB */}
                 <TabsContent value="mapa" className="mt-0 h-full">
                     <DesignerWrapper
                         nudos={nudos || []}
@@ -125,6 +69,10 @@ export function ProjectDataPanel({
 
                 <TabsContent value="optimizacion" className="mt-0 h-full">
                     <OptimizationPanel proyectoId={proyectoId} currentCost={initialCost} />
+                </TabsContent>
+
+                <TabsContent value="inicio" className="mt-0 h-full">
+                    <BlueprintUpload />
                 </TabsContent>
             </div>
         </Tabs>

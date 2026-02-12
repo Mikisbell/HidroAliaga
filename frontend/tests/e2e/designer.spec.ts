@@ -182,39 +182,38 @@ test.describe('Diseñador de Red', () => {
         // 5. Verify Inputs exist
         await expect(page.locator('input[name="cota_terreno"]')).toBeVisible();
     });
-});
 
-test('should drag and drop a node from palette', async ({ page }) => {
-    await openDesignerTab(page);
+    test('should drag and drop a node from palette', async ({ page }) => {
+        await openDesignerTab(page);
 
-    // Force stable state
-    await page.waitForTimeout(1000);
-    await page.waitForSelector('.react-flow__node');
+        // Force stable state
+        await page.waitForTimeout(1000);
+        await page.waitForSelector('.react-flow__node');
 
-    const initialCount = await page.locator('.react-flow__node').count();
+        const initialCount = await page.locator('.react-flow__node').count();
 
-    // 1. Get Palette Item (Reservorio) - Force distinct selector
-    const paletteItem = page.getByText('Reservorio').first();
-    await expect(paletteItem).toBeVisible();
+        // 1. Get Palette Item (Reservorio) - Force distinct selector
+        const paletteItem = page.getByText('Reservorio').first();
+        await expect(paletteItem).toBeVisible();
 
-    // 2. Get Drop Target (Canvas Center + Offset to be safe)
-    const canvas = page.locator('.react-flow');
-    const canvasBox = await canvas.boundingBox();
-    if (!canvasBox) throw new Error('Canvas not found');
+        // 2. Get Drop Target (Canvas Center + Offset to be safe)
+        const canvas = page.locator('.react-flow');
+        const canvasBox = await canvas.boundingBox();
+        if (!canvasBox) throw new Error('Canvas not found');
 
-    const dropX = canvasBox.x + canvasBox.width / 2 + 150;
-    const dropY = canvasBox.y + canvasBox.height / 2 + 150;
+        const dropX = canvasBox.x + canvasBox.width / 2 + 150;
+        const dropY = canvasBox.y + canvasBox.height / 2 + 150;
 
-    // 3. Perform Drag & Drop
-    await paletteItem.hover();
-    await page.mouse.down();
-    await page.mouse.move(dropX, dropY, { steps: 10 }); // Smooth drag
-    await page.mouse.up();
+        // 3. Perform Drag & Drop
+        await paletteItem.hover();
+        await page.mouse.down();
+        await page.mouse.move(dropX, dropY, { steps: 10 }); // Smooth drag
+        await page.mouse.up();
 
-    // 4. Verify Creation (Optimistic)
-    await expect(async () => {
-        const newCount = await page.locator('.react-flow__node').count();
-        expect(newCount).toBeGreaterThan(initialCount);
-    }).toPass({ timeout: 10000 });
-});
+        // 4. Verify Creation (Optimistic)
+        await expect(async () => {
+            const newCount = await page.locator('.react-flow__node').count();
+            expect(newCount).toBeGreaterThan(initialCount);
+        }).toPass({ timeout: 10000 });
+    });
 });

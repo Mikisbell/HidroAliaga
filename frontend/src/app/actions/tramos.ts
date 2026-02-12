@@ -165,3 +165,19 @@ export async function deleteBatchTramos(ids: string[]) {
     revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }
+
+export async function deleteTramo(id: string) {
+    const supabase = await createClient()
+
+    if (!id) return { error: "ID requerido" }
+
+    const { error } = await supabase
+        .from('tramos')
+        .delete()
+        .eq('id', id)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/proyectos/[id]/tramos')
+    return { success: true }
+}
