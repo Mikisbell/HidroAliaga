@@ -13,6 +13,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  webpack: (config, { isServer }) => {
+    // Fix for epanet-js / emscripten requiring node modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+        worker_threads: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

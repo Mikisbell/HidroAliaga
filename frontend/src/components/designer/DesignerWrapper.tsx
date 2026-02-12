@@ -6,6 +6,7 @@ import { updateNudoCoordinates, createNudo } from "@/app/actions/nudos"
 import { createTramo } from "@/app/actions/tramos"
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
+import { ValidationPanel } from "./ValidationPanel"
 
 // Dynamic import of the Workspace (Client Only because of React Flow)
 const WorkspaceSplitView = dynamic(() => import("@/components/workspace/WorkspaceSplitView").then(mod => mod.WorkspaceSplitView), {
@@ -94,6 +95,9 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     onAddNode={handleAddNode}
                 />
             </ReactFlowProvider>
+
+            {/* The Referee - Validation Panel */}
+            <ValidationPanel />
         </div>
     )
 }

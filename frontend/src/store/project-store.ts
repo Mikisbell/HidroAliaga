@@ -1,20 +1,8 @@
 
 import { create } from 'zustand'
 
-import { Nudo, Tramo } from '@/types/models';
+import { Nudo, Tramo, Project } from '@/types/models';
 import { IterationStep } from "@/types/simulation"
-
-interface Project {
-    id: string;
-    nombre: string;
-    descripcion?: string;
-    ambito: string;
-    estado: string;
-    created_at: string;
-    updated_at: string;
-    usuario_id: string;
-    // Add other fields as needed matching DB schema
-}
 
 interface ProjectState {
     currentProject: Project | null;
@@ -66,6 +54,10 @@ interface ProjectState {
     // New Hydraulic Engine State
     simulationResults: import('@/lib/hydraulics/engine/types').SimulationResult | null;
     setSimulationResults: (results: import('@/lib/hydraulics/engine/types').SimulationResult | null) => void;
+
+    // Validation State (The Referee)
+    simulationAlerts: import('@/lib/hydraulics/validator').ValidationResult[];
+    setSimulationAlerts: (alerts: import('@/lib/hydraulics/validator').ValidationResult[]) => void;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -141,6 +133,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             });
 
             set({ nudos: newNudos, tramos: newTramos, isLoading: false });
+
+            // === FASE 3: EL ÁRBITRO (VALIDACIÓN) ===
+            import('@/lib/hydraulics/validator').then(({ validateHydraulics }) => {
+                const currentProject = get().currentProject;
+                if (currentProject) {
+                    const alerts = validateHydraulics(currentProject, newNudos, newTramos);
+                    set({ simulationAlerts: alerts });
+                }
+            });
+
         }).catch(err => {
             console.error(err);
             set({ error: "Error en cálculo hidráulico", isLoading: false });
@@ -149,5 +151,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     // New Hydraulic Engine
     simulationResults: null,
-    setSimulationResults: (results) => set({ simulationResults: results })
+    setSimulationResults: (results) => set({ simulationResults: results }),
+
+    // Validation (The Referee)
+    simulationAlerts: [],
+    setSimulationAlerts: (alerts) => set({ simulationAlerts: alerts })
 }));
