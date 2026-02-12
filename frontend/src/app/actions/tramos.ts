@@ -69,8 +69,7 @@ export async function createTramoAction(data: any) {
     return { success: true }
 }
 
-// Alias for backwards compatibility - export both names
-export { createTramoAction }
+// Alias for backwards compatibility
 export { createTramoAction as createTramo }
 
 export async function updateNudoViviendasAction(nudoId: string, viviendas: number) {
