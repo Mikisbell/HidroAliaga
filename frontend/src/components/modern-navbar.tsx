@@ -77,22 +77,23 @@ export function ModernNavbar() {
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
-                        {/* Logo - Siempre visible */}
-                        <Link href="/" className="flex items-center gap-2.5 group">
-                            <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-pink-600 flex items-center justify-center text-white transition-transform group-hover:scale-105">
-                                <Droplets className="w-5 h-5" />
+                        {/* Logo - Aurora Organic Gradient 2026 */}
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                                {/* Aurora gradient background */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-indigo-900 to-slate-900" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 via-indigo-500/20 to-amber-500/20" />
+                                <div className="absolute inset-0 backdrop-blur-sm" />
+                                {/* Content */}
+                                <div className="relative h-full flex items-center justify-center">
+                                    <Droplets className="w-5 h-5 text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]" />
+                                </div>
                             </div>
                             <div className="hidden sm:block">
-                                <span className={cn(
-                                    "text-lg font-bold tracking-tight transition-colors",
-                                    isScrolled ? "text-white" : "text-slate-800"
-                                )}>
+                                <span className="text-lg font-semibold text-slate-100 tracking-tight">
                                     {BRAND.name}
                                 </span>
-                                <span className={cn(
-                                    "block text-[10px] -mt-0.5 transition-colors",
-                                    isScrolled ? "text-slate-400" : "text-slate-500"
-                                )}>
+                                <span className="block text-[10px] text-slate-500 font-medium tracking-wide">
                                     by Jhonatan Aliaga
                                 </span>
                             </div>
@@ -125,15 +126,15 @@ export function ModernNavbar() {
                                         )}
                                     </Link>
 
-                                    {/* Dropdown simple - sin mega menú */}
+                                    {/* Dropdown - Dark Glassmorphism 2026 */}
                                     {item.dropdown && activeDropdown === item.label && (
                                         <div className="absolute top-full left-0 pt-2">
-                                            <div className="bg-slate-900 border border-white/10 rounded-lg shadow-xl py-2 min-w-[200px] animate-in fade-in slide-in-from-top-1 duration-200">
+                                            <div className="bg-slate-950/90 backdrop-blur-xl border border-slate-800/60 rounded-xl shadow-2xl shadow-black/50 py-2 min-w-[200px] animate-in fade-in slide-in-from-top-1 duration-200">
                                                 {item.dropdown.map((subItem) => (
                                                     <Link
                                                         key={subItem.label}
                                                         href={subItem.href}
-                                                        className="block px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                                                        className="block px-4 py-2.5 text-sm text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-200"
                                                     >
                                                         {subItem.label}
                                                     </Link>
@@ -160,9 +161,11 @@ export function ModernNavbar() {
                             </Link>
 
                             <Link href="/login">
-                                <Button className="bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white border-0 shadow-lg shadow-violet-500/20">
-                                    Comenzar
-                                    <ArrowRight className="w-4 h-4 ml-1.5" />
+                                <Button className="relative overflow-hidden bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-slate-600 transition-all duration-300">
+                                    <span className="relative z-10 flex items-center">
+                                        Comenzar
+                                        <ArrowRight className="w-4 h-4 ml-1.5" />
+                                    </span>
                                 </Button>
                             </Link>
 
@@ -232,10 +235,10 @@ export function ModernNavbar() {
 
                         {/* CTA en mobile */}
                         <div className="pt-6">
-                            <Link
-                                href="#contacto"
+                            <Link 
+                                href="#contacto" 
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-center w-full py-4 bg-gradient-to-r from-violet-600 to-pink-600 text-white font-medium rounded-xl"
+                                className="flex items-center justify-center w-full py-4 bg-slate-800 text-slate-100 font-medium rounded-xl border border-slate-700 hover:bg-slate-700 transition-colors"
                             >
                                 Contactar Ahora
                                 <ArrowRight className="w-5 h-5 ml-2" />

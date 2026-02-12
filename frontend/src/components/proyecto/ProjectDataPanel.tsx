@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { useProjectStore } from "@/store/project-store"
 import { PropertiesPanel } from "@/components/properties/PropertiesPanel"
-import MapWrapper from "@/components/map/MapWrapper"
+import DesignerWrapper from "@/components/designer/DesignerWrapper"
 import OptimizationPanel from "@/components/optimization/OptimizationPanel"
 import TransparencyPanel from "@/components/results/TransparencyPanel"
 import { Nudo, Tramo, Calculo } from "@/types/models"
@@ -45,10 +45,7 @@ export function ProjectDataPanel({
                 <TabsTrigger value="inicio">Configuración (Opcional)</TabsTrigger>
                 <TabsTrigger value="tramos">Editor de Tramos ({tramos?.length || 0})</TabsTrigger>
                 <TabsTrigger value="nudos">Nudos ({nudos?.length || 0})</TabsTrigger>
-                <TabsTrigger value="mapa">
-                    <span className="hidden lg:inline">Visualización 3D</span>
-                    <span className="lg:hidden">Mapa</span>
-                </TabsTrigger>
+                <TabsTrigger value="mapa">Diseñador de Red</TabsTrigger>
                 <TabsTrigger value="transparencia">Resultados</TabsTrigger>
                 <TabsTrigger value="optimizacion">Optimización</TabsTrigger>
             </TabsList>
@@ -107,12 +104,10 @@ export function ProjectDataPanel({
                 </TabsContent>
 
                 <TabsContent value="mapa" className="mt-0 h-full">
-                    {/* Mobile Map View if needed, but MapWrapper is usually separate */}
-                    <MapWrapper
+                    <DesignerWrapper
                         nudos={nudos || []}
                         tramos={tramos || []}
                         proyectoId={proyectoId}
-                        initialPlanoConfig={initialPlanoConfig}
                     />
                 </TabsContent>
 

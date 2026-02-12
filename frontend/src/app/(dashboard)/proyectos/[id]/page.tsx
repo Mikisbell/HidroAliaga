@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CalcularButton } from "@/components/proyecto/calcular-button"
 import { ExcelImportButton } from "@/components/import/ExcelImportButton"
-import MapWrapper from "@/components/map/MapWrapper"
+// MapWrapper removed — replaced by DesignerWrapper in ProjectDataPanel
 import OptimizationPanel from "@/components/optimization/OptimizationPanel"
 import TransparencyPanel from "@/components/results/TransparencyPanel"
 import { PIPE_DATABASE } from "@/lib/optimization/cost-database"
