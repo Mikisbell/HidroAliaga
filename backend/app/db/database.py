@@ -15,31 +15,28 @@ async_engine = create_async_engine(
     echo=settings.DEBUG,
     pool_size=20,
     max_overflow=10,
-    pool_pre_ping=True
+    pool_pre_ping=True,
 )
 
 # Engine síncrono para operaciones específicas
 from sqlalchemy import create_engine
+
 sync_engine = create_engine(
     settings.DATABASE_URL_SYNC,
     echo=settings.DEBUG,
     pool_size=10,
     max_overflow=5,
-    pool_pre_ping=True
+    pool_pre_ping=True,
 )
 
 # Sesiones
 AsyncSessionLocal = sessionmaker(
-    async_engine,
-    class_=AsyncSession,
-    expire_on_commit=False
+    async_engine, class_=AsyncSession, expire_on_commit=False
 )
 
-SyncSessionLocal = sessionmaker(
-    sync_engine,
-    autocommit=False,
-    autoflush=False
-)
+SyncSessionLocal = sessionmaker(sync_engine, autocommit=False, autoflush=False)
+
+SyncSessionLocal = sessionmaker(sync_engine, autocommit=False, autoflush=False)
 
 # Base declarativa
 Base = declarative_base()

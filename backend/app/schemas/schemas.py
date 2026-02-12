@@ -12,8 +12,10 @@ from enum import Enum
 
 # ============ ENUMS ============
 
+
 class TipoRedEnum(str, Enum):
     """Tipos de red de distribución"""
+
     ABIERTA = "abierta"
     CERRADA = "cerrada"
     MIXTA = "mixta"
@@ -21,12 +23,14 @@ class TipoRedEnum(str, Enum):
 
 class AmbitoEnum(str, Enum):
     """Ámbito de aplicación"""
+
     URBANO = "urbano"
     RURAL = "rural"
 
 
 class TipoNudoEnum(str, Enum):
     """Tipos de nudos"""
+
     CISTERNA = "cisterna"
     TANQUE_ELEVADO = "tanque_elevado"
     UNION = "union"
@@ -38,6 +42,7 @@ class TipoNudoEnum(str, Enum):
 
 class TipoTramoEnum(str, Enum):
     """Tipos de tramos"""
+
     TUBERIA = "tuberia"
     VALVULA = "valvula"
     BOMBA = "bomba"
@@ -46,6 +51,7 @@ class TipoTramoEnum(str, Enum):
 
 class MaterialEnum(str, Enum):
     """Materiales de tuberías"""
+
     PVC = "pvc"
     HDPE = "hdpe"
     HDDE = "hdde"
@@ -56,8 +62,10 @@ class MaterialEnum(str, Enum):
 
 # ============ PROYECTO ============
 
+
 class ProyectoBase(BaseModel):
     """Base para Proyecto"""
+
     nombre: str = Field(..., min_length=1, max_length=255)
     descripcion: Optional[str] = None
     ambito: AmbitoEnum = AmbitoEnum.URBANO
@@ -66,6 +74,7 @@ class ProyectoBase(BaseModel):
 
 class ProyectoCreate(ProyectoBase):
     """Schema para crear proyecto"""
+
     departamento: Optional[str] = None
     provincia: Optional[str] = None
     distrito: Optional[str] = None
@@ -77,6 +86,7 @@ class ProyectoCreate(ProyectoBase):
 
 class ProyectoUpdate(BaseModel):
     """Schema para actualizar proyecto"""
+
     nombre: Optional[str] = Field(None, min_length=1, max_length=255)
     descripcion: Optional[str] = None
     ambito: Optional[AmbitoEnum] = None
@@ -87,8 +97,9 @@ class ProyectoUpdate(BaseModel):
 
 class ProyectoResponse(ProyectoBase):
     """Schema de respuesta para proyecto"""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: UUID
     departamento: Optional[str]
     provincia: Optional[str]
@@ -105,8 +116,10 @@ class ProyectoResponse(ProyectoBase):
 
 # ============ NUDO ============
 
+
 class NudoBase(BaseModel):
     """Base para Nudo"""
+
     codigo: str = Field(..., min_length=1, max_length=50)
     nombre: Optional[str] = None
     tipo: TipoNudoEnum = TipoNudoEnum.UNION
@@ -114,6 +127,7 @@ class NudoBase(BaseModel):
 
 class NudoCreate(NudoBase):
     """Schema para crear nudo"""
+
     longitud: Optional[float] = None
     latitud: Optional[float] = None
     cota_terreno: Optional[float] = None
@@ -125,6 +139,7 @@ class NudoCreate(NudoBase):
 
 class NudoUpdate(BaseModel):
     """Schema para actualizar nudo"""
+
     nombre: Optional[str] = None
     tipo: Optional[TipoNudoEnum] = None
     cota_terreno: Optional[float] = None
@@ -136,8 +151,9 @@ class NudoUpdate(BaseModel):
 
 class NudoResponse(NudoBase):
     """Schema de respuesta para nudo"""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: UUID
     proyecto_id: UUID
     longitud: Optional[float]
@@ -154,8 +170,10 @@ class NudoResponse(NudoBase):
 
 # ============ TRAMO ============
 
+
 class TramoBase(BaseModel):
     """Base para Tramo"""
+
     codigo: str = Field(..., min_length=1, max_length=50)
     nombre: Optional[str] = None
     tipo: TipoTramoEnum = TipoTramoEnum.TUBERIA
@@ -163,6 +181,7 @@ class TramoBase(BaseModel):
 
 class TramoCreate(BaseModel):
     """Schema para crear tramo"""
+
     codigo: str = Field(..., min_length=1, max_length=50)
     nombre: Optional[str] = None
     tipo: TipoTramoEnum = TipoTramoEnum.TUBERIA
@@ -177,6 +196,7 @@ class TramoCreate(BaseModel):
 
 class TramoUpdate(BaseModel):
     """Schema para actualizar tramo"""
+
     nombre: Optional[str] = None
     tipo: Optional[TipoTramoEnum] = None
     longitud: Optional[float] = Field(None, gt=0)
@@ -187,8 +207,9 @@ class TramoUpdate(BaseModel):
 
 class TramoResponse(TramoBase):
     """Schema de respuesta para tramo"""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: UUID
     proyecto_id: UUID
     nudo_origen_id: UUID
@@ -206,8 +227,10 @@ class TramoResponse(TramoBase):
 
 # ============ CÁLCULO ============
 
+
 class CalculoRequest(BaseModel):
     """Request para cálculo hidráulico"""
+
     metodo: str = Field("hardy_cross", pattern="^(hardy_cross|deterministico|hibrido)$")
     tolerancia: float = Field(1e-7, gt=0, le=1e-3)
     max_iteraciones: int = Field(1000, ge=1, le=10000)
@@ -215,6 +238,7 @@ class CalculoRequest(BaseModel):
 
 class IteracionItem(BaseModel):
     """Item de iteración para tabla académica"""
+
     iteracion: int
     malla_id: Optional[str] = None
     tramo_codigo: str
@@ -225,6 +249,7 @@ class IteracionItem(BaseModel):
 
 class CalculoResponse(BaseModel):
     """Response de cálculo hidráulico"""
+
     id: UUID
     proyecto_id: UUID
     metodo: str
@@ -233,28 +258,32 @@ class CalculoResponse(BaseModel):
     error_final: Optional[float]
     iteraciones_realizadas: Optional[int]
     tiempo_calculo: Optional[float]
-    
+
     # Resultados resumidos
     presion_minima: Optional[float]
     presion_maxima: Optional[float]
     velocidad_minima: Optional[float]
     velocidad_maxima: Optional[float]
-    
+
     # Tabla de iteraciones
     iteraciones: List[IteracionItem] = []
-    
+
     # Validación
     validacion_passed: bool
     alertas: List[str] = []
-    
+
     created_at: datetime
 
 
 # ============ OPTIMIZACIÓN ============
 
+
 class OptimizacionRequest(BaseModel):
     """Request para optimización de diámetros"""
-    algoritmo: str = Field("algoritmo_genetico", pattern="^(algoritmo_genetico|gradiente)$")
+
+    algoritmo: str = Field(
+        "algoritmo_genetico", pattern="^(algoritmo_genetico|gradiente)$"
+    )
     poblacion_size: int = Field(100, ge=10, le=500)
     generaciones: int = Field(50, ge=10, le=200)
     crossover_rate: float = Field(0.8, ge=0, le=1)
@@ -264,6 +293,7 @@ class OptimizacionRequest(BaseModel):
 
 class OptimizacionResponse(BaseModel):
     """Response de optimización"""
+
     id: UUID
     proyecto_id: UUID
     algoritmo: str
@@ -279,8 +309,10 @@ class OptimizacionResponse(BaseModel):
 
 # ============ GIS ============
 
+
 class GISConfig(BaseModel):
     """Configuración para GIS"""
+
     usar_dem: bool = True
     servicio_dem: str = "open-elevation"
     crs_salida: str = "EPSG:4326"
@@ -289,12 +321,14 @@ class GISConfig(BaseModel):
 
 class CotaAutoRequest(BaseModel):
     """Request para obtener cotas automáticas"""
+
     nudos: List[UUID]
     usar_cache: bool = True
 
 
 class GeoJSONFeature(BaseModel):
     """Feature GeoJSON"""
+
     type: str = "Feature"
     geometry: Dict[str, Any]
     properties: Dict[str, Any]
@@ -302,14 +336,17 @@ class GeoJSONFeature(BaseModel):
 
 class RedGeoJSON(BaseModel):
     """Red en formato GeoJSON"""
+
     type: str = "FeatureCollection"
     features: List[GeoJSONFeature]
 
 
 # ============ NORMATIVA ============
 
+
 class ConsultaNormativa(BaseModel):
     """Consulta al copiloto normativo"""
+
     pregunta: str = Field(..., min_length=10)
     contexto_adicional: Optional[str] = None
     usar_rag: bool = True
@@ -317,16 +354,19 @@ class ConsultaNormativa(BaseModel):
 
 class RespuestaNormativa(BaseModel):
     """Respuesta del copiloto"""
+
     respuesta: str
     referencias: List[Dict[str, str]] = []
     normas_aplicables: List[str] = []
-   confidence_score: float
+    confidence_score: float
 
 
 # ============ REPORTE ============
 
+
 class ReporteRequest(BaseModel):
     """Request para generar reporte"""
+
     tipo_reporte: str = Field(..., pattern="^(pdf|excel|epanetinp|geojson)$")
     incluye_iteraciones: bool = True
     incluye_planos: bool = True
@@ -334,6 +374,7 @@ class ReporteRequest(BaseModel):
 
 class ReporteResponse(BaseModel):
     """Response de reporte"""
+
     download_url: str
     filename: str
     tamano_archivo: int
@@ -343,8 +384,10 @@ class ReporteResponse(BaseModel):
 
 # ============ ALERTAS ============
 
+
 class AlertaItem(BaseModel):
     """Item de alerta"""
+
     tipo: str
     severidad: str
     parametro: str
@@ -357,6 +400,7 @@ class AlertaItem(BaseModel):
 
 class ValidacionResponse(BaseModel):
     """Response de validación"""
+
     passed: bool
     total_verificaciones: int
     passed_verificaciones: int

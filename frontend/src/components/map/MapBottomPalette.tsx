@@ -3,14 +3,27 @@ import { Spline, Play, Droplets, Zap, CircleDashed } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Nudo } from "@/types/models"
+import { useHydraulicSimulation } from "@/lib/hydraulics/engine/useHydraulicSimulation"
 
 export function MapBottomPalette() {
     const activeTool = useProjectStore(state => state.activeTool)
+    const activeComponentType = useProjectStore(state => state.activeComponentType)
     const setActiveTool = useProjectStore(state => state.setActiveTool)
-    const activeComponentType = useProjectStore((state) => state.activeComponentType)
-    const setActiveComponentType = useProjectStore((state) => state.setActiveComponentType)
-    const calculateHydraulics = useProjectStore(state => state.calculateHydraulics)
-    const isLoading = useProjectStore(state => state.isLoading)
+    const setActiveComponentType = useProjectStore(state => state.setActiveComponentType)
+
+    // Hydraulic Engine Hook
+    const { runSimulation, isCalculating } = useHydraulicSimulation()
+    const nudos = useProjectStore(state => state.nudos)
+    const tramos = useProjectStore(state => state.tramos)
+
+    // Mapping function
+    const handleCalculate = async () => {
+        const { projectToNetwork } = await import('@/lib/hydraulics/engine/projectAdapter')
+        const network = projectToNetwork(nudos, tramos)
+        await runSimulation(network)
+    }
+
+    const isLoading = isCalculating
 
     // Palette Items
     const paletteItems = [
@@ -46,7 +59,7 @@ export function MapBottomPalette() {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
-                                onClick={() => calculateHydraulics()}
+                                onClick={handleCalculate}
                                 disabled={isLoading}
                                 className={cn(
                                     "p-3 rounded-xl transition-all duration-300 flex items-center justify-center bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20 active:scale-95",

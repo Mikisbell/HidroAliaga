@@ -62,6 +62,9 @@ interface ProjectState {
     setError: (error: string | null) => void;
     clearProject: () => void;
     calculateHydraulics: () => void;
+    // New Hydraulic Engine State
+    simulationResults: import('@/lib/hydraulics/engine/types').SimulationResult | null;
+    setSimulationResults: (results: import('@/lib/hydraulics/engine/types').SimulationResult | null) => void;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -138,5 +141,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             console.error(err);
             set({ error: "Error en cálculo hidráulico", isLoading: false });
         });
-    }
+    },
+
+    // New Hydraulic Engine
+    simulationResults: null,
+    setSimulationResults: (results) => set({ simulationResults: results })
 }));

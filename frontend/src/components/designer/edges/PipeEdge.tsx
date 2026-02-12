@@ -11,6 +11,7 @@ import {
 import { updateTramo } from '@/app/actions/tramos'
 import { toast } from 'sonner'
 import { Check, X } from 'lucide-react'
+import { useProjectStore } from '@/store/project-store'
 
 export interface PipeEdgeData {
     codigo?: string
@@ -34,6 +35,31 @@ function PipeEdgeComponent({
     const [isEditing, setIsEditing] = useState(false)
     const [editValue, setEditValue] = useState(edgeData?.longitud?.toString() || "")
     const inputRef = useRef<HTMLInputElement>(null)
+
+    const simulationResults = useProjectStore(state => state.simulationResults)
+
+    // Result logic
+    const result = simulationResults ? simulationResults.linkResults[id] || simulationResults.linkResults[edgeData?.codigo || ''] : null;
+
+    // Velocity Color Coding
+    const edgeStyle = (() => {
+        const baseStyle = {
+            strokeWidth: selected ? 3 : 2,
+            strokeOpacity: 0.8,
+            strokeLinecap: 'round' as const,
+        };
+
+        if (!result) return { ...baseStyle, stroke: selected ? '#3b82f6' : '#64748b' };
+
+        // Velocity Color Scale
+        // < 0.6 m/s = Blue (Low)
+        // 0.6 - 3.0 m/s = Green (Good)
+        // > 3.0 m/s = Red (High)
+        const v = result.velocity;
+        if (v < 0.6) return { ...baseStyle, stroke: '#3b82f6', strokeWidth: selected ? 4 : 3 }; // Blue
+        if (v > 3.0) return { ...baseStyle, stroke: '#ef4444', strokeWidth: selected ? 4 : 3 }; // Red
+        return { ...baseStyle, stroke: '#22c55e', strokeWidth: selected ? 4 : 3 }; // Green
+    })();
 
     const [edgePath, labelX, labelY] = getStraightPath({
         sourceX,
@@ -96,12 +122,7 @@ function PipeEdgeComponent({
             <BaseEdge
                 id={id}
                 path={edgePath}
-                style={{
-                    stroke: selected ? '#3b82f6' : '#64748b',
-                    strokeWidth: selected ? 3 : 2,
-                    strokeOpacity: 0.8,
-                    strokeLinecap: 'round',
-                }}
+                style={edgeStyle}
             />
             <EdgeLabelRenderer>
                 <div
@@ -132,23 +153,31 @@ function PipeEdgeComponent({
                             </div>
                         </div>
                     ) : (
-                        <div
-                            className={`group flex items-center gap-1.5 px-1.5 py-0.5 rounded-full border shadow-sm cursor-pointer transition-all hover:scale-105 hover:border-blue-400 ${selected
+                        <div className="flex flex-col items-center gap-0.5">
+                            <div
+                                className={`group flex items-center gap-1.5 px-1.5 py-0.5 rounded-full border shadow-sm cursor-pointer transition-all hover:scale-105 hover:border-blue-400 ${selected
                                     ? 'bg-blue-50 border-blue-300 text-blue-900'
                                     : 'bg-background/95 border-border/60 text-muted-foreground'
-                                }`}
-                            onClick={() => setIsEditing(true)}
-                            title="Clic para editar longitud"
-                        >
-                            {/* Label Content */}
-                            <span className="text-[10px] font-bold font-mono">
-                                L={longitud?.toFixed(1) || '0.0'}
-                            </span>
-
-                            {diametro && (
-                                <span className="text-[9px] opacity-70 border-l border-current pl-1.5">
-                                    Ø{diametro}
+                                    }`}
+                                onClick={() => setIsEditing(true)}
+                                title="Clic para editar longitud"
+                            >
+                                {/* Label Content */}
+                                <span className="text-[10px] font-bold font-mono">
+                                    L={longitud?.toFixed(1) || '0.0'}
                                 </span>
+
+                                {diametro && (
+                                    <span className="text-[9px] opacity-70 border-l border-current pl-1.5">
+                                        Ø{diametro}
+                                    </span>
+                                )}
+                            </div>
+                            {/* Simulation Result Label */}
+                            {result && (
+                                <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600">
+                                    {result.velocity.toFixed(2)} m/s
+                                </div>
                             )}
                         </div>
                     )}
