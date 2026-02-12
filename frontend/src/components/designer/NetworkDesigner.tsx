@@ -1,21 +1,22 @@
 "use client"
 
-import { useCallback, useMemo, useRef, DragEvent } from 'react'
+import { useCallback, useMemo, useRef, useState, useEffect, DragEvent } from 'react'
 import {
     ReactFlow,
     Controls,
     Background,
     BackgroundVariant,
     MiniMap,
-    useNodesState,
-    useEdgesState,
-    addEdge,
+    applyNodeChanges,
+    applyEdgeChanges,
     type Connection,
     type Node,
     type Edge,
     type NodeTypes,
     type EdgeTypes,
     type OnConnect,
+    type OnNodesChange,
+    type OnEdgesChange,
     Panel,
     type ReactFlowInstance,
 } from '@xyflow/react'
@@ -28,7 +29,7 @@ import { PipeEdge } from './edges/PipeEdge'
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 
-// Register custom node types
+// ==================== NODE TYPES ====================
 const nodeTypes: NodeTypes = {
     reservorio: ReservoirNode,
     camara_rompe_presion: CRPNode,
@@ -44,13 +45,12 @@ const edgeTypes: EdgeTypes = {
     pipe: PipeEdge,
 }
 
-// Map Nudo tipo → ReactFlow node type
 function nudoToNodeType(tipo: string): string {
     if (nodeTypes[tipo]) return tipo
-    return 'union' // Fallback
+    return 'union'
 }
 
-// Convert Nudo[] → ReactFlow Node[]
+// ==================== CONVERTERS ====================
 function nudosToNodes(nudos: Nudo[]): Node[] {
     return nudos.map((nudo, index) => ({
         id: nudo.id,
@@ -71,7 +71,6 @@ function nudosToNodes(nudos: Nudo[]): Node[] {
     }))
 }
 
-// Convert Tramo[] → ReactFlow Edge[]
 function tramosToEdges(tramos: Tramo[]): Edge[] {
     return tramos.map(tramo => ({
         id: tramo.id,
@@ -87,6 +86,7 @@ function tramosToEdges(tramos: Tramo[]): Edge[] {
     }))
 }
 
+// ==================== COMPONENT ====================
 interface NetworkDesignerProps {
     nudos: Nudo[]
     tramos: Tramo[]
@@ -111,24 +111,68 @@ export default function NetworkDesigner({
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const reactFlowRef = useRef<ReactFlowInstance | null>(null)
 
-    // Initialize nodes and edges from props
-    const initialNodes = useMemo(() => nudosToNodes(nudos), [nudos])
-    const initialEdges = useMemo(() => tramosToEdges(tramos), [tramos])
+    // ================================================================
+    // GAME-LOOP ARCHITECTURE:
+    //   Source of truth: Zustand store (nudos, tramos)
+    //   Local state: synced via useEffect whenever store changes
+    //   React Flow: controlled component using this local state
+    //
+    // Flow:
+    //   [User Action] → Zustand store mutation → props change
+    //     → useEffect fires → setNodes(derived) → React Flow re-renders
+    //
+    //   [User Drags Node] → onNodesChange → applyNodeChanges → local state
+    //     → onNodeDragStop → persist to DB (optimistic, no re-derive)
+    // ================================================================
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes] = useState<Node[]>(() => nudosToNodes(nudos))
+    const [edges, setEdges] = useState<Edge[]>(() => tramosToEdges(tramos))
 
-    // Handle new connections (drawing a pipe between two nodes)
+    // ★ KEY: Sync local state whenever Zustand store data changes
+    // This is what makes it "real-time" — when addNudo/addTramo updates
+    // the store, this effect fires and pushes new data to React Flow.
+    useEffect(() => {
+        setNodes(prev => {
+            const newNodes = nudosToNodes(nudos)
+            // Preserve positions of existing nodes (user may have dragged them)
+            return newNodes.map(newNode => {
+                const existing = prev.find(n => n.id === newNode.id)
+                if (existing) {
+                    return { ...newNode, position: existing.position }
+                }
+                return newNode
+            })
+        })
+    }, [nudos])
+
+    useEffect(() => {
+        setEdges(tramosToEdges(tramos))
+    }, [tramos])
+
+    // Handle React Flow internal changes (drag, select, resize, etc.)
+    const onNodesChange: OnNodesChange = useCallback(
+        (changes) => {
+            setNodes(nds => applyNodeChanges(changes, nds))
+        },
+        []
+    )
+
+    const onEdgesChange: OnEdgesChange = useCallback(
+        (changes) => {
+            setEdges(eds => applyEdgeChanges(changes, eds))
+        },
+        []
+    )
+
+    // Handle new connections
     const onConnect: OnConnect = useCallback(
         (connection: Connection) => {
             if (connection.source && connection.target) {
                 onConnectProp?.(connection.source, connection.target)
-                setEdges((eds) =>
-                    addEdge({ ...connection, type: 'pipe', data: {} }, eds)
-                )
+                // Edge will appear via store → useEffect sync
             }
         },
-        [onConnectProp, setEdges]
+        [onConnectProp]
     )
 
     // Handle node drag end → persist position
@@ -139,7 +183,7 @@ export default function NetworkDesigner({
         [onNodeDragStop]
     )
 
-    // Handle node click → select in store
+    // Handle node click → select in store (no panel navigation!)
     const handleNodeClick = useCallback(
         (_event: React.MouseEvent, node: Node) => {
             const nudo = nudos.find(n => n.id === node.id)
@@ -159,38 +203,27 @@ export default function NetworkDesigner({
         [setSelectedElement]
     )
 
-    // ========== DRAG & DROP HANDLERS ==========
-
-    // Allow drop on the canvas
+    // ========== DRAG & DROP ==========
     const handleDragOver = useCallback((event: DragEvent) => {
         event.preventDefault()
         event.dataTransfer.dropEffect = 'move'
     }, [])
 
-    // Handle drop: create a new node at the drop position
     const handleDrop = useCallback(
         (event: DragEvent) => {
             event.preventDefault()
-
             const nodeType = event.dataTransfer.getData('application/reactflow-nodetype')
-
-            // If no valid type was dragged, ignore
             if (!nodeType || !reactFlowRef.current) return
 
-            // Convert screen coordinates to flow position
             const position = reactFlowRef.current.screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY,
             })
 
-            // Set the active component type for the server action
             setActiveComponentType(nodeType as Nudo['tipo'])
             setActiveTool('node')
-
-            // Call the onAddNode handler with position and type
             onAddNode?.(position.x, position.y, nodeType)
 
-            // Reset tool after placing
             setTimeout(() => {
                 setActiveTool('select')
                 setActiveComponentType(null)
@@ -199,8 +232,7 @@ export default function NetworkDesigner({
         [onAddNode, setActiveTool, setActiveComponentType]
     )
 
-    // ========== PANE CLICK (fallback for click-to-place) ==========
-
+    // ========== PANE CLICK ==========
     const handlePaneClick = useCallback(
         (event: React.MouseEvent) => {
             if (activeTool === 'node' && onAddNode && reactFlowRef.current) {
@@ -209,7 +241,6 @@ export default function NetworkDesigner({
                     y: event.clientY,
                 })
                 onAddNode(position.x, position.y, activeComponentType || undefined)
-                // Reset tool after placing
                 setActiveTool('select')
                 setActiveComponentType(null)
             } else {
@@ -274,7 +305,6 @@ export default function NetworkDesigner({
                     zoomable
                 />
 
-                {/* Mode indicator */}
                 {activeTool === 'node' && (
                     <Panel position="top-center">
                         <div className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold shadow-lg animate-in fade-in slide-in-from-top-2">

@@ -3,7 +3,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { useProjectStore } from "@/store/project-store"
-import { PropertiesPanel } from "@/components/properties/PropertiesPanel"
 import DesignerWrapper from "@/components/designer/DesignerWrapper"
 import OptimizationPanel from "@/components/optimization/OptimizationPanel"
 import TransparencyPanel from "@/components/results/TransparencyPanel"
@@ -22,7 +21,6 @@ interface ProjectDataPanelProps {
 export function ProjectDataPanel({
     proyectoId, nudos: initialNudos, tramos: initialTramos, initialCost, ultimoCalculo, initialPlanoConfig
 }: ProjectDataPanelProps) {
-    const selectedElement = useProjectStore(state => state.selectedElement)
 
     const storeNudos = useProjectStore(state => state.nudos)
     const storeTramos = useProjectStore(state => state.tramos)
