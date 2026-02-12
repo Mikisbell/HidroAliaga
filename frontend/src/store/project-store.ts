@@ -58,6 +58,7 @@ interface ProjectState {
     setElements: (nudos: Nudo[], tramos: Tramo[]) => void; // Batch update
     addNudo: (nudo: Nudo) => void;
     updateNudo: (nudo: Nudo) => void;
+    updateProjectSettings: (settings: import('@/types/models').ProjectSettings) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
     clearProject: () => void;
@@ -113,6 +114,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     addNudo: (nudo) => set((state) => ({ nudos: [...state.nudos, nudo] })),
     updateNudo: (nudo) => set((state) => ({
         nudos: state.nudos.map((n) => (n.id === nudo.id ? { ...n, ...nudo } : n))
+    })),
+    updateProjectSettings: (settings) => set((state) => ({
+        currentProject: state.currentProject ? { ...state.currentProject, settings } : null
     })),
     setLoading: (loading) => set({ isLoading: loading }),
     setError: (error) => set({ error }),

@@ -10,6 +10,16 @@ export type TipoNudo = 'cisterna' | 'tanque_elevado' | 'union' | 'consumo' | 'va
 export type TipoTramo = 'tuberia' | 'valvula' | 'bomba' | 'accesorio'
 export type Material = 'pvc' | 'hdpe' | 'hdde' | 'concreto' | 'acero' | 'cobre'
 
+// ============ CONFIGURACION NORMATIVA ============
+
+export interface ProjectSettings {
+    normativa: 'urbano' | 'rural';
+    dotacion: number;
+    k1?: number;
+    k2?: number;
+    // Futuros ajustes
+}
+
 // ============ PROYECTO ============
 
 export interface Proyecto {
@@ -32,12 +42,26 @@ export interface Proyecto {
     usuario_id?: string
     created_at: string
     updated_at: string
+    settings?: ProjectSettings; // JSONB
     configuracion_plano?: {
         url: string
         opacity: number
         rotation?: number
         bounds: [[number, number], [number, number]] | null
     }
+}
+
+// Interfaz simplificada que usamos en el frontend a veces como 'Project'
+export interface Project {
+    id: string;
+    nombre: string;
+    ambito: string;
+    descripcion?: string;
+    estado: string;
+    settings: ProjectSettings;
+    created_at?: string;
+    updated_at?: string;
+    usuario_id?: string;
 }
 
 export interface ProyectoCreate {
@@ -52,6 +76,7 @@ export interface ProyectoCreate {
     periodo_diseno?: number
     dotacion_percapita?: number
     coef_cobertura?: number
+    settings?: ProjectSettings;
 }
 
 // ============ NUDO ============
@@ -210,4 +235,22 @@ export interface Alerta {
     sugerencia?: string
     resuelta: boolean
     created_at: string
+}
+
+// ============ INTERFACES ESPECÍFICAS DE FE ============
+
+export interface JunctionData extends Record<string, unknown> {
+    label?: string;
+    codigo?: string;
+    cota_terreno?: number;
+    demanda_base?: number;
+    numero_viviendas?: number;
+    color?: string;
+}
+
+export interface ReservoirData extends Record<string, unknown> {
+    label?: string;
+    codigo?: string;
+    cota_terreno?: number;
+    altura_agua?: number;
 }

@@ -37,6 +37,7 @@ import {
 import { useProfile } from "@/hooks/use-profile"
 import { handleApiError } from "@/lib/error-handler"
 import { BRAND } from "@/lib/constants"
+import { ProjectSettingsModal } from "@/components/project/ProjectSettingsModal"
 
 interface SidebarProject {
     id: string
@@ -59,6 +60,7 @@ function NavContent() {
     const [projects, setProjects] = useState<SidebarProject[]>([])
     const [projectsOpen, setProjectsOpen] = useState(true)
     const [projectsLoading, setProjectsLoading] = useState(true)
+    const [settingsOpen, setSettingsOpen] = useState(false)
 
     const fetchProjects = useCallback(async () => {
         try {
@@ -290,7 +292,7 @@ function NavContent() {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem disabled>
+                        <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
                             <Settings className="w-4 h-4 mr-2" />
                             Configuración
                         </DropdownMenuItem>
@@ -308,6 +310,9 @@ function NavContent() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            {/* Settings Modal */}
+            <ProjectSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
         </div>
     )
 }
