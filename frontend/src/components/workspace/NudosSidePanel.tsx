@@ -1,24 +1,31 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Nudo } from "@/types/models"
+import { Nudo, Tramo } from "@/types/models"
 import { updateNudo, deleteNudo } from "@/app/actions/nudos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { useProjectStore } from "@/store/project-store"
-import { Trash2 } from "lucide-react"
+import { Trash2, ArrowLeft, Settings2 } from "lucide-react"
 
-interface NudosSidePanelProps {
+// Inspector Forms
+import NodePropertiesForm from "@/components/designer/inspector/NodePropertiesForm"
+import PipePropertiesForm from "@/components/designer/inspector/PipePropertiesForm"
+
+interface RightPanelProps {
     nudos: Nudo[]
+    tramos: Tramo[]
 }
 
-export function NudosSidePanel({ nudos }: NudosSidePanelProps) {
+export function RightPanel({ nudos, tramos }: RightPanelProps) {
     const router = useRouter()
-    const setSelectedElement = useProjectStore(state => state.setSelectedElement)
-    const selectedElement = useProjectStore(state => state.selectedElement)
-    const removeNudoStore = useProjectStore(state => state.removeNudo)
+    const {
+        selectedElement,
+        setSelectedElement,
+        removeNudo: removeNudoStore
+    } = useProjectStore()
 
     const handleNudoUpdate = useCallback(async (id: string, field: string, value: any) => {
         let numValue = value
@@ -52,6 +59,52 @@ export function NudosSidePanel({ nudos }: NudosSidePanelProps) {
         }
     }, [removeNudoStore, router])
 
+    // --- RENDER INSPECTOR MODE ---
+    if (selectedElement) {
+        let title = "Propiedades"
+        let content = null
+
+        if (selectedElement.type === 'nudo') {
+            const data = nudos.find(n => n.id === selectedElement.id)
+            if (data) {
+                title = `Nudo ${data.codigo}`
+                content = <NodePropertiesForm nudo={data} />
+            }
+        } else if (selectedElement.type === 'tramo') {
+            const data = tramos.find(t => t.id === selectedElement.id)
+            if (data) {
+                title = `Tramo ${data.codigo || 'Tubería'}`
+                content = <PipePropertiesForm tramo={data} />
+            }
+        }
+
+        if (content) {
+            return (
+                <div className="h-full flex flex-col bg-background/50 border-l border-border/40 w-[350px]">
+                    <div className="p-2 border-b border-border/40 bg-muted/20 flex items-center gap-2">
+                        <button
+                            onClick={() => setSelectedElement(null)}
+                            className="p-1 hover:bg-muted rounded-md transition-colors"
+                            title="Volver a la lista"
+                        >
+                            <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-2">
+                            <Settings2 className="w-3 h-3" />
+                            {title}
+                        </h3>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                        {content}
+                    </div>
+                </div>
+            )
+        }
+        // Fallback if data not found (e.g. deleted), go back to list
+        setSelectedElement(null)
+    }
+
+    // --- RENDER LIST MODE (Default) ---
     return (
         <div className="h-full flex flex-col bg-background/50 border-l border-border/40 w-[350px]">
             <div className="p-2 border-b border-border/40 bg-muted/20 flex items-center justify-between">
@@ -77,8 +130,7 @@ export function NudosSidePanel({ nudos }: NudosSidePanelProps) {
                                 <tr
                                     key={n.id}
                                     className={cn(
-                                        "hover:bg-muted/10 cursor-pointer transition-colors group",
-                                        selectedElement?.id === n.id && "bg-primary/5 hover:bg-primary/10"
+                                        "hover:bg-muted/10 cursor-pointer transition-colors group"
                                     )}
                                     onClick={() => setSelectedElement({ id: n.id, type: 'nudo' })}
                                 >

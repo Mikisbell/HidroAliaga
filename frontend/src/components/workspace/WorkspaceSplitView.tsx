@@ -7,14 +7,12 @@ import { cn } from "@/lib/utils"
 import NetworkDesigner from "@/components/designer/NetworkDesigner"
 import { MapBottomPalette } from "@/components/map/MapBottomPalette"
 import { MapSideTools } from "@/components/map/MapSideTools"
-import { NudosSidePanel } from "./NudosSidePanel"
-import { TramosBottomPanel } from "./TramosBottomPanel"
+import { HydraulicTablePanel } from "./HydraulicTablePanel"
 import { Nudo, Tramo } from "@/types/models"
 
 interface WorkspaceSplitViewProps {
     nudos: Nudo[]
     tramos: Tramo[]
-    // Pass-through props for Designer
     onNodeDragStop?: (id: string, x: number, y: number) => void
     onConnect?: (sourceId: string, targetId: string) => void
     onNodeClick?: (nudo: Nudo) => void
@@ -29,15 +27,12 @@ export function WorkspaceSplitView({
     onNodeClick,
     onAddNode
 }: WorkspaceSplitViewProps) {
-    // We reuse isGridOpen to toggle the bottom panel (Tramos)
     const { isGridOpen } = useProjectStore()
 
-    // Top/Bottom split state
-    const [splitPercentage, setSplitPercentage] = useState(70)
+    const [splitPercentage, setSplitPercentage] = useState(60)
     const containerRef = useRef<HTMLDivElement>(null)
     const isDragging = useRef(false)
 
-    // Handle Dragging specifically for Top/Bottom Split
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         isDragging.current = true
         document.body.style.cursor = 'row-resize'
@@ -52,13 +47,10 @@ export function WorkspaceSplitView({
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
         if (!isDragging.current || !containerRef.current) return
-
         const containerRect = containerRef.current.getBoundingClientRect()
         const relativeY = e.clientY - containerRect.top
         const percentage = (relativeY / containerRect.height) * 100
-
-        const clamped = Math.min(Math.max(percentage, 20), 80)
-        setSplitPercentage(clamped)
+        setSplitPercentage(Math.min(Math.max(percentage, 20), 80))
     }, [])
 
     useEffect(() => {
@@ -70,17 +62,15 @@ export function WorkspaceSplitView({
         }
     }, [handleMouseMove, handleMouseUp])
 
-
     return (
         <div ref={containerRef} className="flex flex-col h-full w-full overflow-hidden relative">
 
-            {/* --- TOP SECTION (Map + Node Panel) --- */}
+            {/* --- TOP: Map --- */}
             <div
                 style={{ height: isGridOpen ? `${splitPercentage}%` : '100%' }}
-                className={cn("bg-background transition-[height] duration-0 relative min-h-0 flex flex-row")}
+                className={cn("bg-background transition-[height] duration-0 relative min-h-0")}
             >
-                {/* 1. LEFT: Network Designer (Map) */}
-                <div className="flex-1 relative min-w-0">
+                <div className="flex-1 relative w-full h-full">
                     <MapBottomPalette />
                     <MapSideTools />
                     <NetworkDesigner
@@ -92,18 +82,9 @@ export function WorkspaceSplitView({
                         onAddNode={onAddNode}
                     />
                 </div>
-
-                {/* 2. RIGHT: Nudos Side Panel (Fixed Width) */}
-                {/* Only show if there is enough space? For now always show if grid is open or maybe always? 
-                    User asked for "Nudos a la derecha de diseñador". Let's show it always active unless explicit toggle. 
-                    Actually, let's link it to a new state or just always visible for this "3-in-1" view. 
-                    Let's assume always visible for now. */}
-                <div className="hidden md:block">
-                    <NudosSidePanel nudos={nudos} />
-                </div>
             </div>
 
-            {/* --- SPLITTER HANDLE (Horizontal) --- */}
+            {/* --- SPLITTER --- */}
             {isGridOpen && (
                 <div
                     onMouseDown={handleMouseDown}
@@ -113,13 +94,13 @@ export function WorkspaceSplitView({
                 </div>
             )}
 
-            {/* --- BOTTOM SECTION (Pipes Panel) --- */}
+            {/* --- BOTTOM: Unified Hydraulic Table --- */}
             {isGridOpen && (
                 <div
                     style={{ height: `${100 - splitPercentage}%` }}
                     className="bg-background min-h-0 flex flex-col"
                 >
-                    <TramosBottomPanel tramos={tramos} />
+                    <HydraulicTablePanel nudos={nudos} tramos={tramos} />
                 </div>
             )}
         </div>

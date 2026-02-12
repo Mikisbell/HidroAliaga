@@ -25,6 +25,7 @@ describe('useProjectStore', () => {
             created_at: '2026-01-01',
             updated_at: '2026-01-01',
             usuario_id: 'u1',
+            settings: {} as any
         }
 
         useProjectStore.getState().setProject(project)
@@ -74,6 +75,7 @@ describe('useProjectStore', () => {
         const project = {
             id: 'p1', nombre: 'Test', ambito: 'rural', estado: 'activo',
             created_at: '', updated_at: '', usuario_id: 'u1',
+            settings: {} as any
         }
         useProjectStore.getState().setProject(project)
         useProjectStore.getState().addNudo({ id: 'n1', codigo: 'N-1' } as any)

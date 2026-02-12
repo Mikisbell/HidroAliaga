@@ -144,8 +144,7 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     onNodeClick={() => setActiveTool('select')}
                     onAddNode={handleAddNode}
                 />
-                {/* Property Inspector (Floating Request) */}
-                <PropertyInspector />
+                {/* Property Inspector integrated in Side Panel */}
                 {/* The Referee - Validation Panel INSIDE Provider for Zoom capabilities */}
                 <ValidationPanel />
             </ReactFlowProvider>
