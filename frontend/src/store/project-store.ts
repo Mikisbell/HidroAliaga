@@ -1,5 +1,5 @@
 
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 import { Nudo, Tramo } from '@/types/models';
 import { IterationStep } from "@/types/simulation"
