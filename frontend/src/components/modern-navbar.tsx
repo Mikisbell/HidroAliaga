@@ -169,7 +169,12 @@ export function ModernNavbar() {
                             {/* Botón Mobile */}
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                                className={cn(
+                                    "lg:hidden w-10 h-10 flex items-center justify-center rounded-lg transition-colors",
+                                    isScrolled
+                                        ? "text-slate-400 hover:text-white hover:bg-white/5"
+                                        : "text-slate-700 hover:text-slate-900 hover:bg-slate-100/50"
+                                )}
                                 aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
                             >
                                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

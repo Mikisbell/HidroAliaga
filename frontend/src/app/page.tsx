@@ -95,7 +95,7 @@ export default async function HomePage() {
             <ModernNavbar />
 
             {/* Hero Section */}
-            <section className="relative z-10 px-6 md:px-12 pt-12 pb-16 max-w-7xl mx-auto">
+            <section className="relative z-10 px-6 md:px-12 pt-32 pb-16 max-w-7xl mx-auto">
                 <ScrollReveal>
                     <div className="text-center space-y-6">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
