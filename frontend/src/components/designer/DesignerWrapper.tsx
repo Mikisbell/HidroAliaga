@@ -94,10 +94,9 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     onNodeClick={() => setActiveTool('select')} // Basic handler, expand as needed
                     onAddNode={handleAddNode}
                 />
+                {/* The Referee - Validation Panel INSIDE Provider for Zoom capabilities */}
+                <ValidationPanel />
             </ReactFlowProvider>
-
-            {/* The Referee - Validation Panel */}
-            <ValidationPanel />
         </div>
     )
 }

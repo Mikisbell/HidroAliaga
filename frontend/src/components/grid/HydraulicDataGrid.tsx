@@ -47,11 +47,11 @@ export function HydraulicDataGrid() {
             numValue = parseFloat(value) || 0
         }
 
-        const res = await updateNudo(id, { [field]: numValue })
-        if (res.error) {
-            toast.error(res.error) // Revert if failed (complex without store interaction)
-        } else {
+        try {
+            await updateNudo(id, { [field]: numValue })
             router.refresh()
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Error al actualizar nudo")
         }
     }, [router])
 
