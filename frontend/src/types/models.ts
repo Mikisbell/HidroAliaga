@@ -73,6 +73,8 @@ export interface Nudo {
     presion_minima_verificada: boolean
     es_critico: boolean
     notas?: string
+    numero_viviendas?: number // Manual input for demand calculation
+    altura_agua?: number // For Reservoirs (Water Level)
     created_at: string
     updated_at: string
 }
@@ -88,6 +90,8 @@ export interface NudoCreate {
     demanda_base?: number
     elevacion?: number
     es_critico?: boolean
+    numero_viviendas?: number
+    altura_agua?: number
 }
 
 // ============ TRAMO ============

@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 
 import { Nudo, Tramo } from '@/types/models';
+import { IterationStep } from "@/types/simulation"
 
 interface Project {
     id: string;
@@ -32,6 +33,26 @@ interface ProjectState {
     selectedElement: { id: string; type: 'nudo' | 'tramo' } | null;
     setSelectedElement: (element: { id: string; type: 'nudo' | 'tramo' } | null) => void;
 
+    // Simulation State
+    simulationMode: 'design' | 'simulation';
+    simulationStatus: 'stopped' | 'playing' | 'paused';
+    simulationSpeed: number;
+    simulationStep: number;
+    simulationLog: IterationStep[];
+
+    // UI/Layout State
+    activeView: 'design' | 'data' | 'simulation';
+    isGridOpen: boolean;
+    setActiveView: (view: 'design' | 'data' | 'simulation') => void;
+    setGridOpen: (isOpen: boolean) => void;
+
+    // Simulation Actions
+    setSimulationMode: (mode: 'design' | 'simulation') => void;
+    setSimulationStatus: (status: 'stopped' | 'playing' | 'paused') => void;
+    setSimulationStep: (step: number) => void;
+    setSimulationLog: (log: IterationStep[]) => void;
+    resetSimulation: () => void;
+
     // Actions
     setProject: (project: Project) => void;
     setElements: (nudos: Nudo[], tramos: Tramo[]) => void; // Batch update
@@ -59,6 +80,30 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     setStartNodeId: (id) => set({ startNodeId: id }),
     selectedElement: null,
     setSelectedElement: (element) => set({ selectedElement: element }),
+
+    // Simulation Defaults
+    simulationMode: 'design',
+    simulationStatus: 'stopped',
+    simulationSpeed: 1000,
+    simulationStep: 0,
+    simulationLog: [],
+
+    // UI Defaults
+    activeView: 'design',
+    isGridOpen: true,
+    setActiveView: (view) => set({ activeView: view }),
+    setGridOpen: (isOpen) => set({ isGridOpen: isOpen }),
+
+    setSimulationMode: (mode) => set({ simulationMode: mode }),
+    setSimulationStatus: (status) => set({ simulationStatus: status }),
+    setSimulationStep: (step) => set({ simulationStep: step }),
+    setSimulationLog: (log) => set({ simulationLog: log }),
+    resetSimulation: () => set({
+        simulationStatus: 'stopped',
+        simulationStep: 0,
+        simulationLog: [],
+        simulationMode: 'design'
+    }),
 
     setProject: (project) => set({ currentProject: project, error: null }),
     setElements: (nudos, tramos) => set({ nudos, tramos }),

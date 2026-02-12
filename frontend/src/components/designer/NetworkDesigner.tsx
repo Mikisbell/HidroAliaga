@@ -21,10 +21,10 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import { ReservoirNode } from './nodes/ReservoirNode'
-import { CRPNode } from './nodes/CRPNode'
-import { JunctionNode } from './nodes/JunctionNode'
-import { PipeEdge } from './edges/PipeEdge'
+import ReservoirNode from './nodes/ReservoirNode' // Default import
+import CRPNode from './nodes/CRPNode'
+import JunctionNode from './nodes/JunctionNode'
+import { PipeEdge } from './edges/PipeEdge' // This one is named export
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 
@@ -65,6 +65,9 @@ function nudosToNodes(nudos: Nudo[]): Node[] {
             codigo: nudo.codigo,
             cota_terreno: nudo.cota_terreno,
             demanda_base: nudo.demanda_base,
+            numero_viviendas: nudo.numero_viviendas,
+            altura_agua: nudo.altura_agua,
+            tipo: nudo.tipo, // Pass type for CRP logic
         },
     }))
 }

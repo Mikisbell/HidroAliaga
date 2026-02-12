@@ -1,65 +1,100 @@
-"use client"
+"use client";
 
-import { memo } from 'react'
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { memo, useState, useCallback, useEffect } from "react";
+import { Handle, Position, NodeProps } from "@xyflow/react";
+import { Home, Droplets, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { updateNudoViviendasAction } from "@/app/actions/tramos";
+import { updateNudo } from "@/app/actions/nudos";
 
-export interface JunctionNodeData {
-    label: string
-    codigo: string
-    cota_terreno?: number
-    demanda_base?: number
-    [key: string]: unknown
+interface JunctionData extends Record<string, unknown> {
+    label?: string;
+    cota_terreno?: number;
+    numero_viviendas?: number;
+    demanda_base?: number;
 }
 
-function JunctionNodeComponent({ data, selected }: NodeProps) {
-    const nodeData = data as JunctionNodeData
-    return (
-        <div className={`relative group ${selected ? 'ring-4 ring-gray-400/50 rounded-full' : ''}`}>
-            {/* Main Shape - Small Circle */}
-            <div className="w-5 h-5 bg-white dark:bg-gray-200 border-[3px] border-black dark:border-white rounded-full shadow-md transition-all duration-200 group-hover:scale-125 group-hover:shadow-lg cursor-grab active:cursor-grabbing" />
+const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
+    const data = initialData as JunctionData;
+    const [cota, setCota] = useState(data.cota_terreno?.toString() || "");
+    const [houses, setHouses] = useState(data.numero_viviendas?.toString() || "");
+    const [demand, setDemand] = useState(data.demanda_base !== undefined ? data.demanda_base.toFixed(3) : "0.000");
 
-            {/* Label - Prominent letter next to node */}
-            <div className="absolute -right-2 -top-6 whitespace-nowrap">
-                <span className="text-sm font-bold text-foreground bg-background/70 px-1 rounded drop-shadow-sm">
-                    {nodeData.codigo || nodeData.label || 'N'}
-                </span>
+    // Local update handler
+    const handleBlur = useCallback(async () => {
+        const valCota = parseFloat(cota);
+        const valHouses = parseInt(houses, 10);
+
+        const updates: any = {};
+        if (!isNaN(valCota)) updates.cota_terreno = valCota;
+        if (!isNaN(valHouses)) updates.numero_viviendas = valHouses;
+
+        if (Object.keys(updates).length > 0) {
+            try {
+                await updateNudo(id, updates);
+                // If houses changed, we might trigger a recalculation of demand (L/s) here or rely on backend
+            } catch (error) {
+                console.error("Failed to update junction:", error);
+            }
+        }
+    }, [id, cota, houses]);
+
+    return (
+        <div
+            className={cn(
+                "relative flex flex-col items-center justify-center p-2 rounded-full border-2 bg-background transition-all shadow-sm group min-w-[100px]",
+                selected
+                    ? "border-emerald-500 ring-2 ring-emerald-200 shadow-xl scale-105"
+                    : "border-emerald-200 hover:border-emerald-400"
+            )}
+        >
+            {/* Node Label (A, B, C...) */}
+            <div className="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center z-10 shadow-sm text-xs font-bold text-emerald-700">
+                {data.label || id.substring(0, 1)}
             </div>
 
-            {/* Cota + Demand info */}
-            {nodeData.cota_terreno !== undefined && (
-                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="text-[9px] text-muted-foreground bg-muted/60 px-1 rounded">
-                        {nodeData.cota_terreno}m
-                        {nodeData.demanda_base ? ` · ${nodeData.demanda_base}L/s` : ''}
-                    </span>
+            <div className="flex flex-col items-center gap-1 w-full px-1">
+                {/* Cota Input */}
+                <div className="flex items-center gap-1 w-full">
+                    <span className="text-[9px] font-mono text-muted-foreground w-4 text-right">Z:</span>
+                    <input
+                        type="number"
+                        className="w-full bg-transparent text-xs font-semibold text-right focus:outline-none p-0.5 border-b border-dashed border-muted-foreground/30 focus:border-emerald-500 transition-colors"
+                        placeholder="Cota"
+                        value={cota}
+                        onChange={(e) => setCota(e.target.value)}
+                        onBlur={handleBlur}
+                    />
                 </div>
-            )}
 
-            {/* Connection Handles - All 4 sides */}
-            <Handle
-                type="target"
-                position={Position.Top}
-                className="!w-2.5 !h-2.5 !bg-gray-600 !border-2 !border-white dark:!border-gray-900 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-            <Handle
-                type="source"
-                position={Position.Bottom}
-                className="!w-2.5 !h-2.5 !bg-gray-600 !border-2 !border-white dark:!border-gray-900 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-            <Handle
-                type="source"
-                position={Position.Right}
-                id="right"
-                className="!w-2.5 !h-2.5 !bg-gray-600 !border-2 !border-white dark:!border-gray-900 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-            <Handle
-                type="target"
-                position={Position.Left}
-                id="left"
-                className="!w-2.5 !h-2.5 !bg-gray-600 !border-2 !border-white dark:!border-gray-900 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            />
+                {/* Houses Input */}
+                <div className="flex items-center gap-1 w-full group/houses">
+                    <Home className="w-3 h-3 text-emerald-500/70" />
+                    <input
+                        type="number"
+                        className="w-full bg-transparent text-xs font-semibold text-right focus:outline-none p-0.5 border-b border-dashed border-muted-foreground/30 focus:border-emerald-500 transition-colors text-emerald-700 dark:text-emerald-400"
+                        placeholder="Viv."
+                        value={houses}
+                        onChange={(e) => setHouses(e.target.value)}
+                        onBlur={handleBlur}
+                        title="Número de Viviendas"
+                    />
+                </div>
+
+                {/* Read-only Demand (L/s) */}
+                <div className="flex items-center justify-end gap-1 w-full opacity-50 text-[9px] font-mono">
+                    <ArrowRight className="w-2.5 h-2.5 text-muted-foreground" />
+                    <span>{demand} L/s</span>
+                </div>
+
+            </div>
+
+
+            {/* Ports */}
+            <Handle type="target" position={Position.Top} className="w-2.5 h-2.5 !bg-emerald-500" />
+            <Handle type="source" position={Position.Bottom} className="w-2.5 h-2.5 !bg-emerald-500" />
         </div>
-    )
-}
+    );
+};
 
-export const JunctionNode = memo(JunctionNodeComponent)
+export default memo(JunctionNode);

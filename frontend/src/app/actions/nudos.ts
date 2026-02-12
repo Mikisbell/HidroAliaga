@@ -33,6 +33,8 @@ export async function updateNudo(id: string, data: Partial<Nudo>) {
     if (data.nombre !== undefined) updates.nombre = data.nombre
     if (data.notas !== undefined) updates.notas = data.notas
     if (data.es_critico !== undefined) updates.es_critico = data.es_critico
+    if (data.numero_viviendas !== undefined) updates.numero_viviendas = data.numero_viviendas
+    if (data.altura_agua !== undefined) updates.altura_agua = data.altura_agua
 
     const { error } = await supabase
         .from("nudos")
@@ -62,7 +64,9 @@ export async function createNudo(proyectoId: string, latitud: number, longitud: 
         longitud,
         cota_terreno: 0, // Default, usuario debe editar
         demanda_base: 0,
-        elevacion: 0
+        elevacion: 0,
+        numero_viviendas: 0,
+        altura_agua: 0
     }).select().single()
 
     if (error) {
