@@ -8,21 +8,34 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
     const data = initialData as JunctionData;
     const label = data.codigo || data.label || id.substring(0, 1)
 
-    // Simulation Results
+    // Simulation Results & Alerts (The Referee)
     const simulationResults = useProjectStore(state => state.simulationResults);
+    const simulationAlerts = useProjectStore(state => state.simulationAlerts);
 
     const result = useMemo(() => {
         if (!simulationResults || !simulationResults.nodeResults) return null;
         return simulationResults.nodeResults[id] || simulationResults.nodeResults[data.codigo || ''];
     }, [simulationResults, id, data.codigo]);
 
-    // Pressure Color Coding
-    const pressureColor = useMemo(() => {
-        if (!result) return data.color || "bg-emerald-500";
-        if (result.pressure < 10) return "bg-red-500 animate-pulse"; // Low Pressure Warning
-        if (result.pressure > 50) return "bg-orange-500"; // High Pressure Warning
-        return "bg-emerald-500"; // OK
-    }, [result, data.color]);
+    // Validation Status
+    const statusColor = useMemo(() => {
+        if (!simulationAlerts || simulationAlerts.length === 0) return "bg-emerald-500";
+
+        const myAlerts = simulationAlerts.filter(a => a.elementId === id);
+        const hasError = myAlerts.some(a => a.level === 'error');
+        const hasWarning = myAlerts.some(a => a.level === 'warning');
+
+        if (hasError) return "bg-red-500 animate-pulse";
+        if (hasWarning) return "bg-amber-500";
+        return "bg-emerald-500";
+    }, [simulationAlerts, id]);
+
+    // Determine border color based on status
+    const borderColor = useMemo(() => {
+        if (statusColor.includes("red")) return "border-red-500";
+        if (statusColor.includes("amber")) return "border-amber-500";
+        return "border-emerald-500";
+    }, [statusColor]);
 
     return (
         <div
@@ -31,14 +44,14 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
                 selected
                     ? "border-emerald-600 ring-2 ring-emerald-200 shadow-md scale-110"
                     : `border-transparent hover:border-emerald-600 hover:shadow-md`,
-                pressureColor === "bg-emerald-500" ? "border-emerald-500" : "border-transparent" // Default border
+                selected ? "border-emerald-600" : borderColor // Dynamic Border
             )}
             title={data.nombre as string || "Nudo"}
         >
             {/* Status Indicator (Fill) */}
             <div className={cn(
                 "absolute inset-0.5 rounded-full opacity-20",
-                pressureColor
+                statusColor
             )} />
 
             {/* Centered Label */}

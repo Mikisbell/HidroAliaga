@@ -36,30 +36,46 @@ function PipeEdgeComponent({
     const [editValue, setEditValue] = useState(edgeData?.longitud?.toString() || "")
     const inputRef = useRef<HTMLInputElement>(null)
 
+    // Simulation Results & Alerts (The Referee)
     const simulationResults = useProjectStore(state => state.simulationResults)
+    const simulationAlerts = useProjectStore(state => state.simulationAlerts)
 
     // Result logic
     const result = simulationResults ? simulationResults.linkResults[id] || simulationResults.linkResults[edgeData?.codigo || ''] : null;
 
-    // Velocity Color Coding
-    const edgeStyle = (() => {
-        const baseStyle = {
-            strokeWidth: selected ? 3 : 2,
-            strokeOpacity: 0.8,
-            strokeLinecap: 'round' as const,
-        };
+    // Validation Status Color
+    const statusColor = (() => {
+        if (!simulationAlerts || simulationAlerts.length === 0) return '#22c55e'; // Green default/ok
 
-        if (!result) return { ...baseStyle, stroke: selected ? '#3b82f6' : '#64748b' };
+        const myAlerts = simulationAlerts.filter(a => a.elementId === id);
+        const hasError = myAlerts.some(a => a.level === 'error');
+        const hasWarning = myAlerts.some(a => a.level === 'warning');
 
-        // Velocity Color Scale
-        // < 0.6 m/s = Blue (Low)
-        // 0.6 - 3.0 m/s = Green (Good)
-        // > 3.0 m/s = Red (High)
-        const v = result.velocity;
-        if (v < 0.6) return { ...baseStyle, stroke: '#3b82f6', strokeWidth: selected ? 4 : 3 }; // Blue
-        if (v > 3.0) return { ...baseStyle, stroke: '#ef4444', strokeWidth: selected ? 4 : 3 }; // Red
-        return { ...baseStyle, stroke: '#22c55e', strokeWidth: selected ? 4 : 3 }; // Green
+        if (hasError) return '#ef4444'; // Red
+        if (hasWarning) return '#f59e0b'; // Amber
+        return '#22c55e'; // Green
     })();
+
+    // Fallback logic for normal simulation view if no alerts/validation executed yet
+    // Uses velocity as proxy if available, otherwise gray/blue
+    const finalColor = (() => {
+        if (simulationAlerts && simulationAlerts.length > 0) return statusColor;
+        if (result) {
+            // Legacy/Simple Velocity check if no validation run
+            const v = result.velocity;
+            if (v < 0.6) return '#3b82f6';
+            if (v > 3.0) return '#ef4444';
+            return '#22c55e';
+        }
+        return selected ? '#3b82f6' : '#64748b'; // Default/Selected
+    })();
+
+    const edgeStyle = {
+        strokeWidth: selected ? 4 : 3,
+        strokeOpacity: 0.8,
+        strokeLinecap: 'round' as const,
+        stroke: finalColor
+    };
 
     const [edgePath, labelX, labelY] = getStraightPath({
         sourceX,
