@@ -1,6 +1,18 @@
-import { TramosGrid } from "@/components/tramos/TramosGrid"
+"use client"
 
-// ... existing imports
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { useProjectStore } from "@/store/project-store"
+import { PropertiesPanel } from "@/components/properties/PropertiesPanel"
+import MapWrapper from "@/components/map/MapWrapper"
+import OptimizationPanel from "@/components/optimization/OptimizationPanel"
+import TransparencyPanel from "@/components/results/TransparencyPanel"
+import { Nudo, Tramo, Calculo } from "@/types/models"
+import { useEffect, useState } from "react"
+import { TramosGrid } from "@/components/tramos/TramosGrid"
+import { BlueprintUpload } from "@/components/setup/BlueprintUpload"
 
 interface ProjectDataPanelProps {
     proyectoId: string
@@ -14,7 +26,7 @@ interface ProjectDataPanelProps {
 export function ProjectDataPanel({
     proyectoId, nudos: initialNudos, tramos: initialTramos, initialCost, ultimoCalculo, initialPlanoConfig
 }: ProjectDataPanelProps) {
-    // ... existing hook logic
+    const selectedElement = useProjectStore(state => state.selectedElement)
 
     const storeNudos = useProjectStore(state => state.nudos)
     const storeTramos = useProjectStore(state => state.tramos)
@@ -28,12 +40,13 @@ export function ProjectDataPanel({
     }
 
     return (
-        <Tabs defaultValue="tramos" className="animate-fade-in-up-delay-3 h-full flex flex-col">
+        <Tabs defaultValue="inicio" className="animate-fade-in-up-delay-3 h-full flex flex-col">
             <TabsList className="bg-card/60 border border-border/30 w-full justify-start overflow-x-auto">
+                <TabsTrigger value="inicio">Configuración (Opcional)</TabsTrigger>
                 <TabsTrigger value="tramos">Editor de Tramos ({tramos?.length || 0})</TabsTrigger>
                 <TabsTrigger value="nudos">Nudos ({nudos?.length || 0})</TabsTrigger>
                 <TabsTrigger value="mapa">
-                    <span className="hidden lg:inline">Mapa Visual</span>
+                    <span className="hidden lg:inline">Visualización 3D</span>
                     <span className="lg:hidden">Mapa</span>
                 </TabsTrigger>
                 <TabsTrigger value="transparencia">Resultados</TabsTrigger>
@@ -41,30 +54,15 @@ export function ProjectDataPanel({
             </TabsList>
 
             <div className="flex-1 overflow-y-auto min-h-0 mt-4">
-                <TabsContent value="transparencia" className="mt-0 h-full">
-                    {ultimoCalculo ? (
-                        <TransparencyPanel calculo={ultimoCalculo} />
-                    ) : (
-                        <Card className="bg-card/60 border-border/30 h-full">
-                            <CardContent className="py-16 text-center text-muted-foreground/50 flex flex-col items-center justify-center h-full">
-                                <p className="text-sm">Realiza un cálculo primero para ver el detalle de iteraciones.</p>
-                            </CardContent>
-                        </Card>
-                    )}
+                <TabsContent value="inicio" className="mt-0 h-full">
+                    <BlueprintUpload />
                 </TabsContent>
 
-                <TabsContent value="mapa" className="mt-0 h-full">
-                    {/* Mobile Map View if needed, but MapWrapper is usually separate */}
-                    <MapWrapper
-                        nudos={nudos || []}
-                        tramos={tramos || []}
-                        proyectoId={proyectoId}
-                        initialPlanoConfig={initialPlanoConfig}
-                    />
-                </TabsContent>
-
-                <TabsContent value="optimizacion" className="mt-0 h-full">
-                    <OptimizationPanel proyectoId={proyectoId} currentCost={initialCost} />
+                <TabsContent value="tramos" className="mt-0 h-full">
+                    {/* Integrated Editable Grid */}
+                    <div className="h-full overflow-hidden">
+                        <TramosGrid tramos={tramos || []} nudos={nudos || []} proyectoId={proyectoId} />
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="nudos" className="mt-0 h-full">
@@ -108,11 +106,30 @@ export function ProjectDataPanel({
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="tramos" className="mt-0 h-full">
-                    {/* Integrated Editable Grid */}
-                    <div className="h-full overflow-hidden">
-                        <TramosGrid tramos={tramos || []} nudos={nudos || []} proyectoId={proyectoId} />
-                    </div>
+                <TabsContent value="mapa" className="mt-0 h-full">
+                    {/* Mobile Map View if needed, but MapWrapper is usually separate */}
+                    <MapWrapper
+                        nudos={nudos || []}
+                        tramos={tramos || []}
+                        proyectoId={proyectoId}
+                        initialPlanoConfig={initialPlanoConfig}
+                    />
+                </TabsContent>
+
+                <TabsContent value="transparencia" className="mt-0 h-full">
+                    {ultimoCalculo ? (
+                        <TransparencyPanel calculo={ultimoCalculo} />
+                    ) : (
+                        <Card className="bg-card/60 border-border/30 h-full">
+                            <CardContent className="py-16 text-center text-muted-foreground/50 flex flex-col items-center justify-center h-full">
+                                <p className="text-sm">Realiza un cálculo primero para ver el detalle de iteraciones.</p>
+                            </CardContent>
+                        </Card>
+                    )}
+                </TabsContent>
+
+                <TabsContent value="optimizacion" className="mt-0 h-full">
+                    <OptimizationPanel proyectoId={proyectoId} currentCost={initialCost} />
                 </TabsContent>
             </div>
         </Tabs>
