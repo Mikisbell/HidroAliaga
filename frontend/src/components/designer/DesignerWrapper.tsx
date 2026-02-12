@@ -7,6 +7,7 @@ import { createTramo } from "@/app/actions/tramos"
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
 import { ValidationPanel } from "./ValidationPanel"
+import { toast } from "sonner"
 
 // Dynamic import of the Workspace (Client Only because of React Flow)
 const WorkspaceSplitView = dynamic(() => import("@/components/workspace/WorkspaceSplitView").then(mod => mod.WorkspaceSplitView), {
@@ -30,57 +31,104 @@ interface DesignerWrapperProps {
 export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerWrapperProps) {
     const activeComponentType = useProjectStore(state => state.activeComponentType)
     const setActiveTool = useProjectStore(state => state.setActiveTool)
+    const setActiveComponentType = useProjectStore(state => state.setActiveComponentType)
+    const addNudo = useProjectStore(state => state.addNudo)
+    const removeNudo = useProjectStore(state => state.removeNudo)
+    const replaceNudo = useProjectStore(state => state.replaceNudo)
+    const addTramo = useProjectStore(state => state.addTramo)
+    const removeTramo = useProjectStore(state => state.removeTramo)
+    const storeNudos = useProjectStore(state => state.nudos)
 
-    // When a node is dragged, save its new position (using latitud/longitud as X/Y)
+    // ========== OPTIMISTIC: Node position save (debounced, no blocking) ==========
     const handleNodeDragStop = async (id: string, x: number, y: number) => {
-        try {
-            // We store canvas X/Y in the latitud/longitud fields
-            await updateNudoCoordinates(id, y / 1000, x / 1000)
-        } catch (error) {
-            console.error("Failed to save node position:", error)
-        }
+        // Fire and forget — don't block the UI
+        updateNudoCoordinates(id, y / 1000, x / 1000).catch(err => {
+            console.error("Failed to save node position:", err)
+        })
     }
 
-    // Creating a new pipe by connecting two nodes
+    // ========== OPTIMISTIC: Create pipe ==========
     const handleConnect = async (sourceId: string, targetId: string) => {
         if (!proyectoId) return
 
-        // Zero Map Logic: Ask for Length
         const lengthStr = window.prompt("Longitud Real del Tramo (m):", "100")
-        if (lengthStr === null) return // User cancelled
-
+        if (lengthStr === null) return
         const length = parseFloat(lengthStr)
         if (isNaN(length) || length <= 0) {
-            alert("Por favor ingrese una longitud válida mayor a 0")
+            toast.error("Longitud inválida")
             return
         }
 
+        // 1. INSTANT: Create temporary tramo in store
+        const tempId = `temp-tramo-${Date.now()}`
+        const tempTramo: Tramo = {
+            id: tempId,
+            proyecto_id: proyectoId,
+            codigo: `T-${storeNudos.length + 1}`,
+            nudo_origen_id: sourceId,
+            nudo_destino_id: targetId,
+            longitud: length,
+            material: 'pvc',
+            diametro_comercial: 0.75,
+            diametro_interior: 0,
+            coef_hazen_williams: 150,
+            clase_tuberia: 'CL-10',
+        } as Tramo
+        addTramo(tempTramo)
+
+        // 2. BACKGROUND: Persist to DB
         try {
             await createTramo({
                 proyecto_id: proyectoId,
                 nudo_origen_id: sourceId,
                 nudo_destino_id: targetId,
-                longitud: length, // Pass manual length
-                // Default material/diameter will be handled by backend or defaults
+                longitud: length,
             })
+            toast.success("Tramo creado")
         } catch (error) {
-            console.error("Failed to create pipe:", error)
-            alert(error instanceof Error ? error.message : "Error al crear el tramo")
+            // Rollback on failure
+            removeTramo(tempId)
+            toast.error(error instanceof Error ? error.message : "Error al crear tramo")
         }
     }
 
-    // Adding a new node on canvas click OR drag & drop
+    // ========== OPTIMISTIC: Create node (drag & drop OR click) ==========
     const handleAddNode = async (x: number, y: number, tipo?: string) => {
         if (!proyectoId) return
+
+        const typeToCreate = (tipo || activeComponentType || 'union') as Nudo['tipo']
+
+        // 1. INSTANT: Create temporary node in store (appears immediately on canvas)
+        const tempId = `temp-${Date.now()}`
+        const nudoCount = storeNudos.length
+        const tempNudo: Nudo = {
+            id: tempId,
+            proyecto_id: proyectoId,
+            codigo: `N-${nudoCount + 1}`,
+            tipo: typeToCreate,
+            latitud: y / 1000,
+            longitud: x / 1000,
+            cota_terreno: 0,
+            demanda_base: 0,
+            elevacion: 0,
+            numero_viviendas: 0,
+            altura_agua: 0,
+        } as Nudo
+        addNudo(tempNudo)
+        setActiveTool('select')
+        setActiveComponentType(null)
+
+        // 2. BACKGROUND: Persist to DB (user doesn't wait for this)
         try {
-            // Priority: explicit tipo from drag&drop > activeComponentType from palette click > fallback 'union'
-            const typeToCreate = (tipo || activeComponentType || 'union') as Nudo['tipo']
-            // Store canvas position as lat/lng (scaled)
-            await createNudo(proyectoId, y / 1000, x / 1000, typeToCreate)
-            setActiveTool('select')
+            const result = await createNudo(proyectoId, y / 1000, x / 1000, typeToCreate)
+            if (result.nudo) {
+                // Replace temp node with real DB node (has real UUID)
+                replaceNudo(tempId, result.nudo as Nudo)
+            }
         } catch (error) {
-            console.error("Failed to create node:", error)
-            alert("Error al crear el nudo")
+            // Rollback: remove the optimistic node
+            removeNudo(tempId)
+            toast.error(error instanceof Error ? error.message : "Error al crear nudo")
         }
     }
 
@@ -92,7 +140,7 @@ export default function DesignerWrapper({ nudos, tramos, proyectoId }: DesignerW
                     tramos={tramos}
                     onNodeDragStop={handleNodeDragStop}
                     onConnect={handleConnect}
-                    onNodeClick={() => setActiveTool('select')} // Basic handler, expand as needed
+                    onNodeClick={() => setActiveTool('select')}
                     onAddNode={handleAddNode}
                 />
                 {/* The Referee - Validation Panel INSIDE Provider for Zoom capabilities */}

@@ -45,7 +45,11 @@ interface ProjectState {
     setProject: (project: Project) => void;
     setElements: (nudos: Nudo[], tramos: Tramo[]) => void; // Batch update
     addNudo: (nudo: Nudo) => void;
+    removeNudo: (id: string) => void;
+    replaceNudo: (tempId: string, realNudo: Nudo) => void;
     updateNudo: (nudo: Nudo) => void;
+    addTramo: (tramo: Tramo) => void;
+    removeTramo: (id: string) => void;
     updateProjectSettings: (settings: import('@/types/models').ProjectSettings) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
@@ -104,9 +108,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     setProject: (project) => set({ currentProject: project, error: null }),
     setElements: (nudos, tramos) => set({ nudos, tramos }),
     addNudo: (nudo) => set((state) => ({ nudos: [...state.nudos, nudo] })),
+    removeNudo: (id) => set((state) => ({ nudos: state.nudos.filter(n => n.id !== id) })),
+    replaceNudo: (tempId, realNudo) => set((state) => ({
+        nudos: state.nudos.map(n => n.id === tempId ? realNudo : n)
+    })),
     updateNudo: (nudo) => set((state) => ({
         nudos: state.nudos.map((n) => (n.id === nudo.id ? { ...n, ...nudo } : n))
     })),
+    addTramo: (tramo) => set((state) => ({ tramos: [...state.tramos, tramo] })),
+    removeTramo: (id) => set((state) => ({ tramos: state.tramos.filter(t => t.id !== id) })),
     updateProjectSettings: (settings) => set((state) => ({
         currentProject: state.currentProject ? { ...state.currentProject, settings } : null
     })),
