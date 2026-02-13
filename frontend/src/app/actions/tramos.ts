@@ -178,6 +178,6 @@ export async function deleteTramo(id: string) {
 
     if (error) return { error: error.message }
 
-    revalidatePath('/proyectos/[id]/tramos')
+    // No revalidatePath — store is the source of truth (optimistic)
     return { success: true }
 }

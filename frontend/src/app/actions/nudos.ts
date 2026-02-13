@@ -83,6 +83,17 @@ export async function deleteNudo(id: string) {
 
     if (!id) return { error: "ID requerido" }
 
+    // CASCADE: Delete all tramos connected to this nudo first
+    const { error: tramoError } = await supabase
+        .from("tramos")
+        .delete()
+        .or(`nudo_origen_id.eq.${id},nudo_destino_id.eq.${id}`)
+
+    if (tramoError) {
+        return { error: `Error deleting connected tramos: ${tramoError.message}` }
+    }
+
+    // Now delete the nudo itself
     const { error } = await supabase
         .from("nudos")
         .delete()
@@ -92,6 +103,6 @@ export async function deleteNudo(id: string) {
         return { error: `Error deleting nudo: ${error.message}` }
     }
 
-    revalidatePath("/proyectos/[id]", "page")
+    // No revalidatePath — store is the source of truth (optimistic)
     return { success: true }
 }

@@ -24,6 +24,7 @@ export function MapSideTools() {
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const removeNudo = useProjectStore(state => state.removeNudo)
     const removeTramo = useProjectStore(state => state.removeTramo)
+    const tramos = useProjectStore(state => state.tramos)
 
     const handleDelete = async () => {
         if (!selectedElement) return
@@ -32,6 +33,11 @@ export function MapSideTools() {
 
         // 1. INSTANT: Remove from store (optimistic)
         if (type === 'nudo') {
+            // CASCADE: Also remove all tramos connected to this nudo
+            const connectedTramos = tramos.filter(
+                t => t.nudo_origen_id === id || t.nudo_destino_id === id
+            )
+            connectedTramos.forEach(t => removeTramo(t.id))
             removeNudo(id)
         } else {
             removeTramo(id)
