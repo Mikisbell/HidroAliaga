@@ -26,6 +26,7 @@ import ReservoirNode from './nodes/ReservoirNode'
 import CRPNode from './nodes/CRPNode'
 import JunctionNode from './nodes/JunctionNode'
 import { PipeEdge } from './edges/PipeEdge'
+import { NodeEditPopover } from './nodes/NodeEditPopover'
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 
@@ -111,6 +112,9 @@ export default function NetworkDesigner({
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const reactFlowRef = useRef<ReactFlowInstance | null>(null)
 
+    // Double-click edit state
+    const [editingNode, setEditingNode] = useState<{ nudo: Nudo; position: { x: number; y: number } } | null>(null)
+
     // ================================================================
     // GAME-LOOP ARCHITECTURE:
     //   Source of truth: Zustand store (nudos, tramos)
@@ -195,6 +199,20 @@ export default function NetworkDesigner({
         [nudos, setSelectedElement, onNodeClick]
     )
 
+    // Handle double-click → open inline edit popover
+    const handleNodeDoubleClick = useCallback(
+        (event: React.MouseEvent, node: Node) => {
+            const nudo = nudos.find(n => n.id === node.id)
+            if (nudo) {
+                setEditingNode({
+                    nudo,
+                    position: { x: event.clientX, y: event.clientY }
+                })
+            }
+        },
+        [nudos]
+    )
+
     // Handle edge click → select in store
     const handleEdgeClick = useCallback(
         (_event: React.MouseEvent, edge: Edge) => {
@@ -260,6 +278,7 @@ export default function NetworkDesigner({
                 onConnect={onConnect}
                 onNodeDragStop={handleNodeDragStop}
                 onNodeClick={handleNodeClick}
+                onNodeDoubleClick={handleNodeDoubleClick}
                 onEdgeClick={handleEdgeClick}
                 onPaneClick={handlePaneClick}
                 onDragOver={handleDragOver}
@@ -320,6 +339,15 @@ export default function NetworkDesigner({
                     </Panel>
                 )}
             </ReactFlow>
+
+            {/* Double-click edit popover */}
+            {editingNode && (
+                <NodeEditPopover
+                    nudo={editingNode.nudo}
+                    position={editingNode.position}
+                    onClose={() => setEditingNode(null)}
+                />
+            )}
         </div>
     )
 }
