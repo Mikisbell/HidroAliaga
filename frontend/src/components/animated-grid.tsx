@@ -2,7 +2,7 @@
 
 export function AnimatedGrid() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.05]">
       <svg
         className="absolute inset-0 w-full h-full"
         xmlns="http://www.w3.org/2000/svg"

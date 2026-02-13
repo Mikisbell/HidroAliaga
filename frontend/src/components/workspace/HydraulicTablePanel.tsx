@@ -8,7 +8,11 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/store/project-store"
-import { TrendingUp, MapPin, GripVertical } from "lucide-react"
+import {
+    TrendingUp, MapPin, GripVertical,
+    Copy,
+    ArrowRight
+} from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // DnD Kit imports
@@ -144,6 +148,10 @@ function SortableRow({ row, isSelected, onRowClick, onUpdate }: {
 
             {/* 1. TRAMO-I */}
             <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoI}</TD>
+            {/* Arrow Icon */}
+            <TD className="text-muted-foreground">
+                <ArrowRight className="w-3 h-3 mx-auto" />
+            </TD>
             {/* 2. TRAMO-F */}
             <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoF}</TD>
             {/* 3. Cota inicio */}
@@ -365,14 +373,32 @@ export function HydraulicTablePanel() {
             const pi = cpi - cotaI
             const pf = cpf - cotaF
 
+            // Determine Flow Direction based on DFS traversal
+            // DFS traverses: startNode -> endNode (Flow Direction)
+            // If the pipe is defined as Start->End, it matches.
+            // If the pipe is defined as End->Start (reversed), we swap for display.
+            const isReverse = t.nudo_destino_id === startNode?.id
+
+            const displayStart = isReverse ? endNode : startNode
+            const displayEnd = isReverse ? startNode : endNode
+            const displayCotaI = isReverse ? cotaF : cotaI
+            const displayCotaF = isReverse ? cotaI : cotaF
+
             return {
                 id: t.id, // For DnD
                 tramo: t,
-                tramoI, tramoF, cotaI, cotaF, nViv,
-                qu, qDiseno, longitud, sTeor, dReal,
+                tramoI: displayStart?.codigo || '?',
+                tramoF: displayEnd?.codigo || '?',
+                cotaI: displayCotaI,
+                cotaF: displayCotaF,
+                nViv,
+                qu, qDiseno, longitud, sTeor: isReverse ? -sTeor : sTeor,
+                dReal,
                 dComercial, diamMM, vel, sr, hf,
                 cpi, cpf, pi, pf,
-                startNode, endNode
+                startNode: displayStart,
+                endNode: displayEnd,
+                isReverse // For visual cue
             }
         })
     }, [tramos, nudos, simulationResults, totalViviendas])
@@ -496,6 +522,7 @@ export function HydraulicTablePanel() {
                                         <tr className="border-b border-border">
                                             <TH className="w-6"></TH> {/* Drag handle col */}
                                             <TH>Tramo-I</TH>
+                                            <TH className="w-8"></TH> {/* Arrow col */}
                                             <TH>Tramo-F</TH>
                                             <TH>Cota I</TH>
                                             <TH>Cota F</TH>

@@ -72,9 +72,9 @@ export function WaterParticlesCanvas() {
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
         
-        // Use OKLCH colors from domain (blue 230°, cyan 200°)
+        // Use OKLCH colors from domain (blue 230°, cyan 200°) with higher opacity
         const hue = Math.random() > 0.5 ? 230 : 200
-        ctx.fillStyle = `oklch(0.70 0.05 ${hue} / ${particle.opacity})`
+        ctx.fillStyle = `oklch(0.75 0.08 ${hue} / ${particle.opacity * 1.5})`
         ctx.fill()
       })
 
@@ -95,7 +95,7 @@ export function WaterParticlesCanvas() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.8 }}
     />
   )
 }

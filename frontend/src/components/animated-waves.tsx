@@ -2,7 +2,7 @@
 
 export function AnimatedWaves() {
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none overflow-hidden opacity-10">
+    <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none overflow-hidden opacity-15">
       <svg
         className="absolute bottom-0 w-full h-full"
         xmlns="http://www.w3.org/2000/svg"

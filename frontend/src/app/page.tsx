@@ -15,6 +15,11 @@ import { CTASection } from "@/components/cta-section"
 import { ElegantContact } from "@/components/elegant-contact"
 import { ModernFooter } from "@/components/modern-footer"
 import { ModernNavbar } from "@/components/modern-navbar"
+import { ProfessionalHero } from "@/components/professional-hero"
+import { TechnicalShowcase } from "@/components/technical-showcase"
+import { SocialProof } from "@/components/social-proof"
+import { ProcessTimeline } from "@/components/process-timeline"
+import { FinalCTA } from "@/components/final-cta"
 import { FlaskConical, Map, Dna, ClipboardCheck, BarChart3, FileText, Rocket } from "lucide-react"
 
 const features = [
@@ -103,71 +108,17 @@ export default async function HomePage() {
 
             {/* Main Content */}
             <main id="main-content">
-                {/* Hero Section */}
-                <section className="relative z-10 px-6 md:px-12 pt-32 pb-16 max-w-7xl mx-auto">
-                    <ScrollReveal>
-                        <div className="text-center space-y-6">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-                                Plataforma de Ingeniería Hidráulica — Perú
-                            </div>
+                {/* Professional Hero Section with Animations */}
+                <ProfessionalHero />
 
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-                                Diseña redes de agua potable{" "}
-                                <span className="text-gradient">en minutos, no en días</span>
-                            </h1>
+                {/* Technical Showcase with Pressure Gauges */}
+                <TechnicalShowcase />
 
-                            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                                Automatiza cálculos Hardy Cross, valida normativa RNE OS.050 y genera reportes profesionales.
-                                Ahorra <strong className="text-foreground">15+ horas por proyecto</strong> con 100% cumplimiento normativo.
-                            </p>
+                {/* Process Timeline */}
+                <ProcessTimeline />
 
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-                                {user ? (
-                                    <Link href="/dashboard">
-                                        <Button 
-                                            size="lg"
-                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
-                                        >
-                                            <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
-                                            Continuar en Dashboard
-                                        </Button>
-                                    </Link>
-                                ) : (
-                                    <Link href="/login">
-                                        <Button 
-                                            size="lg"
-                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
-                                        >
-                                            <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
-                                            Probar Gratis 14 Días
-                                        </Button>
-                                    </Link>
-                                )}
-                                <Link href="#capacidades">
-                                    <Button 
-                                        size="lg"
-                                        variant="outline" 
-                                        className="h-14 px-8 text-lg rounded-xl border-border/30 hover:border-border/50 transition-all duration-200"
-                                    >
-                                        Ver Capacidades
-                                    </Button>
-                                </Link>
-                            </div>
-
-                            <div className="flex items-center justify-center gap-6 pt-4 text-xs text-muted-foreground">
-                                <span>✓ Sin tarjeta de crédito</span>
-                                <span>✓ Acceso completo</span>
-                                <span>✓ Soporte incluido</span>
-                            </div>
-                        </div>
-                    </ScrollReveal>
-
-                    {/* Hero Network Visualization */}
-                    <ScrollReveal delay={0.2}>
-                        <HeroNetwork />
-                    </ScrollReveal>
-                </section>
+                {/* Social Proof & Testimonials */}
+                <SocialProof />
 
                 {/* Sección de Problema - NUEVO */}
                 <ProblemSection />
@@ -280,6 +231,9 @@ export default async function HomePage() {
             <div id="proyectos">
                 <ProjectsShowcase />
             </div>
+
+            {/* Final CTA - Impactante */}
+            <FinalCTA />
 
             {/* Contacto Elegante */}
             <div id="contacto">
