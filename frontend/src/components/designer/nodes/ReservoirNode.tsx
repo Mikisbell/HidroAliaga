@@ -20,14 +20,20 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
     return (
         <div
             className={cn(
-                "relative flex items-center justify-center group cursor-pointer",
+                "relative group cursor-pointer overflow-visible",
                 selected && "scale-110"
             )}
             title={data.nombre || "Reservorio"}
+            /* Exact size matches the SVG tank */
+            style={{ width: 48, height: 40 }}
         >
-            {/* SVG Tank with LABEL CENTERED inside */}
-            <svg width="48" height="40" viewBox="0 0 48 40"
-                className={cn("drop-shadow-md transition-all", selected && "drop-shadow-lg")}
+            {/* SVG Tank — fills the container exactly */}
+            <svg
+                width="48" height="40" viewBox="0 0 48 40"
+                className={cn(
+                    "absolute inset-0 drop-shadow-md transition-all",
+                    selected && "drop-shadow-lg"
+                )}
             >
                 {/* Tank body */}
                 <rect x="8" y="6" width="32" height="28" rx="2"
@@ -51,17 +57,16 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
                     d="M10 20 Q14.5 17.5, 19 20 Q23.5 22.5, 28 20 Q32.5 17.5, 38 20"
                     fill="none"
                     className={cn(selected ? "stroke-blue-500" : "stroke-blue-400")}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
+                    strokeWidth="1.5" strokeLinecap="round"
                 />
                 {/* Top rim */}
                 <line x1="5" y1="6" x2="43" y2="6"
                     className={cn(selected ? "stroke-blue-700" : "stroke-blue-600")}
                     strokeWidth="3" strokeLinecap="round"
                 />
-                {/* Centered label text */}
+                {/* Centered label */}
                 <text
-                    x="24" y="18"
+                    x="24" y="16"
                     textAnchor="middle"
                     dominantBaseline="central"
                     className={cn(
@@ -77,18 +82,14 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
 
             {/* Cota badge */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-7 top-1/2 -translate-y-1/2 text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-blue-200 shadow-sm">
+                <span className="absolute -right-8 top-1/2 -translate-y-1/2 text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-blue-200 shadow-sm whitespace-nowrap">
                     {data.cota_terreno}m
                 </span>
             )}
 
-            {selected && (
-                <div className="absolute -inset-1 rounded-lg border-2 border-blue-400/40 pointer-events-none" />
-            )}
-
-            {/* 1 Handle — SOURCE only (bottom, water out) */}
+            {/* 1 Handle — SOURCE at bottom center of the tank */}
             <Handle type="source" position={Position.Bottom} id="out"
-                className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0 !-bottom-1.5" />
+                className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
         </div>
     )
 }

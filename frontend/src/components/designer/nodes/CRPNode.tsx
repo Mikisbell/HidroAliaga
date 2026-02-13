@@ -18,16 +18,21 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
     return (
         <div
             className={cn(
-                "relative flex items-center justify-center group cursor-pointer",
+                "relative group cursor-pointer overflow-visible",
                 selected && "scale-110"
             )}
             title={data.nombre || `CRP ${data.crp_type || ''}`}
+            /* Exact size matches the diamond SVG */
+            style={{ width: 40, height: 40 }}
         >
-            {/* Diamond SVG with LABEL CENTERED inside */}
-            <svg width="40" height="40" viewBox="0 0 40 40"
-                className={cn("drop-shadow-md transition-all", selected && "drop-shadow-lg")}
+            {/* Diamond SVG — fills the container exactly */}
+            <svg
+                width="40" height="40" viewBox="0 0 40 40"
+                className={cn(
+                    "absolute inset-0 drop-shadow-md transition-all",
+                    selected && "drop-shadow-lg"
+                )}
             >
-                {/* Diamond body */}
                 <path
                     d="M20 3 L37 20 L20 37 L3 20 Z"
                     className={cn(
@@ -39,7 +44,6 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                 />
-                {/* Centered label text */}
                 <text
                     x="20" y="21"
                     textAnchor="middle"
@@ -57,27 +61,23 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
 
             {/* Type badge */}
             {data.crp_type && (
-                <span className="absolute -left-3 top-1 text-[7px] font-mono font-bold text-amber-600 bg-amber-100/90 px-0.5 rounded pointer-events-none border border-amber-300/50">
+                <span className="absolute -left-4 top-1 text-[7px] font-mono font-bold text-amber-600 bg-amber-100/90 px-0.5 rounded pointer-events-none border border-amber-300/50 whitespace-nowrap">
                     {data.crp_type}
                 </span>
             )}
 
             {/* Cota badge */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-7 top-1/2 -translate-y-1/2 text-[8px] font-mono text-amber-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-amber-200 shadow-sm">
+                <span className="absolute -right-8 top-1/2 -translate-y-1/2 text-[8px] font-mono text-amber-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-amber-200 shadow-sm whitespace-nowrap">
                     {data.cota_terreno}m
                 </span>
             )}
 
-            {selected && (
-                <div className="absolute -inset-1 rounded-lg border-2 border-amber-400/40 pointer-events-none" />
-            )}
-
-            {/* 2 Handles — IN (top), OUT (bottom) */}
+            {/* 2 Handles at the diamond vertices — IN (top tip), OUT (bottom tip) */}
             <Handle type="target" position={Position.Top} id="in"
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0 !-top-1" />
+                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
             <Handle type="source" position={Position.Bottom} id="out"
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0 !-bottom-1" />
+                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
         </div>
     )
 }
