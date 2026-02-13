@@ -61,5 +61,8 @@ export default defineConfig({
         command: 'npx next dev -p 3002 --webpack',
         url: 'http://localhost:3002',
         reuseExistingServer: !process.env.CI,
+        env: {
+            NEXT_PUBLIC_SKIP_AUTH: 'true',  // Bypass middleware auth during E2E tests
+        },
     },
 });

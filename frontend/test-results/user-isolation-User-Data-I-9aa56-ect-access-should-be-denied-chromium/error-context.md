@@ -53,7 +53,7 @@
               - generic [ref=e72]:
                 - paragraph [ref=e73]:
                   - text: Call Stack
-                  - generic [ref=e74]: "17"
+                  - generic [ref=e74]: "15"
                 - button "Show 12 ignore-listed frame(s)" [ref=e75] [cursor=pointer]:
                   - text: Show 12 ignore-listed frame(s)
                   - img [ref=e76]
@@ -71,34 +71,22 @@
                 - text: src\components\workspace\WorkspaceSplitView.tsx (76:21)
               - generic [ref=e88]:
                 - generic [ref=e89]:
-                  - text: DesignerWrapper
-                  - button "Open DesignerWrapper in editor" [ref=e90] [cursor=pointer]:
-                    - img [ref=e91]
-                - text: src\components\designer\DesignerWrapper.tsx (148:17)
-              - generic [ref=e93]:
-                - generic [ref=e94]:
-                  - text: ProjectDataPanel
-                  - button "Open ProjectDataPanel in editor" [ref=e95] [cursor=pointer]:
-                    - img [ref=e96]
-                - text: src\components\proyecto\ProjectDataPanel.tsx (48:21)
-              - generic [ref=e98]:
-                - generic [ref=e99]:
                   - text: ProyectoPage
-                  - button "Open ProyectoPage in editor" [ref=e100] [cursor=pointer]:
-                    - img [ref=e101]
+                  - button "Open ProyectoPage in editor" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
                 - text: src\app\(dashboard)\proyectos\[id]\page.tsx (155:17)
-        - generic [ref=e103]: "1"
-        - generic [ref=e104]: "2"
-    - generic [ref=e109] [cursor=pointer]:
-      - button "Open Next.js Dev Tools" [ref=e110]:
-        - img [ref=e111]
-      - generic [ref=e114]:
-        - button "Open issues overlay" [ref=e115]:
-          - generic [ref=e116]:
-            - generic [ref=e117]: "0"
-            - generic [ref=e118]: "1"
-          - generic [ref=e119]: Issue
-        - button "Collapse issues badge" [ref=e120]:
-          - img [ref=e121]
-  - 'heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2] [ref=e125]'
+        - generic [ref=e93]: "1"
+        - generic [ref=e94]: "2"
+    - generic [ref=e99] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e100]:
+        - img [ref=e101]
+      - generic [ref=e104]:
+        - button "Open issues overlay" [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]: "0"
+            - generic [ref=e108]: "1"
+          - generic [ref=e109]: Issue
+        - button "Collapse issues badge" [ref=e110]:
+          - img [ref=e111]
+  - 'heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2] [ref=e115]'
 ```
