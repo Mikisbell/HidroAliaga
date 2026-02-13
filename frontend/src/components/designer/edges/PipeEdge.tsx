@@ -164,7 +164,7 @@ function PipeEdgeComponent({
                           |           <-- Gap for line (transparent)
                       [Households]    <-- Below
                     */}
-                    <div className="flex flex-col items-center select-none gap-3"> {/* gap-2 ensures space for the line */}
+                    <div className="flex flex-col items-center select-none gap-1"> {/* gap-2 ensures space for the line */}
 
                         {/* --- TOP: Length Label --- */}
                         {isEditing ? (

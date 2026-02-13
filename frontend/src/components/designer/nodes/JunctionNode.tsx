@@ -70,8 +70,8 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
             {/* Cota badge — OUTSIDE the root div, won't affect dimensions */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
                 <div className="absolute pointer-events-none whitespace-nowrap"
-                    style={{ left: CIRCLE_SIZE + 4, top: CIRCLE_SIZE / 2 - 6 }}>
-                    <span className="text-[7px] font-mono text-gray-500 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
+                    style={{ left: CIRCLE_SIZE + 1, top: CIRCLE_SIZE / 2 - 5 }}>
+                    <span className="text-[7px] font-mono text-gray-500">
                         {data.cota_terreno}
                     </span>
                 </div>
