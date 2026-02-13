@@ -204,7 +204,7 @@ function PipeEdgeComponent({
 
                         {/* --- BOTTOM: Household Count & Result --- */}
                         <div
-                            className="bg-transparent px-1 min-w-[20px] text-center cursor-pointer hover:bg-purple-50/50 transition-colors"
+                            className="bg-transparent px-1 min-w-[20px] text-center cursor-pointer transition-colors"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const current = typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0;
