@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             + Nuevo Proyecto
           </Button>
         </Link>
-      </div>
+      </AnimatedSection>
 
       {/* Stats */}
       <AnimatedSection delay={100}>

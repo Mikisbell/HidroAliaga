@@ -137,92 +137,110 @@ function PipeEdgeComponent({
     }, [id, editValue, setEdges])
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        position: 'absolute',
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) rotate(${angleDeg}deg)`,
-                zIndex: 10,
-                    transformOrigin: 'center center'
+        if (e.key === 'Enter') {
+            handleSave()
+        } else if (e.key === 'Escape') {
+            setIsEditing(false)
+            setEditValue(edgeData?.longitud?.toString() || "") // Revert to original
+        }
     }
-}
+
+    return (
+        <>
+            <BaseEdge path={edgePath} style={edgeStyle} />
+
+            {/* Visual Markers for Start/End — Small (r=1.5) as requested */}
+            <circle cx={sourceX} cy={sourceY} r={1.5} fill="#22c55e" />
+            <circle cx={targetX} cy={targetY} r={1.5} fill="#3b82f6" />
+
+            <EdgeLabelRenderer>
+                <div
+                    style={{
+                        position: 'absolute',
+                        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) rotate(${angleDeg}deg)`,
+                        zIndex: 10,
+                        transformOrigin: 'center center'
+                    }}
                 >
-{/* 
+                    {/* 
                       Layout:
                       [Length Label]  <-- Above
                           |           <-- Gap for line (transparent)
                       [Households]    <-- Below
                     */}
-    < div className = "flex flex-col items-center select-none gap-1" > {/* gap-2 ensures space for the line */ }
+                    <div className="flex flex-col items-center select-none gap-1"> {/* gap-2 ensures space for the line */}
 
-{/* --- TOP: Length Label --- */ }
-{
-    isEditing ? (
-        <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center mb-1">
-            <span className="text-[7px] font-mono text-muted-foreground pl-1">L=</span>
-            <input
-                ref={inputRef}
-                type="number"
-                className="w-14 h-4 text-[7px] font-bold bg-transparent outline-none"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={handleSave}
-            />
-            <div
-                className="w-5 h-5 bg-blue-500 text-white rounded cursor-pointer flex items-center justify-center hover:bg-blue-600 transition-colors"
-                onMouseDown={(e) => { e.preventDefault(); handleSave(); }}
-            >
-                <Check className="w-3 h-3" />
-            </div>
-        </div>
-    ) : (
-        <div className="flex flex-col items-center gap-0.5" style={{ transform: 'translateY(2px)' }}> {/* Slight nudge down towards line? No, up. Flex puts it top. */}
-            <div
-                className="group flex items-center px-1 py-0 rounded hover:bg-white/50 cursor-pointer transition-all"
-                onClick={() => setIsEditing(true)}
-                title="Longitud (m) - Clic para editar"
-            >
-                <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[7px] font-bold font-mono whitespace-nowrap text-foreground/80">
-                    L={longitud?.toFixed(1) || '0.0'}m
-                </span>
-            </div>
-        </div>
-    )
-}
+                        {/* --- TOP: Length Label --- */}
+                        {
+                            isEditing ? (
+                                <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center mb-1">
+                                    <span className="text-[7px] font-mono text-muted-foreground pl-1">L=</span>
+                                    <input
+                                        ref={inputRef}
+                                        type="number"
+                                        className="w-14 h-4 text-[7px] font-bold bg-transparent outline-none"
+                                        value={editValue}
+                                        onChange={(e) => setEditValue(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        onBlur={handleSave}
+                                    />
+                                    <div
+                                        className="w-5 h-5 bg-blue-500 text-white rounded cursor-pointer flex items-center justify-center hover:bg-blue-600 transition-colors"
+                                        onMouseDown={(e) => { e.preventDefault(); handleSave(); }}
+                                    >
+                                        <Check className="w-3 h-3" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-0.5" style={{ transform: 'translateY(2px)' }}> {/* Slight nudge down towards line? No, up. Flex puts it top. */}
+                                    <div
+                                        className="group flex items-center px-1 py-0 rounded hover:bg-white/50 cursor-pointer transition-all"
+                                        onClick={() => setIsEditing(true)}
+                                        title="Longitud (m) - Clic para editar"
+                                    >
+                                        <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[7px] font-bold font-mono whitespace-nowrap text-foreground/80">
+                                            L={longitud?.toFixed(1) || '0.0'}m
+                                        </span>
+                                    </div>
+                                </div>
+                            )
+                        }
 
-{/* --- GAP (Invisible, handled by flex gap) --- */ }
+                        {/* --- GAP (Invisible, handled by flex gap) --- */}
 
-{/* --- BOTTOM: Household Count & Result --- */ }
-<div
-    className="bg-transparent px-1 min-w-[20px] text-center cursor-pointer transition-colors"
-    onClick={(e) => {
-        e.stopPropagation();
-        const current = typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0;
-        const newVal = window.prompt("Viviendas en tramo:", current.toString());
-        if (newVal !== null) {
-            const num = parseInt(newVal);
-            if (!isNaN(num)) {
-                setEdges((prev) => prev.map((ed) => {
-                    if (ed.id === id) return { ...ed, data: { ...ed.data, numero_viviendas: num } }
-                    return ed
-                }));
-                updateTramo({ id, numero_viviendas: num });
-            }
-        }
-    }}
-    title="Viviendas abastecidas (Clic para editar)"
->
-    <span className="text-[7px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
-</div>
+                        {/* --- BOTTOM: Household Count & Result --- */}
+                        <div
+                            className="bg-transparent px-1 min-w-[20px] text-center cursor-pointer transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const current = typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0;
+                                const newVal = window.prompt("Viviendas en tramo:", current.toString());
+                                if (newVal !== null) {
+                                    const num = parseInt(newVal);
+                                    if (!isNaN(num)) {
+                                        setEdges((prev) => prev.map((ed) => {
+                                            if (ed.id === id) return { ...ed, data: { ...ed.data, numero_viviendas: num } }
+                                            return ed
+                                        }));
+                                        updateTramo({ id, numero_viviendas: num });
+                                    }
+                                }
+                            }}
+                            title="Viviendas abastecidas (Clic para editar)"
+                        >
+                            <span className="text-[7px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
+                        </div>
 
-{/* Simulation Result (If exists, place it below households or alongside?) */ }
-{
-    result && (
-        <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
-            style={{ transform: `rotate(${-angleDeg}deg)` }}
-        >
-            {result.velocity.toFixed(2)} m/s
-        </div>
-    )
-}
+                        {/* Simulation Result (If exists, place it below households or alongside?) */}
+                        {
+                            result && (
+                                <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
+                                    style={{ transform: `rotate(${-angleDeg}deg)` }}
+                                >
+                                    {result.velocity.toFixed(2)} m/s
+                                </div>
+                            )
+                        }
 
                     </div >
                 </div >
