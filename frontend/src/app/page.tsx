@@ -5,15 +5,17 @@ import { createClient } from "@/lib/supabase/server"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 import { HeroNetwork } from "@/components/hero-network"
 import { FeatureCard } from "@/components/feature-card"
+import { ProblemSection } from "@/components/problem-section"
 import { ProfessionalProfile } from "@/components/professional-profile"
 import { ProfessionalServices } from "@/components/professional-services"
 import { WhyChooseUs } from "@/components/why-choose-us"
 import { Testimonials } from "@/components/testimonials"
 import { ProjectsShowcase } from "@/components/projects-showcase"
+import { CTASection } from "@/components/cta-section"
 import { ElegantContact } from "@/components/elegant-contact"
 import { ModernFooter } from "@/components/modern-footer"
 import { ModernNavbar } from "@/components/modern-navbar"
-import { FlaskConical, Map, Dna, ClipboardCheck, BarChart3, FileText } from "lucide-react"
+import { FlaskConical, Map, Dna, ClipboardCheck, BarChart3, FileText, Rocket } from "lucide-react"
 
 const features = [
     {
@@ -66,6 +68,11 @@ export default async function HomePage() {
 
     return (
         <div className="min-h-screen water-bg relative overflow-hidden">
+            {/* Skip to main content - Accesibilidad */}
+            <a href="#main-content" className="skip-to-main">
+                Saltar al contenido principal
+            </a>
+
             {/* Floating water bubbles */}
             {[
                 { w: 50, h: 50, l: 8, b: 30, d: 14, dl: 0 },
@@ -94,63 +101,79 @@ export default async function HomePage() {
             {/* Modern Navigation Bar */}
             <ModernNavbar />
 
-            {/* Hero Section */}
-            <section className="relative z-10 px-6 md:px-12 pt-32 pb-16 max-w-7xl mx-auto">
-                <ScrollReveal>
-                    <div className="text-center space-y-6">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                            Plataforma de Ingeniería Hidráulica — Perú
-                        </div>
+            {/* Main Content */}
+            <main id="main-content">
+                {/* Hero Section */}
+                <section className="relative z-10 px-6 md:px-12 pt-32 pb-16 max-w-7xl mx-auto">
+                    <ScrollReveal>
+                        <div className="text-center space-y-6">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
+                                Plataforma de Ingeniería Hidráulica — Perú
+                            </div>
 
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-                            Diseña redes de<br />
-                            <span className="text-gradient">agua potable</span><br />
-                            con precisión normativa
-                        </h1>
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+                                Diseña redes de agua potable{" "}
+                                <span className="text-gradient">en minutos, no en días</span>
+                            </h1>
 
-                        <p className="text-lg md:text-xl text-muted-foreground/70 max-w-2xl mx-auto leading-relaxed">
-                            Motor hidráulico Hardy Cross + Hazen-Williams, visualización GIS con cotas automáticas,
-                            y optimización por Algoritmo Genético. Todo conforme al <strong className="text-foreground/80">RNE OS.050</strong> y <strong className="text-foreground/80">RM 192-2018</strong>.
-                        </p>
+                            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                                Automatiza cálculos Hardy Cross, valida normativa RNE OS.050 y genera reportes profesionales.
+                                Ahorra <strong className="text-foreground">15+ horas por proyecto</strong> con 100% cumplimiento normativo.
+                            </p>
 
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-                            {user ? (
-                                <Link href="/dashboard">
-                                    <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
-                                        Continuar en Dashboard 🚀
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                                {user ? (
+                                    <Link href="/dashboard">
+                                        <Button 
+                                            size="lg"
+                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
+                                        >
+                                            <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
+                                            Continuar en Dashboard
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Link href="/login">
+                                        <Button 
+                                            size="lg"
+                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
+                                        >
+                                            <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
+                                            Probar Gratis 14 Días
+                                        </Button>
+                                    </Link>
+                                )}
+                                <Link href="#capacidades">
+                                    <Button 
+                                        size="lg"
+                                        variant="outline" 
+                                        className="h-14 px-8 text-lg rounded-xl border-border/30 hover:border-border/50 transition-all duration-200"
+                                    >
+                                        Ver Capacidades
                                     </Button>
                                 </Link>
-                            ) : (
-                                <Link href="/login">
-                                    <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
-                                        Comenzar Gratis →
-                                    </Button>
-                                </Link>
-                            )}
-                            <Link href="#capacidades">
-                                <Button variant="outline" className="rounded-xl h-11 md:h-12 px-6 md:px-8 text-base border-border/30 text-muted-foreground hover:text-foreground hover:border-border/50 transition-all duration-200">
-                                    Ver Capacidades
-                                </Button>
-                            </Link>
+                            </div>
+
+                            <div className="flex items-center justify-center gap-6 pt-4 text-xs text-muted-foreground">
+                                <span>✓ Sin tarjeta de crédito</span>
+                                <span>✓ Acceso completo</span>
+                                <span>✓ Soporte incluido</span>
+                            </div>
                         </div>
+                    </ScrollReveal>
 
-                        <div className="flex items-center justify-center gap-6 pt-4 text-xs text-muted-foreground/40">
-                            <span>✓ Sin instalación</span>
-                            <span>✓ Exporta PDF/Excel</span>
-                            <span>✓ Compatible EPANET</span>
-                        </div>
-                    </div>
-                </ScrollReveal>
+                    {/* Hero Network Visualization */}
+                    <ScrollReveal delay={0.2}>
+                        <HeroNetwork />
+                    </ScrollReveal>
+                </section>
 
-                {/* Hero Network Visualization */}
-                <ScrollReveal delay={0.2}>
-                    <HeroNetwork />
-                </ScrollReveal>
-            </section>
+                {/* Sección de Problema - NUEVO */}
+                <ProblemSection />
 
-            {/* Perfil Profesional Tipo LinkedIn */}
-            <ProfessionalProfile />
+                {/* Perfil Profesional Tipo LinkedIn */}
+                <ProfessionalProfile />
 
             {/* Servicios Profesionales */}
             <div id="servicios">
@@ -186,15 +209,17 @@ export default async function HomePage() {
             </section>
 
             {/* Capacidades */}
-            <section id="capacidades" className="relative z-10 px-6 md:px-12 pb-20">
+            <section id="capacidades" className="relative z-10 px-6 md:px-12 py-16 md:py-24">
                 <div className="max-w-6xl mx-auto">
                     <ScrollReveal>
-                        <div className="text-center mb-12">
-                            <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Capacidades</p>
-                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                        <div className="text-center mb-12 md:mb-16">
+                            <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
+                                Capacidades
+                            </Badge>
+                            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
                                 Ingeniería hidráulica <span className="text-gradient">de nivel profesional</span>
                             </h2>
-                            <p className="text-muted-foreground/60 mt-3 max-w-lg mx-auto">
+                            <p className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg">
                                 Cada herramienta diseñada para cumplir las exigencias del Reglamento Nacional de Edificaciones
                             </p>
                         </div>
@@ -248,34 +273,19 @@ export default async function HomePage() {
             {/* Testimonios */}
             <Testimonials />
 
+            {/* CTA Intermedio - NUEVO */}
+            <CTASection />
+
             {/* Proyectos */}
             <div id="proyectos">
                 <ProjectsShowcase />
             </div>
 
-            {/* CTA Final */}
-            <section className="relative z-10 px-6 md:px-12 pb-20">
-                <ScrollReveal>
-                    <div className="max-w-3xl mx-auto text-center space-y-6">
-                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                            Empieza a diseñar tu red <span className="text-gradient">hoy</span>
-                        </h2>
-                        <p className="text-muted-foreground/60 max-w-lg mx-auto">
-                            Crea tu cuenta gratuita y diseña redes de agua potable con la precisión que exige la normativa peruana.
-                        </p>
-                        <Link href="/login">
-                            <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-8 md:px-10 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
-                                Crear Cuenta Gratis →
-                            </Button>
-                        </Link>
-                    </div>
-                </ScrollReveal>
-            </section>
-
             {/* Contacto Elegante */}
             <div id="contacto">
                 <ElegantContact />
             </div>
+            </main>
 
             {/* Footer Moderno */}
             <ModernFooter />

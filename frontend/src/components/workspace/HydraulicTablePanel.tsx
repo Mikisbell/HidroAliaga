@@ -43,14 +43,17 @@ function calcSlopeTeor(cotaI: number, cotaF: number, longitud: number): number {
     return ((cotaI - cotaF) / longitud) * 1000
 }
 
-/** Calculate theoretical real diameter from Q (L/s) targeting velocity ~1 m/s */
-function calcDiamReal(qLps: number): number {
-    if (qLps <= 0) return 0
+/** Calculate theoretical real diameter using Hazen-Williams:
+ *  D = (Q / (0.2785 * C * S^0.54))^(1/2.63)
+ *  Q in m³/s, S in m/m, D in m → converted to inches */
+function calcDiamReal(qLps: number, sTeorPermil: number, C: number): number {
+    if (qLps <= 0 || sTeorPermil <= 0) return 0
     const qM3s = qLps / 1000
-    const targetVel = 1.0 // m/s
-    const areaM2 = qM3s / targetVel
-    const diamM = Math.sqrt((4 * areaM2) / Math.PI)
-    return diamM * 39.3701 // convert m → inches
+    const S = sTeorPermil / 1000 // ‰ → m/m
+    const denom = 0.2785 * C * Math.pow(S, 0.54)
+    if (denom <= 0) return 0
+    const diamM = Math.pow(qM3s / denom, 1 / 2.63)
+    return diamM * 39.3701 // m → inches
 }
 
 /** Velocity from Q (L/s) and diameter (mm) */
@@ -246,8 +249,8 @@ export function HydraulicTablePanel() {
             // 9: Theoretical slope (‰)
             const sTeor = calcSlopeTeor(cotaI, cotaF, longitud)
 
-            // 10: Real diameter (targeting ~1 m/s)
-            const dReal = calcDiamReal(qDiseno)
+            // 10: Real diameter (Hazen-Williams with theoretical slope)
+            const dReal = calcDiamReal(qDiseno, sTeor, t.coef_hazen_williams || 150)
 
             // 11-12: Commercial diameter
             const dComercial = t.diametro_comercial ?? 0
@@ -388,7 +391,7 @@ export function HydraulicTablePanel() {
                                         <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">D com ″</TH>
                                         <TH>Ø mm</TH>
                                         <TH>Vel m/s</TH>
-                                        <TH>Sr</TH>
+                                        <TH>Sr ‰</TH>
                                         <TH>Hf (m)</TH>
                                         <TH>Cpi</TH>
                                         <TH>CPf</TH>
@@ -456,7 +459,7 @@ export function HydraulicTablePanel() {
                                                     {row.vel > 0 ? row.vel.toFixed(2) : '—'}
                                                 </TD>
                                                 {/* 14. Sr */}
-                                                <TD>{row.sr > 0 ? row.sr.toFixed(4) : '—'}</TD>
+                                                <TD>{row.sr > 0 ? (row.sr * 1000).toFixed(2) : '—'}</TD>
                                                 {/* 15. Hf */}
                                                 <TD>{row.hf > 0 ? row.hf.toFixed(2) : '—'}</TD>
                                                 {/* 16. Cpi */}
@@ -469,7 +472,7 @@ export function HydraulicTablePanel() {
                                                         row.pi > 50 ? "text-amber-600 font-bold" :
                                                             row.pi > 0 ? "text-emerald-600" : ""
                                                 )}>
-                                                    {row.pi !== 0 ? row.pi.toFixed(2) : '—'}
+                                                    {row.pi.toFixed(3)}
                                                 </TD>
                                                 {/* 19. Pf — color coded */}
                                                 <TD className={cn(
@@ -477,7 +480,7 @@ export function HydraulicTablePanel() {
                                                         row.pf > 50 ? "text-amber-600 font-bold" :
                                                             row.pf > 0 ? "text-emerald-600" : ""
                                                 )}>
-                                                    {row.pf !== 0 ? row.pf.toFixed(2) : '—'}
+                                                    {row.pf.toFixed(3)}
                                                 </TD>
                                             </tr>
                                         )

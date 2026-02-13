@@ -154,15 +154,25 @@ export function ElegantContact() {
                                     <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
                                         <div className="grid sm:grid-cols-2 gap-5">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Nombre completo *</label>
+                                                <label htmlFor="nombre" className="text-sm font-semibold text-foreground">
+                                                    Nombre completo <span className="text-red-400">*</span>
+                                                </label>
                                                 <Input 
+                                                    id="nombre"
+                                                    name="nombre"
                                                     placeholder="Juan Pérez" 
                                                     className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    required
+                                                    aria-required="true"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Empresa</label>
+                                                <label htmlFor="empresa" className="text-sm font-semibold text-foreground">
+                                                    Empresa
+                                                </label>
                                                 <Input 
+                                                    id="empresa"
+                                                    name="empresa"
                                                     placeholder="Tu empresa (opcional)" 
                                                     className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
                                                 />
@@ -171,16 +181,27 @@ export function ElegantContact() {
                                         
                                         <div className="grid sm:grid-cols-2 gap-5">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Email *</label>
+                                                <label htmlFor="email" className="text-sm font-semibold text-foreground">
+                                                    Email <span className="text-red-400">*</span>
+                                                </label>
                                                 <Input 
+                                                    id="email"
+                                                    name="email"
                                                     type="email"
                                                     placeholder="juan@email.com" 
                                                     className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    required
+                                                    aria-required="true"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Teléfono</label>
+                                                <label htmlFor="telefono" className="text-sm font-semibold text-foreground">
+                                                    Teléfono
+                                                </label>
                                                 <Input 
+                                                    id="telefono"
+                                                    name="telefono"
+                                                    type="tel"
                                                     placeholder="+51 999 888 777" 
                                                     className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
                                                 />
@@ -188,8 +209,16 @@ export function ElegantContact() {
                                         </div>
                                         
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-300">Tipo de servicio *</label>
-                                            <select className="w-full h-12 px-4 rounded-md border border-slate-700 bg-slate-900/50 text-sm text-slate-300 focus:border-orange-500/50 focus:outline-none">
+                                            <label htmlFor="servicio" className="text-sm font-semibold text-foreground">
+                                                Tipo de servicio <span className="text-red-400">*</span>
+                                            </label>
+                                            <select 
+                                                id="servicio"
+                                                name="servicio"
+                                                className="w-full h-12 px-4 rounded-md border border-slate-700 bg-slate-900/50 text-sm text-slate-300 focus:border-orange-500/50 focus:outline-none"
+                                                required
+                                                aria-required="true"
+                                            >
                                                 <option value="">Selecciona un servicio</option>
                                                 <option value="software">Software Hidroaliaga</option>
                                                 <option value="diseno">Diseño de Redes Hidráulicas</option>
@@ -201,15 +230,24 @@ export function ElegantContact() {
                                         </div>
                                         
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-300">Mensaje *</label>
+                                            <label htmlFor="mensaje" className="text-sm font-semibold text-foreground">
+                                                Mensaje <span className="text-red-400">*</span>
+                                            </label>
                                             <Textarea 
+                                                id="mensaje"
+                                                name="mensaje"
                                                 placeholder="Cuéntame sobre tu proyecto: ubicación, número de habitantes, tipo de red, etc." 
                                                 className="min-h-[140px] bg-slate-900/50 border-slate-700 focus:border-orange-500/50 resize-none"
+                                                required
+                                                aria-required="true"
                                             />
                                         </div>
                                         
-                                        <Button className="w-full h-12 bg-gradient-to-r from-orange-500 via-pink-500 to-violet-500 hover:from-orange-400 hover:via-pink-400 hover:to-violet-400 text-white border-0 text-base font-medium">
-                                            <Send className="w-4 h-4 mr-2" />
+                                        <Button 
+                                            type="submit"
+                                            className="w-full h-12 bg-gradient-to-r from-orange-500 via-pink-500 to-violet-500 hover:from-orange-400 hover:via-pink-400 hover:to-violet-400 text-white border-0 text-base font-medium"
+                                        >
+                                            <Send className="w-4 h-4 mr-2" aria-hidden="true" />
                                             Enviar Mensaje
                                         </Button>
                                         

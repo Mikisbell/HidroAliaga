@@ -151,9 +151,11 @@ export function ModernFooter() {
                                         key={social.label}
                                         href={social.href}
                                         className={`w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 transition-all ${social.color} hover:text-white hover:border-transparent`}
-                                        aria-label={social.label}
+                                        aria-label={`Síguenos en ${social.label}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                     >
-                                        <social.icon className="w-5 h-5" />
+                                        <social.icon className="w-5 h-5" aria-hidden="true" />
                                     </a>
                                 ))}
                             </div>
