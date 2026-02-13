@@ -370,7 +370,8 @@ export default function NetworkDesigner({
         async (event: DragEvent) => {
             event.preventDefault()
             const nodeType = event.dataTransfer.getData('application/reactflow-nodetype')
-            if (!nodeType || !reactFlowRef.current || !currentProject) return
+            const currentProj = useProjectStore.getState().currentProject
+            if (!nodeType || !reactFlowRef.current || !currentProj) return
 
             const position = reactFlowRef.current.screenToFlowPosition({
                 x: event.clientX,
@@ -385,7 +386,7 @@ export default function NetworkDesigner({
                 // Use optimistic temporary handling or await server?
                 // Awaiting server ensures ID consistency.
                 const { success, nudo, error } = await createNudo(
-                    currentProject.id,
+                    currentProj.id,
                     position.x,
                     position.y,
                     nodeType as Nudo['tipo']
