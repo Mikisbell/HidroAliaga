@@ -177,17 +177,20 @@ export default function NetworkDesigner({
 
     // VALIDATION: Prevent multiple connections per handle
     const isValidConnection = useCallback(
-        (connection: Connection) => {
+        (connection: Connection | Edge) => {
             // Check if source handle is already used
+            const targetHandle = 'targetHandle' in connection ? connection.targetHandle : null;
+            const sourceHandle = 'sourceHandle' in connection ? connection.sourceHandle : null;
+
             const sourceUsed = edges.some(e =>
                 e.source === connection.source &&
-                e.sourceHandle === connection.sourceHandle
+                e.sourceHandle === sourceHandle
             );
 
             // Check if target handle is already used
             const targetUsed = edges.some(e =>
                 e.target === connection.target &&
-                e.targetHandle === connection.targetHandle
+                e.targetHandle === targetHandle
             );
 
             // Allow if it's the SAME edge (reconnecting to same handle - unlikely in this call but safe)

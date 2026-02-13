@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudo } from "@/app/actions/nudos"
-import { updateTramoAction } from "@/app/actions/tramos"
+import { updateTramo } from "@/app/actions/tramos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -69,7 +69,7 @@ export function HydraulicTablePanel() {
         const numValue = parseFloat(value) || 0
         updateTramoStore({ id, [field]: numValue } as any)
         try {
-            await updateTramoAction({ id, [field]: numValue })
+            await updateTramo({ id, [field]: numValue })
         } catch {
             toast.error("Error al actualizar tramo")
             router.refresh()
