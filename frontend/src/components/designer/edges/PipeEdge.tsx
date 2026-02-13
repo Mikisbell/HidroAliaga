@@ -18,6 +18,7 @@ export interface PipeEdgeData {
     longitud?: number
     diametro_comercial?: number
     material?: string
+    numero_viviendas?: number
     [key: string]: unknown
 }
 
@@ -157,56 +158,88 @@ function PipeEdgeComponent({
                         transformOrigin: 'center center'
                     }}
                 >
-                    {isEditing ? (
-                        <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center">
-                            <span className="text-[10px] font-mono text-muted-foreground pl-1">L=</span>
-                            <input
-                                ref={inputRef}
-                                type="number"
-                                className="w-16 h-5 text-[11px] font-bold bg-transparent outline-none"
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                onBlur={handleSave}
-                            />
-                            <div
-                                className="w-5 h-5 bg-blue-500 text-white rounded cursor-pointer flex items-center justify-center hover:bg-blue-600 transition-colors"
-                                onMouseDown={(e) => { e.preventDefault(); handleSave(); }} // onMouseDown prevents blur firing before clean click
-                            >
-                                <Check className="w-3 h-3" />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center gap-0.5">
-                            <div
-                                className={`group flex items-center gap-1.5 px-1.5 py-0.5 rounded-full border shadow-sm cursor-pointer transition-all hover:scale-105 hover:border-blue-400 ${selected
-                                    ? 'bg-blue-50 border-blue-300 text-blue-900'
-                                    : 'bg-background/95 border-border/60 text-muted-foreground'
-                                    }`}
-                                onClick={() => setIsEditing(true)}
-                                title="Clic para editar longitud"
-                            >
-                                {/* Label Content */}
-                                <span className="text-[10px] font-bold font-mono whitespace-nowrap">
-                                    L={longitud?.toFixed(1) || '0.0'}
-                                </span>
+                    {/* Centered Flex Container for Labels */}
+                    <div className="flex flex-col items-center select-none" style={{ transform: 'translateY(-18px)' }}>
 
-                                {diametro && (
-                                    <span className="text-[9px] opacity-70 border-l border-current pl-1.5 whitespace-nowrap">
-                                        Ø{diametro}
+                        {/* --- Household Count (Paralela) --- */}
+                        <div
+                            className="bg-purple-50/90 border border-purple-200 rounded px-1.5 min-w-[24px] text-center cursor-pointer hover:bg-purple-100 transition-colors mb-0.5 shadow-sm transform hover:scale-110"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const current = typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0;
+                                const newVal = window.prompt("Cantidad de viviendas en este tramo:", current.toString());
+                                if (newVal !== null) {
+                                    const num = parseInt(newVal);
+                                    if (!isNaN(num)) {
+                                        // Update local store via ReactFlow first?
+                                        setEdges((prev) => prev.map((ed) => {
+                                            if (ed.id === id) {
+                                                return { ...ed, data: { ...ed.data, numero_viviendas: num } }
+                                            }
+                                            return ed
+                                        }));
+                                        // Update Backend
+                                        updateTramo({ id, numero_viviendas: num });
+                                    }
+                                }
+                            }}
+                            title="Viviendas abastecidas (Clic para editar)"
+                        >
+                            <span className="text-[9px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
+                        </div>
+
+                        {/* --- Length Label (Standard) --- */}
+                        {isEditing ? (
+                            <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center">
+                                <span className="text-[10px] font-mono text-muted-foreground pl-1">L=</span>
+                                <input
+                                    ref={inputRef}
+                                    type="number"
+                                    className="w-16 h-5 text-[11px] font-bold bg-transparent outline-none"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    onBlur={handleSave}
+                                />
+                                <div
+                                    className="w-5 h-5 bg-blue-500 text-white rounded cursor-pointer flex items-center justify-center hover:bg-blue-600 transition-colors"
+                                    onMouseDown={(e) => { e.preventDefault(); handleSave(); }} // onMouseDown prevents blur firing before clean click
+                                >
+                                    <Check className="w-3 h-3" />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-0.5">
+                                <div
+                                    className={`group flex items-center gap-1.5 px-1.5 py-0.5 rounded-full border shadow-sm cursor-pointer transition-all hover:scale-105 hover:border-blue-400 ${selected
+                                        ? 'bg-blue-50 border-blue-300 text-blue-900'
+                                        : 'bg-background/95 border-border/60 text-muted-foreground'
+                                        }`}
+                                    onClick={() => setIsEditing(true)}
+                                    title="Clic para editar longitud"
+                                >
+                                    {/* Label Content */}
+                                    <span className="text-[10px] font-bold font-mono whitespace-nowrap">
+                                        L={longitud?.toFixed(1) || '0.0'}
                                     </span>
+
+                                    {diametro && (
+                                        <span className="text-[9px] opacity-70 border-l border-current pl-1.5 whitespace-nowrap">
+                                            Ø{diametro}
+                                        </span>
+                                    )}
+                                </div>
+                                {/* Simulation Result Label */}
+                                {result && (
+                                    <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
+                                        style={{ transform: `rotate(${-angleDeg}deg)` }}
+                                    >
+                                        {result.velocity.toFixed(2)} m/s
+                                    </div>
                                 )}
                             </div>
-                            {/* Simulation Result Label - Always horizontal? No, also rotated. */}
-                            {result && (
-                                <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
-                                    style={{ transform: `rotate(${-angleDeg}deg)` }} // Counter-rotate? No, user wants aligned. But results might be better horizontal? Let's keep it rotated for now or maybe counter-rotate if readability is key. User said "alineado a la tuberia".
-                                >
-                                    {result.velocity.toFixed(2)} m/s
-                                </div>
-                            )}
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </EdgeLabelRenderer>
         </>

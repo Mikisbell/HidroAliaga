@@ -143,6 +143,7 @@ export interface Tramo {
     coeficiente_rugosidad?: number
     source_handle?: string
     target_handle?: string
+    numero_viviendas?: number
     created_at: string
     updated_at: string
 }
@@ -160,6 +161,7 @@ export interface TramoCreate {
     coef_hazen_williams?: number
     source_handle?: string
     target_handle?: string
+    numero_viviendas?: number
 }
 
 // ============ RESULTADOS DETALLADOS ============

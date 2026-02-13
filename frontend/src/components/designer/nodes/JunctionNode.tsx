@@ -72,7 +72,7 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
                 <div className="absolute pointer-events-none whitespace-nowrap"
                     style={{ left: CIRCLE_SIZE + 4, top: CIRCLE_SIZE / 2 - 6 }}>
                     <span className="text-[8px] font-mono text-gray-500 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
-                        {data.cota_terreno}m
+                        {data.cota_terreno}
                     </span>
                 </div>
             )}
@@ -82,7 +82,7 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
                 <div className="absolute pointer-events-none whitespace-nowrap"
                     style={{ left: CIRCLE_SIZE / 2 - 15, top: CIRCLE_SIZE + 2 }}>
                     <span className="text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-1 py-0.5 rounded border shadow-sm">
-                        {result.pressure.toFixed(1)}m
+                        {result.pressure.toFixed(1)}
                     </span>
                 </div>
             )}
