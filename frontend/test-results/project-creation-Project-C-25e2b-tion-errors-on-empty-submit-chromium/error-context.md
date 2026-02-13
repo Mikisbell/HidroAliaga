@@ -59,7 +59,7 @@
         - generic [ref=e64]:
           - text: Contraseña
           - generic [ref=e65]:
-            - textbox "••••••••" [ref=e66]
+            - textbox "••••••••" [ref=e66]: admin123
             - button "👁️" [ref=e67]
         - button "Ingresar al Sistema →" [ref=e68]:
           - generic [ref=e70]:
@@ -76,4 +76,12 @@
         - link "← Volver al inicio" [ref=e84] [cursor=pointer]:
           - /url: /
   - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - generic [ref=e93]:
+      - text: Compiling
+      - generic [ref=e94]:
+        - generic [ref=e95]: .
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+  - alert [ref=e98]
 ```

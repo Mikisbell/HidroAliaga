@@ -55,11 +55,11 @@
       - generic [ref=e61]:
         - generic [ref=e62]:
           - text: Email
-          - textbox "admin@hidroaliaga.com" [ref=e63]
+          - textbox "admin@hidroaliaga.com" [ref=e63]: user_b@test.com
         - generic [ref=e64]:
           - text: Contraseña
           - generic [ref=e65]:
-            - textbox "••••••••" [ref=e66]: admin123
+            - textbox "••••••••" [ref=e66]: password123
             - button "👁️" [ref=e67]
         - button "Ingresar al Sistema →" [ref=e68]:
           - generic [ref=e70]:
@@ -78,5 +78,5 @@
   - region "Notifications alt+T"
   - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
     - img [ref=e91]
-  - alert [ref=e94]: Diseño de redes de agua potable con precisión normativa
+  - alert [ref=e94]
 ```

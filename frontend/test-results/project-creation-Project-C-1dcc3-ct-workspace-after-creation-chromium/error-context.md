@@ -1,92 +1,87 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e1]:
-  - generic [active]:
-    - generic [ref=e4]:
-      - generic [ref=e5]:
-        - generic [ref=e6]:
-          - navigation [ref=e7]:
-            - button "previous" [disabled] [ref=e8]:
-              - img "previous" [ref=e9]
-            - generic [ref=e11]:
-              - generic [ref=e12]: 1/
-              - text: "1"
-            - button "next" [disabled] [ref=e13]:
-              - img "next" [ref=e14]
-          - img
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e10]: H
+        - generic [ref=e12]:
+          - paragraph [ref=e13]: Hidroaliaga
+          - paragraph [ref=e14]: by Jhonatan Aliaga
+      - generic [ref=e15]:
         - generic [ref=e16]:
-          - generic [ref=e17]:
-            - img [ref=e18]
-            - generic "Latest available version is detected (16.1.6)." [ref=e20]: Next.js 16.1.6
-            - generic [ref=e21]: Webpack
-          - img
-      - dialog "Runtime ReferenceError" [ref=e23]:
-        - generic [ref=e26]:
+          - generic [ref=e17]: Plataforma Activa — v0.1.0
+          - heading "Diseño de redes de agua potable con precisión normativa" [level=1] [ref=e19]:
+            - text: Diseño de redes
+            - text: de agua potable con
+            - text: precisión normativa
+          - paragraph [ref=e20]: Motor hidráulico Hardy Cross, validación automatizada conforme al RNE OS.050 y optimización por algoritmo genético.
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: ⚡
+            - generic [ref=e24]:
+              - paragraph [ref=e25]: Hardy Cross
+              - paragraph [ref=e26]: Hazen-Williams N=1.852
           - generic [ref=e27]:
-            - generic [ref=e28]:
-              - generic [ref=e30]: Runtime ReferenceError
-              - generic [ref=e31]:
-                - button "Copy Error Info" [ref=e32] [cursor=pointer]:
-                  - img [ref=e33]
-                - button "No related documentation found" [disabled] [ref=e35]:
-                  - img [ref=e36]
-                - button "Attach Node.js inspector" [ref=e38] [cursor=pointer]:
-                  - img [ref=e39]
-            - generic [ref=e48]: currentProject is not defined
-          - generic [ref=e49]:
-            - generic [ref=e50]:
-              - paragraph [ref=e52]:
-                - img [ref=e54]
-                - generic [ref=e57]: src\components\designer\NetworkDesigner.tsx (413:60) @ NetworkDesigner
-                - button "Open in editor" [ref=e58] [cursor=pointer]:
-                  - img [ref=e60]
-              - generic [ref=e63]:
-                - generic [ref=e64]: "411 | }, 100)"
-                - generic [ref=e65]: "412 | },"
-                - generic [ref=e66]: "> 413 | [onAddNode, setActiveTool, setActiveComponentType, currentProject]"
-                - generic [ref=e67]: "| ^"
-                - generic [ref=e68]: 414 | )
-                - generic [ref=e69]: 415 |
-                - generic [ref=e70]: 416 | // ========== PANE CLICK ==========
-            - generic [ref=e71]:
-              - generic [ref=e72]:
-                - paragraph [ref=e73]:
-                  - text: Call Stack
-                  - generic [ref=e74]: "15"
-                - button "Show 12 ignore-listed frame(s)" [ref=e75] [cursor=pointer]:
-                  - text: Show 12 ignore-listed frame(s)
-                  - img [ref=e76]
-              - generic [ref=e78]:
-                - generic [ref=e79]:
-                  - text: NetworkDesigner
-                  - button "Open NetworkDesigner in editor" [ref=e80] [cursor=pointer]:
-                    - img [ref=e81]
-                - text: src\components\designer\NetworkDesigner.tsx (413:60)
-              - generic [ref=e83]:
-                - generic [ref=e84]:
-                  - text: WorkspaceSplitView
-                  - button "Open WorkspaceSplitView in editor" [ref=e85] [cursor=pointer]:
-                    - img [ref=e86]
-                - text: src\components\workspace\WorkspaceSplitView.tsx (76:21)
-              - generic [ref=e88]:
-                - generic [ref=e89]:
-                  - text: ProyectoPage
-                  - button "Open ProyectoPage in editor" [ref=e90] [cursor=pointer]:
-                    - img [ref=e91]
-                - text: src\app\(dashboard)\proyectos\[id]\page.tsx (155:17)
-        - generic [ref=e93]: "1"
-        - generic [ref=e94]: "2"
-    - generic [ref=e99] [cursor=pointer]:
-      - button "Open Next.js Dev Tools" [ref=e100]:
-        - img [ref=e101]
-      - generic [ref=e104]:
-        - button "Open issues overlay" [ref=e105]:
-          - generic [ref=e106]:
-            - generic [ref=e107]: "0"
-            - generic [ref=e108]: "1"
-          - generic [ref=e109]: Issue
-        - button "Collapse issues badge" [ref=e110]:
-          - img [ref=e111]
-  - 'heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2] [ref=e115]'
+            - generic [ref=e28]: 🗺️
+            - generic [ref=e29]:
+              - paragraph [ref=e30]: GIS + DEM
+              - paragraph [ref=e31]: Cotas automáticas
+          - generic [ref=e32]:
+            - generic [ref=e33]: 📋
+            - generic [ref=e34]:
+              - paragraph [ref=e35]: RNE OS.050
+              - paragraph [ref=e36]: Validación normativa
+          - generic [ref=e37]:
+            - generic [ref=e38]: 🧬
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: IA Optimizer
+              - paragraph [ref=e41]: Algoritmo genético
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: OS.050
+          - generic [ref=e45]: RM 192-2018
+          - generic [ref=e46]: RM 107-2025
+        - paragraph [ref=e47]: © 2026 Hidroaliaga — by Jhonatan Aliaga
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Bienvenido de vuelta" [level=2] [ref=e52]
+        - paragraph [ref=e53]: Ingresa tus credenciales para acceder al sistema
+      - button "Google Continuar con Google" [ref=e54]:
+        - img "Google" [ref=e55]
+        - generic [ref=e56]: Continuar con Google
+      - generic [ref=e59]: O usa tu correo
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - text: Email
+          - textbox "admin@hidroaliaga.com" [ref=e63]
+        - generic [ref=e64]:
+          - text: Contraseña
+          - generic [ref=e65]:
+            - textbox "••••••••" [ref=e66]: admin123
+            - button "👁️" [ref=e67]
+        - button "Ingresar al Sistema →" [ref=e68]:
+          - generic [ref=e70]:
+            - text: Ingresar al Sistema
+            - generic [ref=e71]: →
+      - generic [ref=e74]: ¿No tienes cuenta?
+      - button "Crear una cuenta nueva" [ref=e76]
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: OS.050·
+          - generic [ref=e80]: RM 192·
+          - generic [ref=e81]: RM 107
+        - paragraph [ref=e82]: Reglamento Nacional de Edificaciones — Perú
+        - link "← Volver al inicio" [ref=e84] [cursor=pointer]:
+          - /url: /
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - generic [ref=e93]:
+      - text: Compiling
+      - generic [ref=e94]:
+        - generic [ref=e95]: .
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+  - alert [ref=e98]
 ```

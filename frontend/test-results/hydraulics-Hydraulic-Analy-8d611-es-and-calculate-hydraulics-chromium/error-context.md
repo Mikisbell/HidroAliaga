@@ -1,0 +1,167 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "H HidroAliaga Professional Suite" [ref=e6] [cursor=pointer]:
+            - /url: /dashboard
+            - generic [ref=e7]: H
+            - generic [ref=e8]:
+              - heading "HidroAliaga" [level=1] [ref=e9]
+              - paragraph [ref=e10]: Professional Suite
+          - button "Toggle theme" [ref=e11]:
+            - img
+            - generic [ref=e12]: Toggle theme
+        - link "Nuevo Proyecto" [ref=e14] [cursor=pointer]:
+          - /url: /proyectos/nuevo
+          - button "Nuevo Proyecto" [ref=e15]:
+            - generic [ref=e16]:
+              - img
+            - generic [ref=e17]: Nuevo Proyecto
+        - navigation [ref=e18]:
+          - paragraph [ref=e19]: Navegación
+          - link "Dashboard" [ref=e20] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e21]
+            - text: Dashboard
+          - link "Proyectos" [ref=e26] [cursor=pointer]:
+            - /url: /proyectos
+            - img [ref=e27]
+            - text: Proyectos
+          - link "Normativa" [ref=e29] [cursor=pointer]:
+            - /url: /normativa
+            - img [ref=e30]
+            - text: Normativa
+          - button "Mis Proyectos" [ref=e33]:
+            - paragraph [ref=e34]: Mis Proyectos
+            - img [ref=e35]
+          - generic [ref=e37]:
+            - link "Workspace Check 1770998962373" [ref=e38] [cursor=pointer]:
+              - /url: /proyectos/fd6548bd-37ed-41d1-835d-fafd8b9e5aa2
+              - img [ref=e39]
+              - generic [ref=e42]: Workspace Check 1770998962373
+            - link "E2E Test Project 1770998960013" [ref=e44] [cursor=pointer]:
+              - /url: /proyectos/4eadee58-ebcc-4018-b9b8-1ee20f44e34b
+              - img [ref=e45]
+              - generic [ref=e48]: E2E Test Project 1770998960013
+            - link "Smoke Test 1770998959188" [ref=e50] [cursor=pointer]:
+              - /url: /proyectos/9cc9984f-f24e-48b9-911f-5ab8d9020015
+              - img [ref=e51]
+              - generic [ref=e54]: Smoke Test 1770998959188
+            - link "Smoke Test 1770996378658" [ref=e56] [cursor=pointer]:
+              - /url: /proyectos/ba4e8bfc-2144-47fd-87bf-981e0b6bfd53
+              - img [ref=e57]
+              - generic [ref=e60]: Smoke Test 1770996378658
+            - link "Smoke Test 1770996090749" [ref=e62] [cursor=pointer]:
+              - /url: /proyectos/a88d8e14-6e88-4b47-a5a9-cd4da52b37f3
+              - img [ref=e63]
+              - generic [ref=e66]: Smoke Test 1770996090749
+            - link "E2E Test Project 1770834348114" [ref=e68] [cursor=pointer]:
+              - /url: /proyectos/71b3c917-18ce-4c3f-8de2-8b5fc2bfa080
+              - img [ref=e69]
+              - generic [ref=e72]: E2E Test Project 1770834348114
+            - link "Ver todos" [ref=e74] [cursor=pointer]:
+              - /url: /proyectos
+              - img [ref=e75]
+              - text: Ver todos
+          - paragraph [ref=e78]: Administración
+          - link "Admin Panel" [ref=e79] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e80]
+            - text: Admin Panel
+        - button "a admin admin@hidroaliaga.com" [ref=e83]:
+          - generic [ref=e85]: a
+          - generic [ref=e86]:
+            - paragraph [ref=e87]: admin
+            - paragraph [ref=e88]: admin@hidroaliaga.com
+          - img
+    - main [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - paragraph [ref=e92]: Crear
+          - heading "Nuevo Proyecto" [level=1] [ref=e93]
+          - paragraph [ref=e94]: Define el perfil del proyecto antes de iniciar el trazado
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e98]:
+              - generic [ref=e99]: 📝
+              - text: Información General
+            - generic [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]: Nombre del proyecto *
+                - textbox "Nombre del proyecto *" [ref=e103]:
+                  - /placeholder: "Ej: Red de Agua Potable - Caserío San Miguel"
+                  - text: Hydraulic Test 1770999507188
+              - generic [ref=e104]:
+                - generic [ref=e105]: Descripción
+                - textbox "Descripción" [ref=e106]:
+                  - /placeholder: Descripción del proyecto, tipo de sistema, fuentes...
+              - generic [ref=e107]:
+                - generic [ref=e108]:
+                  - generic [ref=e109]: Ámbito
+                  - combobox [ref=e110]:
+                    - generic: 🏙️ Urbano (OS.050)
+                    - img
+                  - combobox [ref=e111]
+                - generic [ref=e112]:
+                  - generic [ref=e113]: Tipo de Red
+                  - combobox [ref=e114]:
+                    - generic: 🔄 Cerrada (Mallas)
+                    - img
+                  - combobox [ref=e115]
+          - generic [ref=e116]:
+            - generic [ref=e118]:
+              - generic [ref=e119]: 📍
+              - text: Ubicación
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - generic [ref=e123]: Departamento
+                - textbox "Departamento" [ref=e124]:
+                  - /placeholder: Cajamarca
+              - generic [ref=e125]:
+                - generic [ref=e126]: Provincia
+                - textbox "Provincia" [ref=e127]:
+                  - /placeholder: Jaén
+              - generic [ref=e128]:
+                - generic [ref=e129]: Distrito
+                - textbox "Distrito" [ref=e130]:
+                  - /placeholder: San Ignacio
+          - generic [ref=e131]:
+            - generic [ref=e133]:
+              - generic [ref=e134]: ⚙️
+              - text: Parámetros de Diseño
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]:
+                  - generic [ref=e138]: Población de Diseño
+                  - spinbutton "Población de Diseño" [ref=e139]: "1000"
+                - generic [ref=e140]:
+                  - generic [ref=e141]: Período de Diseño
+                  - spinbutton "Período de Diseño" [ref=e142]: "20"
+                  - paragraph [ref=e143]: años
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - generic [ref=e146]: Dotación Per Cápita
+                  - spinbutton "Dotación Per Cápita" [ref=e147]: "169"
+                  - paragraph [ref=e148]: "L/hab/día — RM 107: Cálido 169, Templado 155, Frío 129"
+                - generic [ref=e149]:
+                  - generic [ref=e150]: Coef. Cobertura
+                  - spinbutton "Coef. Cobertura" [ref=e151]: "0.8"
+          - generic [ref=e152]:
+            - button "Crear Proyecto" [ref=e153]
+            - button "Cancelar" [ref=e154]
+      - button [ref=e155]:
+        - img
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e161] [cursor=pointer]:
+    - generic [ref=e164]:
+      - text: Compiling
+      - generic [ref=e165]:
+        - generic [ref=e166]: .
+        - generic [ref=e167]: .
+        - generic [ref=e168]: .
+  - alert [ref=e169]
+```

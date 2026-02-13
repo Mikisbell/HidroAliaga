@@ -3,126 +3,85 @@
 ```yaml
 - generic [active] [ref=e1]:
   - generic [ref=e2]:
-    - complementary [ref=e3]:
-      - generic [ref=e4]:
-        - generic [ref=e5]:
-          - link "H HidroAliaga Professional Suite" [ref=e6] [cursor=pointer]:
-            - /url: /dashboard
-            - generic [ref=e7]: H
-            - generic [ref=e8]:
-              - heading "HidroAliaga" [level=1] [ref=e9]
-              - paragraph [ref=e10]: Professional Suite
-          - button "Toggle theme" [ref=e11]:
-            - img
-            - generic [ref=e12]: Toggle theme
-        - link "Nuevo Proyecto" [ref=e14] [cursor=pointer]:
-          - /url: /proyectos/nuevo
-          - button "Nuevo Proyecto" [ref=e15]:
-            - generic [ref=e16]:
-              - img
-            - generic [ref=e17]: Nuevo Proyecto
-        - navigation [ref=e18]:
-          - paragraph [ref=e19]: Navegación
-          - link "Dashboard" [ref=e20] [cursor=pointer]:
-            - /url: /dashboard
-            - img [ref=e21]
-            - text: Dashboard
-          - link "Proyectos" [ref=e26] [cursor=pointer]:
-            - /url: /proyectos
-            - img [ref=e27]
-            - text: Proyectos
-          - link "Normativa" [ref=e29] [cursor=pointer]:
-            - /url: /normativa
-            - img [ref=e30]
-            - text: Normativa
-          - button "Mis Proyectos" [ref=e33]:
-            - paragraph [ref=e34]: Mis Proyectos
-            - img [ref=e35]
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e10]: H
+        - generic [ref=e12]:
+          - paragraph [ref=e13]: Hidroaliaga
+          - paragraph [ref=e14]: by Jhonatan Aliaga
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Plataforma Activa — v0.1.0
+          - heading "Diseño de redes de agua potable con precisión normativa" [level=1] [ref=e19]:
+            - text: Diseño de redes
+            - text: de agua potable con
+            - text: precisión normativa
+          - paragraph [ref=e20]: Motor hidráulico Hardy Cross, validación automatizada conforme al RNE OS.050 y optimización por algoritmo genético.
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: ⚡
+            - generic [ref=e24]:
+              - paragraph [ref=e25]: Hardy Cross
+              - paragraph [ref=e26]: Hazen-Williams N=1.852
+          - generic [ref=e27]:
+            - generic [ref=e28]: 🗺️
+            - generic [ref=e29]:
+              - paragraph [ref=e30]: GIS + DEM
+              - paragraph [ref=e31]: Cotas automáticas
+          - generic [ref=e32]:
+            - generic [ref=e33]: 📋
+            - generic [ref=e34]:
+              - paragraph [ref=e35]: RNE OS.050
+              - paragraph [ref=e36]: Validación normativa
           - generic [ref=e37]:
-            - link "Smoke Test 1770996378658" [ref=e38] [cursor=pointer]:
-              - /url: /proyectos/ba4e8bfc-2144-47fd-87bf-981e0b6bfd53
-              - img [ref=e39]
-              - generic [ref=e42]: Smoke Test 1770996378658
-            - link "Smoke Test 1770996090749" [ref=e44] [cursor=pointer]:
-              - /url: /proyectos/a88d8e14-6e88-4b47-a5a9-cd4da52b37f3
-              - img [ref=e45]
-              - generic [ref=e48]: Smoke Test 1770996090749
-            - link "E2E Test Project 1770834255738" [ref=e50] [cursor=pointer]:
-              - /url: /proyectos/419aea3d-8df6-4bdb-8288-502233afb332
-              - img [ref=e51]
-              - generic [ref=e54]: E2E Test Project 1770834255738
-            - link "Workspace Check 1770834255538" [ref=e56] [cursor=pointer]:
-              - /url: /proyectos/2de454b4-1238-4da3-91d1-75af01e041be
-              - img [ref=e57]
-              - generic [ref=e60]: Workspace Check 1770834255538
-            - link "Workspace Check 1770834348115" [ref=e62] [cursor=pointer]:
-              - /url: /proyectos/7c07c78d-c995-4da9-9c7d-1a8cb277b523
-              - img [ref=e63]
-              - generic [ref=e66]: Workspace Check 1770834348115
-            - link "E2E Test Project 1770834348114" [ref=e68] [cursor=pointer]:
-              - /url: /proyectos/71b3c917-18ce-4c3f-8de2-8b5fc2bfa080
-              - img [ref=e69]
-              - generic [ref=e72]: E2E Test Project 1770834348114
-            - link "Ver todos" [ref=e74] [cursor=pointer]:
-              - /url: /proyectos
-              - img [ref=e75]
-              - text: Ver todos
-          - paragraph [ref=e78]: Administración
-          - link "Admin Panel" [ref=e79] [cursor=pointer]:
-            - /url: /admin
-            - img [ref=e80]
-            - text: Admin Panel
-        - button "a admin admin@hidroaliaga.com" [ref=e83]:
-          - generic [ref=e85]: a
-          - generic [ref=e86]:
-            - paragraph [ref=e87]: admin
-            - paragraph [ref=e88]: admin@hidroaliaga.com
-          - img
-    - main [ref=e89]:
-      - generic [ref=e90]:
-        - generic [ref=e91]:
-          - generic [ref=e92]:
-            - paragraph [ref=e93]: Proyecto
-            - heading "E2E Test Project 1770998960013" [level=1] [ref=e94]
-            - generic [ref=e95]:
-              - generic [ref=e96]: urbano
-              - generic [ref=e97]: Red cerrada
-              - generic [ref=e98]: 📍 Cajamarca
-          - generic [ref=e99]:
-            - button "Importar Excel" [ref=e100]:
-              - img
-              - text: Importar Excel
-            - button "Memoria de Cálculo" [disabled]:
-              - img
-              - text: Memoria de Cálculo
-            - button "▶ Calcular Red" [ref=e102]
-        - generic [ref=e103]:
-          - generic [ref=e105]:
-            - paragraph [ref=e106]: "0"
-            - paragraph [ref=e107]: Nudos
-          - generic [ref=e109]:
-            - paragraph [ref=e110]: "0"
-            - paragraph [ref=e111]: Tramos
-          - generic [ref=e113]:
-            - paragraph [ref=e114]: "0"
-            - paragraph [ref=e115]: Cálculos
-          - generic [ref=e117]:
-            - paragraph [ref=e118]: —
-            - paragraph [ref=e119]: Convergencia
-        - generic [ref=e121]:
-          - tablist [ref=e122]:
-            - tab "Diseñador y Datos" [selected] [ref=e123]
-            - tab "Resultados" [ref=e124]
-            - tab "Optimización" [ref=e125]
-            - tab "Configuración" [ref=e126]
-          - tabpanel "Diseñador y Datos" [ref=e128]:
-            - generic [ref=e131]:
-              - paragraph [ref=e132]: 📐
-              - paragraph [ref=e133]: Cargando espacio de trabajo...
-      - button [ref=e134]:
-        - img
+            - generic [ref=e38]: 🧬
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: IA Optimizer
+              - paragraph [ref=e41]: Algoritmo genético
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: OS.050
+          - generic [ref=e45]: RM 192-2018
+          - generic [ref=e46]: RM 107-2025
+        - paragraph [ref=e47]: © 2026 Hidroaliaga — by Jhonatan Aliaga
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Bienvenido de vuelta" [level=2] [ref=e52]
+        - paragraph [ref=e53]: Ingresa tus credenciales para acceder al sistema
+      - button "Google Continuar con Google" [ref=e54]:
+        - img "Google" [ref=e55]
+        - generic [ref=e56]: Continuar con Google
+      - generic [ref=e59]: O usa tu correo
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - text: Email
+          - textbox "admin@hidroaliaga.com" [ref=e63]
+        - generic [ref=e64]:
+          - text: Contraseña
+          - generic [ref=e65]:
+            - textbox "••••••••" [ref=e66]: admin123
+            - button "👁️" [ref=e67]
+        - button "Ingresar al Sistema →" [ref=e68]:
+          - generic [ref=e70]:
+            - text: Ingresar al Sistema
+            - generic [ref=e71]: →
+      - generic [ref=e74]: ¿No tienes cuenta?
+      - button "Crear una cuenta nueva" [ref=e76]
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: OS.050·
+          - generic [ref=e80]: RM 192·
+          - generic [ref=e81]: RM 107
+        - paragraph [ref=e82]: Reglamento Nacional de Edificaciones — Perú
+        - link "← Volver al inicio" [ref=e84] [cursor=pointer]:
+          - /url: /
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e140] [cursor=pointer]:
-    - img [ref=e141]
-  - alert [ref=e144]
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - generic [ref=e93]:
+      - text: Compiling
+      - generic [ref=e94]:
+        - generic [ref=e95]: .
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+  - alert [ref=e98]
 ```

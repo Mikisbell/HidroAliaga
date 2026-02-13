@@ -62,7 +62,7 @@ export default defineConfig({
         url: 'http://localhost:3002',
         reuseExistingServer: !process.env.CI,
         env: {
-            NEXT_PUBLIC_SKIP_AUTH: 'true',  // Bypass middleware auth during E2E tests
+            NEXT_PUBLIC_SKIP_AUTH: 'true',  // Bypass middleware auth during E2E tests (best working solution)
         },
     },
 });

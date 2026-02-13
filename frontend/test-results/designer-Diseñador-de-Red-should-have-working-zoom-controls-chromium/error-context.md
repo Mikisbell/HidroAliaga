@@ -78,5 +78,5 @@
   - region "Notifications alt+T"
   - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
     - img [ref=e91]
-  - alert [ref=e94]: Diseño de redes de agua potable con precisión normativa
+  - alert [ref=e94]
 ```
