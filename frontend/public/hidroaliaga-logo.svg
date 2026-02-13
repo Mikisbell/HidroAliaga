@@ -1,0 +1,67 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Definir gradientes -->
+  <defs>
+    <linearGradient id="dropGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dropGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Gota izquierda (más grande) -->
+  <path 
+    d="M 70 50 
+       C 70 50, 50 70, 50 95
+       C 50 115, 60 130, 75 130
+       C 90 130, 100 115, 100 95
+       C 100 70, 80 50, 70 50 Z"
+    fill="url(#dropGradient1)"
+    filter="url(#glow)"
+    opacity="0.95"
+  />
+  
+  <!-- Gota derecha (entrelazada) -->
+  <path 
+    d="M 130 70
+       C 130 70, 110 90, 110 115
+       C 110 135, 120 150, 135 150
+       C 150 150, 160 135, 160 115
+       C 160 90, 140 70, 130 70 Z"
+    fill="url(#dropGradient2)"
+    filter="url(#glow)"
+    opacity="0.95"
+  />
+  
+  <!-- Círculo de conexión (representa el flujo de agua) -->
+  <circle cx="95" cy="105" r="8" fill="#0ea5e9" opacity="0.6"/>
+  
+  <!-- Detalles de brillo en las gotas -->
+  <ellipse cx="65" cy="75" rx="8" ry="12" fill="white" opacity="0.3"/>
+  <ellipse cx="125" cy="95" rx="8" ry="12" fill="white" opacity="0.3"/>
+  
+  <!-- Ondas de agua debajo (opcional) -->
+  <path 
+    d="M 40 165 Q 60 160, 80 165 T 120 165 T 160 165" 
+    stroke="#0ea5e9" 
+    stroke-width="2" 
+    fill="none" 
+    opacity="0.4"
+  />
+  <path 
+    d="M 45 175 Q 65 170, 85 175 T 125 175 T 165 175" 
+    stroke="#06b6d4" 
+    stroke-width="2" 
+    fill="none" 
+    opacity="0.3"
+  />
+</svg>

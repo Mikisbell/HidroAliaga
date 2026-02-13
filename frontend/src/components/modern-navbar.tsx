@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { HidroaliagaLogo } from "@/components/hidroaliaga-logo"
 import { BRAND } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import {
     Menu,
     X,
-    Droplets,
     ArrowRight,
     ChevronDown
 } from "lucide-react"
@@ -33,7 +33,7 @@ const navItems = [
         href: "#servicios",
     },
     {
-        label: "Sobre Jhonatan",
+        label: "Sobre Aron",
         href: "#perfil",
     },
 ]
@@ -77,26 +77,9 @@ export function ModernNavbar() {
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
-                        {/* Logo - Aurora Organic Gradient 2026 */}
-                        <Link href="/" className="flex items-center gap-3 group">
-                            <div className="relative w-10 h-10 rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                                {/* Aurora gradient background */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-indigo-900 to-slate-900" />
-                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 via-indigo-500/20 to-amber-500/20" />
-                                <div className="absolute inset-0 backdrop-blur-sm" />
-                                {/* Content */}
-                                <div className="relative h-full flex items-center justify-center">
-                                    <Droplets className="w-5 h-5 text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.5)]" />
-                                </div>
-                            </div>
-                            <div className="hidden sm:block">
-                                <span className="text-lg font-semibold text-slate-100 tracking-tight">
-                                    {BRAND.name}
-                                </span>
-                                <span className="block text-[10px] text-slate-500 font-medium tracking-wide">
-                                    by Jhonatan Aliaga
-                                </span>
-                            </div>
+                        {/* Logo con nuevo diseño de gotas entrelazadas */}
+                        <Link href="/" className="group">
+                            <HidroaliagaLogo size="md" showText={true} className="transition-transform duration-300 group-hover:scale-105" />
                         </Link>
 
                         {/* Navegación Desktop - Solo lo esencial */}
@@ -249,7 +232,7 @@ export function ModernNavbar() {
                     {/* Footer mobile */}
                     <div className="mt-auto py-6 border-t border-white/5">
                         <p className="text-center text-xs text-slate-600">
-                            © 2026 {BRAND.name} by Jhonatan Aliaga
+                            © 2026 {BRAND.name} by Aron Aliaga
                         </p>
                     </div>
                 </div>

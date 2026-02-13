@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { HidroaliagaLogo } from "@/components/hidroaliaga-logo"
 import { 
     Linkedin, 
     Twitter, 
@@ -128,17 +129,7 @@ export function ModernFooter() {
                     <div className="grid lg:grid-cols-6 gap-12">
                         {/* Brand Column */}
                         <div className="lg:col-span-2">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 via-pink-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl">
-                                    H
-                                </div>
-                                <div>
-                                    <span className="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                                        Hidroaliaga
-                                    </span>
-                                    <p className="text-xs text-slate-500">by Jhonatan Aliaga</p>
-                                </div>
-                            </div>
+                            <HidroaliagaLogo size="md" showText={true} className="mb-6" />
                             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
                                 Software profesional de ingeniería hidráulica y servicios de consultoría 
                                 para proyectos de infraestructura hídrica en el Perú.
