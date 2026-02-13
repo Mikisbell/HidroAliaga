@@ -23,7 +23,7 @@ import {
 import '@xyflow/react/dist/style.css'
 
 import { createNudo, deleteNudo } from "@/app/actions/nudos"
-import { createTramoAction, deleteTramo } from "@/app/actions/tramos"
+import { createTramo, deleteTramo } from "@/app/actions/tramos"
 import { toast } from "sonner"
 
 import ReservoirNode from './nodes/ReservoirNode'
@@ -219,10 +219,11 @@ export default function NetworkDesigner({
 
     const onConnect: OnConnect = useCallback(
         async (connection: Connection) => {
-            if (connection.source && connection.target && currentProject) {
+            const currentProj = useProjectStore.getState().currentProject
+            if (connection.source && connection.target && currentProj) {
                 // 1. Create Tramo on Server
-                const response = await createTramoAction({
-                    proyecto_id: currentProject.id,
+                const response = await createTramo({
+                    proyecto_id: currentProj.id,
                     nudo_origen_id: connection.source,
                     nudo_destino_id: connection.target
                 })
@@ -241,7 +242,7 @@ export default function NetworkDesigner({
                 // For now, validation is: "It exists on server".
             }
         },
-        [onConnectProp, currentProject]
+        [onConnectProp] // removed currentProject dep since we read from store
     )
 
     // RECONNECTION HANDLERS
