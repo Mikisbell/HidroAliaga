@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { WaterParticlesCanvas } from "@/components/water-particles-canvas"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -61,7 +62,10 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex">
+        <div className="min-h-screen flex relative">
+            {/* Water Particles Background */}
+            <WaterParticlesCanvas />
+            
             {/* ─── LEFT PANEL: Brand & Features ─── */}
             <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden"
                 style={{ background: 'linear-gradient(135deg, oklch(0.18 0.04 250), oklch(0.13 0.03 260), oklch(0.10 0.02 240))' }}>
@@ -118,12 +122,12 @@ export default function LoginPage() {
                                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'oklch(0.70 0.20 150)' }} />
                                 Plataforma Activa — v0.1.0
                             </div>
-                            <h1 className="text-[2.75rem] leading-[1.1] font-bold text-white tracking-tight">
+                            <h1 className="text-5xl md:text-6xl leading-[1.1] font-bold text-white tracking-tight">
                                 Diseño de redes<br />
                                 de agua potable con<br />
                                 <span style={{ color: 'oklch(0.75 0.18 210)' }}>precisión normativa</span>
                             </h1>
-                            <p className="text-white/40 text-[15px] leading-relaxed max-w-md">
+                            <p className="text-white/40 text-sm md:text-base leading-relaxed max-w-md">
                                 Motor hidráulico Hardy Cross, validación automatizada conforme al RNE OS.050 y optimización por algoritmo genético.
                             </p>
                         </div>
@@ -137,7 +141,7 @@ export default function LoginPage() {
                                 { icon: "🧬", label: "IA Optimizer", desc: "Algoritmo genético", color: "280" },
                             ].map((f) => (
                                 <div key={f.label} className="flex items-start gap-3 p-3.5 rounded-xl transition-colors"
-                                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    style={{ background: 'oklch(0.16 0.01 260)', border: '1px solid oklch(0.25 0.02 260 / 0.2)' }}>
                                     <span className="text-lg mt-0.5">{f.icon}</span>
                                     <div>
                                         <p className="text-white/80 text-sm font-medium">{f.label}</p>
@@ -153,7 +157,7 @@ export default function LoginPage() {
                         <div className="flex items-center gap-4">
                             {["OS.050", "RM 192-2018", "RM 107-2025"].map((n) => (
                                 <span key={n} className="text-[10px] font-medium px-2.5 py-1 rounded-md"
-                                    style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    style={{ background: 'oklch(0.16 0.01 260)', color: 'rgba(255,255,255,0.3)', border: '1px solid oklch(0.25 0.02 260 / 0.2)' }}>
                                     {n}
                                 </span>
                             ))}
@@ -164,7 +168,7 @@ export default function LoginPage() {
             </div>
 
             {/* ─── RIGHT PANEL: Auth Form ─── */}
-            <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative"
+            <div className="flex-1 flex items-center justify-center p-8 md:p-12 relative"
                 style={{ background: 'oklch(0.14 0.01 260)' }}>
 
                 {/* Subtle bg texture */}
@@ -175,7 +179,7 @@ export default function LoginPage() {
                     }}
                 />
 
-                <div className="relative z-10 w-full max-w-[380px] space-y-8">
+                <div className="relative z-10 w-full max-w-[380px] space-y-6">
                     {/* Mobile logo */}
                     <div className="lg:hidden flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
@@ -190,7 +194,7 @@ export default function LoginPage() {
 
                     {/* Header */}
                     <div className="space-y-2">
-                        <h2 className="text-[1.75rem] font-bold text-white tracking-tight">
+                        <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                             {mode === "login" ? "Bienvenido de vuelta" : "Crear cuenta"}
                         </h2>
                         <p className="text-white/35 text-sm">
@@ -216,10 +220,11 @@ export default function LoginPage() {
                                 },
                             });
                         }}
-                        className="w-full h-12 rounded-xl text-sm font-medium text-white transition-all duration-200 flex items-center justify-center gap-3 relative overflow-hidden group mb-4"
+                        className="w-full h-12 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 relative overflow-hidden group mb-4"
                         style={{
-                            background: 'white',
-                            color: 'black',
+                            background: 'oklch(0.18 0.01 260)',
+                            color: 'oklch(0.93 0.01 250)',
+                            border: '1px solid oklch(0.25 0.02 260 / 0.3)',
                             boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
                         }}
                     >
@@ -237,14 +242,14 @@ export default function LoginPage() {
 
                     {/* Alerts */}
                     {error && (
-                        <div className="flex items-start gap-3 p-3.5 rounded-xl text-sm"
+                        <div className="flex items-start gap-3 p-4 rounded-xl text-sm"
                             style={{ background: 'oklch(0.30 0.12 25 / 0.15)', border: '1px solid oklch(0.55 0.20 25 / 0.25)', color: 'oklch(0.75 0.15 25)' }}>
                             <span className="text-base mt-0.5">⚠️</span>
                             <p>{error}</p>
                         </div>
                     )}
                     {mensaje && (
-                        <div className="flex items-start gap-3 p-3.5 rounded-xl text-sm"
+                        <div className="flex items-start gap-3 p-4 rounded-xl text-sm"
                             style={{ background: 'oklch(0.30 0.12 155 / 0.15)', border: '1px solid oklch(0.55 0.15 155 / 0.25)', color: 'oklch(0.75 0.12 155)' }}>
                             <span className="text-base mt-0.5">✅</span>
                             <p>{mensaje}</p>
@@ -255,7 +260,7 @@ export default function LoginPage() {
                     <form onSubmit={mode === "login" ? handleLogin : handleRegistro} className="space-y-5">
                         {mode === "registro" && (
                             <div className="space-y-1.5">
-                                <label className="text-[11px] font-medium uppercase tracking-[0.1em]"
+                                <label className="text-xs font-medium uppercase tracking-[0.1em]"
                                     style={{ color: 'oklch(0.55 0 0)' }}>
                                     Nombre Completo
                                 </label>
@@ -267,7 +272,7 @@ export default function LoginPage() {
                                     required
                                     className="w-full h-12 px-4 rounded-xl text-sm text-white placeholder:text-white/20 outline-none transition-all duration-200"
                                     style={{
-                                        background: 'oklch(0.18 0.01 260)',
+                                        background: 'oklch(0.16 0.01 260)',
                                         border: '1px solid oklch(0.25 0.02 260)',
                                     }}
                                     onFocus={(e) => {
@@ -283,7 +288,7 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-[11px] font-medium uppercase tracking-[0.1em]"
+                            <label className="text-xs font-medium uppercase tracking-[0.1em]"
                                 style={{ color: 'oklch(0.55 0 0)' }}>
                                 Email
                             </label>
@@ -295,7 +300,7 @@ export default function LoginPage() {
                                 required
                                 className="w-full h-12 px-4 rounded-xl text-sm text-white placeholder:text-white/20 outline-none transition-all duration-200"
                                 style={{
-                                    background: 'oklch(0.18 0.01 260)',
+                                    background: 'oklch(0.16 0.01 260)',
                                     border: '1px solid oklch(0.25 0.02 260)',
                                 }}
                                 onFocus={(e) => {
@@ -310,7 +315,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[11px] font-medium uppercase tracking-[0.1em]"
+                            <label className="text-xs font-medium uppercase tracking-[0.1em]"
                                 style={{ color: 'oklch(0.55 0 0)' }}>
                                 Contraseña
                             </label>
@@ -324,7 +329,7 @@ export default function LoginPage() {
                                     minLength={6}
                                     className="w-full h-12 px-4 pr-12 rounded-xl text-sm text-white placeholder:text-white/20 outline-none transition-all duration-200"
                                     style={{
-                                        background: 'oklch(0.18 0.01 260)',
+                                        background: 'oklch(0.16 0.01 260)',
                                         border: '1px solid oklch(0.25 0.02 260)',
                                     }}
                                     onFocus={(e) => {

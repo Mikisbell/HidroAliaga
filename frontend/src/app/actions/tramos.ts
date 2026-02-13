@@ -10,6 +10,8 @@ const updateTramoSchema = z.object({
     diametro_comercial: z.number().positive().optional(),
     material: z.string().optional(),
     diametro_interior: z.number().positive().optional(),
+    numero_viviendas: z.number().nonnegative().optional(),
+    coef_hazen_williams: z.number().positive().optional(),
 })
 
 const updateNudoSchema = z.object({

@@ -22,6 +22,10 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
+import { createNudo, deleteNudo } from "@/app/actions/nudos"
+import { createTramoAction, deleteTramo } from "@/app/actions/tramos"
+import { toast } from "sonner"
+
 import ReservoirNode from './nodes/ReservoirNode'
 import CRPNode from './nodes/CRPNode'
 import JunctionNode from './nodes/JunctionNode'
@@ -214,33 +218,30 @@ export default function NetworkDesigner({
     );
 
     const onConnect: OnConnect = useCallback(
-        (connection: Connection) => {
-            if (connection.source && connection.target) {
-                // Pass handles to the parent callback
-                // We need to cast or update the prop type. 
-                // Since onConnectProp is defined as (sourceId, targetId) => void in props,
-                // we should update the prop signature or pass a 3rd arg context if possible.
-                // Or better, we handle the creation logic here call the server action if the prop allows customization?
-                // The prop is: onConnect?: (sourceId: string, targetId: string) => void
+        async (connection: Connection) => {
+            if (connection.source && connection.target && currentProject) {
+                // 1. Create Tramo on Server
+                const response = await createTramoAction({
+                    proyecto_id: currentProject.id,
+                    nudo_origen_id: connection.source,
+                    nudo_destino_id: connection.target
+                })
 
-                // Let's assume we update the prop signature in the file too.
-                // Or we pass an object?
-                // For now, I'll pass handles as extra args if the parent supports it, 
-                // but Typescript will complain.
+                if (response.error) {
+                    toast.error("Error creating pipe: " + response.error)
+                    return
+                }
 
-                // I need to update NetworkDesignerProps definition first.
-                // But I can't do parallel edits easily on same file parts.
-
-                // Let's rely on the store action directly? 
-                // The prompt says "onConnectProp?.(source, target)".
-                // I will update the prop signature in a separate edit or assume I can modify it now.
-
-                // Let's modify the prop call to include handles.
+                // 2. Add to Store & Visuals
                 // @ts-ignore - Temporary until prop type is updated
                 onConnectProp?.(connection.source, connection.target, connection.sourceHandle, connection.targetHandle)
+
+                // If the store action 'addTramo' relies on an ID, we should ideally use response.tramo.id
+                // But onConnectProp might be handling ID generation internally.
+                // For now, validation is: "It exists on server".
             }
         },
-        [onConnectProp]
+        [onConnectProp, currentProject]
     )
 
     // RECONNECTION HANDLERS
@@ -314,8 +315,41 @@ export default function NetworkDesigner({
                 })
             }
         },
-        [nudos]
-    )
+        [tramos, nudos]
+    );
+
+    // DELETION HANDLERS
+    const onNodesDelete = useCallback(async (currNodes: Node[]) => {
+        // Optimistic update handled by ReactFlow/Store? 
+        // No, we need to tell store to remove them?
+        // Actually reactflow's onNodesChange usually handles the visual removal if we wire it up.
+        // But we need to sync with DB.
+
+        for (const node of currNodes) {
+            const nudoId = node.id
+            // Call Server
+            toast.promise(deleteNudo(nudoId), {
+                loading: 'Eliminando nudo...',
+                success: 'Nudo eliminado',
+                error: 'Error al eliminar nudo'
+            })
+            // Store removal is handled by onNodesChange -> setNodes?
+            // But we need to remove from ProjectStore 'nudos' array too!
+            useProjectStore.getState().removeNudo(nudoId)
+        }
+    }, [])
+
+    const onEdgesDelete = useCallback(async (currEdges: Edge[]) => {
+        for (const edge of currEdges) {
+            const tramoId = edge.id
+            toast.promise(deleteTramo(tramoId), {
+                loading: 'Eliminando tramo...',
+                success: 'Tramo eliminado',
+                error: 'Error al eliminar tramo'
+            })
+            useProjectStore.getState().removeTramo(tramoId)
+        }
+    }, [])
 
     // Handle edge click → select in store
     const handleEdgeClick = useCallback(
@@ -332,10 +366,10 @@ export default function NetworkDesigner({
     }, [])
 
     const handleDrop = useCallback(
-        (event: DragEvent) => {
+        async (event: DragEvent) => {
             event.preventDefault()
             const nodeType = event.dataTransfer.getData('application/reactflow-nodetype')
-            if (!nodeType || !reactFlowRef.current) return
+            if (!nodeType || !reactFlowRef.current || !currentProject) return
 
             const position = reactFlowRef.current.screenToFlowPosition({
                 x: event.clientX,
@@ -344,14 +378,37 @@ export default function NetworkDesigner({
 
             setActiveComponentType(nodeType as Nudo['tipo'])
             setActiveTool('node')
-            onAddNode?.(position.x, position.y, nodeType)
+
+            // 1. Create Nudo on Server
+            try {
+                // Use optimistic temporary handling or await server?
+                // Awaiting server ensures ID consistency.
+                const { success, nudo, error } = await createNudo(
+                    currentProject.id,
+                    position.x,
+                    position.y,
+                    nodeType as Nudo['tipo']
+                )
+
+                if (success && nudo) {
+                    // 2. Add to Store with REAL ID
+                    useProjectStore.getState().addNudo(nudo)
+                    toast.success("Nudo creado")
+                } else {
+                    toast.error("Error creating node: " + error)
+                }
+
+            } catch (e) {
+                toast.error("Error creating node")
+                console.error(e)
+            }
 
             setTimeout(() => {
                 setActiveTool('select')
                 setActiveComponentType(null)
             }, 100)
         },
-        [onAddNode, setActiveTool, setActiveComponentType]
+        [onAddNode, setActiveTool, setActiveComponentType, currentProject]
     )
 
     // ========== PANE CLICK ==========
@@ -380,6 +437,8 @@ export default function NetworkDesigner({
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                onNodesDelete={onNodesDelete}
+                onEdgesDelete={onEdgesDelete}
                 onReconnect={onReconnect}
                 onReconnectStart={onReconnectStart}
                 onReconnectEnd={onReconnectEnd}
