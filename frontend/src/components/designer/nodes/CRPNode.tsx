@@ -11,6 +11,9 @@ interface CRPData extends Record<string, unknown> {
     crp_type?: 'T6' | 'T7'
 }
 
+/**
+ * CRP (Cámara Rompe Presión) — Diamond shape with 2 connection points (IN top, OUT bottom)
+ */
 const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
     const data = initialData as CRPData
     const label = data.codigo || id.substring(0, 1)
@@ -23,81 +26,69 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
             )}
             title={data.nombre || `CRP ${data.crp_type || ''}`}
         >
-            {/* SVG CRP Symbol - Diamond with pressure break arrows */}
-            <svg width="36" height="36" viewBox="0 0 36 36"
+            {/* Diamond SVG with pressure break symbol */}
+            <svg width="34" height="34" viewBox="0 0 34 34"
                 className={cn(
                     "drop-shadow-md transition-all",
                     selected && "drop-shadow-lg"
                 )}
             >
-                {/* Diamond shape */}
+                {/* Diamond body */}
                 <path
-                    d="M18 2 L34 18 L18 34 L2 18 Z"
+                    d="M17 2 L32 17 L17 32 L2 17 Z"
                     className={cn(
                         "transition-all",
                         selected
-                            ? "fill-amber-100 stroke-amber-600"
-                            : "fill-amber-50 stroke-amber-500 group-hover:stroke-amber-600"
+                            ? "fill-amber-100 stroke-amber-600 dark:fill-amber-900/30"
+                            : "fill-amber-50 stroke-amber-500 group-hover:stroke-amber-600 dark:fill-amber-950/20"
                     )}
                     strokeWidth="2.5"
                     strokeLinejoin="round"
                 />
-                {/* Pressure break symbol - zigzag line */}
+                {/* Zigzag pressure break */}
                 <path
-                    d="M11 18 L14 14 L18 22 L22 14 L25 18"
+                    d="M11 17 L14 13 L17 21 L20 13 L23 17"
                     fill="none"
-                    className={cn(
-                        "transition-all",
-                        selected ? "stroke-amber-700" : "stroke-amber-600"
-                    )}
-                    strokeWidth="2.5"
+                    className={cn(selected ? "stroke-amber-700" : "stroke-amber-600")}
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                />
-                {/* Down arrow (pressure drops) */}
-                <path
-                    d="M18 24 L15 21 M18 24 L21 21"
-                    fill="none"
-                    className={cn(selected ? "stroke-amber-600" : "stroke-amber-500")}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
                 />
             </svg>
 
-            {/* Label below */}
+            {/* Label */}
             <span className={cn(
-                "text-[9px] font-bold select-none mt-0.5 px-1 rounded uppercase whitespace-nowrap",
+                "text-[9px] font-bold select-none mt-0.5 px-1 rounded uppercase whitespace-nowrap pointer-events-none",
                 selected
                     ? "text-amber-800 bg-amber-100/80"
-                    : "text-amber-700 bg-white/60 group-hover:bg-amber-50/80"
+                    : "text-amber-700 bg-white/70 dark:bg-gray-900/70 group-hover:bg-amber-50/80"
             )}>
                 {label}
             </span>
 
             {/* Type badge */}
             {data.crp_type && (
-                <span className="absolute -left-2 top-0 text-[7px] font-mono font-bold text-amber-600 bg-amber-100/90 px-0.5 rounded pointer-events-none border border-amber-300/50">
+                <span className="absolute -left-3 top-1 text-[7px] font-mono font-bold text-amber-600 bg-amber-100/90 px-0.5 rounded pointer-events-none border border-amber-300/50">
                     {data.crp_type}
                 </span>
             )}
 
-            {/* Cota indicator */}
+            {/* Cota badge */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-3 top-0 text-[8px] font-mono text-amber-600 bg-white/80 px-0.5 rounded pointer-events-none">
+                <span className="absolute -right-5 top-1 text-[8px] font-mono text-amber-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-amber-200 shadow-sm">
                     {data.cota_terreno}m
                 </span>
             )}
 
-            {/* Selection ring */}
             {selected && (
-                <div className="absolute -inset-1 rounded-lg border-2 border-amber-500/40 animate-pulse pointer-events-none" />
+                <div className="absolute -inset-1 rounded-lg border-2 border-amber-400/40 pointer-events-none" />
             )}
 
-            {/* Ports */}
-            <Handle type="target" position={Position.Top}
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-2 !border-white opacity-0 group-hover:opacity-100 transition-opacity !-top-1" />
-            <Handle type="source" position={Position.Bottom}
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-2 !border-white opacity-0 group-hover:opacity-100 transition-opacity !-bottom-1" />
+            {/* 2 Connection Handles — IN (top) and OUT (bottom) only */}
+            <Handle type="target" position={Position.Top} id="in"
+                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0 !-top-1" />
+            <Handle type="source" position={Position.Bottom} id="out"
+                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0 !-bottom-1" />
         </div>
     )
 }
