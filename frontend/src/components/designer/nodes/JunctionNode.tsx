@@ -58,13 +58,13 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
 
                 {/* 4 Handles — React Flow positions them at edge of this div */}
                 <Handle type="target" position={Position.Top} id="top"
-                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
                 <Handle type="source" position={Position.Right} id="right"
-                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
                 <Handle type="source" position={Position.Bottom} id="bottom"
-                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
                 <Handle type="target" position={Position.Left} id="left"
-                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
             </div>
 
             {/* Cota badge — OUTSIDE the root div, won't affect dimensions */}

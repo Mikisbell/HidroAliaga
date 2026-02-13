@@ -1,14 +1,15 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudo } from "@/app/actions/nudos"
-import { updateTramoAction, deleteTramo } from "@/app/actions/tramos"
+import { updateTramoAction } from "@/app/actions/tramos"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/store/project-store"
-import { Trash2, Droplets } from "lucide-react"
+import { Trash2, TrendingUp, Droplets, MapPin, Activity } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 /**
  * Unified Hydraulic Table — reads directly from Zustand store
@@ -18,17 +19,20 @@ export function HydraulicTablePanel() {
     const router = useRouter()
     const nudos = useProjectStore(state => state.nudos)
     const tramos = useProjectStore(state => state.tramos)
+    const simulationResults = useProjectStore(state => state.simulationResults)
     const selectedElement = useProjectStore(state => state.selectedElement)
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const removeTramoStore = useProjectStore(state => state.removeTramo)
+    const removeNudoStore = useProjectStore(state => state.removeNudo)
     const updateNudoStore = useProjectStore(state => state.updateNudo)
     const updateTramoStore = useProjectStore(state => state.updateTramo)
 
     // --- Derived Data (Joins) ---
-    const rows = useMemo(() => {
+    const tramoRows = useMemo(() => {
         return tramos.map(t => {
             const startNode = nudos.find(n => n.id === t.nudo_origen_id)
             const endNode = nudos.find(n => n.id === t.nudo_destino_id)
+            const res = simulationResults?.linkResults?.[t.id] || simulationResults?.linkResults?.[t.codigo || '']
 
             // Calculated fields
             const cotaInicio = startNode?.cota_terreno ?? 0
@@ -45,9 +49,20 @@ export function HydraulicTablePanel() {
                 cotaFin,
                 longitud,
                 pendiente,
+                result: res
             }
         })
-    }, [tramos, nudos])
+    }, [tramos, nudos, simulationResults])
+
+    const nudoRows = useMemo(() => {
+        return nudos.map(n => {
+            const res = simulationResults?.nodeResults?.[n.id] || simulationResults?.nodeResults?.[n.codigo || '']
+            return {
+                nudo: n,
+                result: res
+            }
+        })
+    }, [nudos, simulationResults])
 
     // --- Actions ---
     const handleTramoUpdate = useCallback(async (id: string, field: string, value: any) => {
@@ -59,187 +74,263 @@ export function HydraulicTablePanel() {
             toast.error("Error al actualizar tramo")
             router.refresh()
         }
-    }, [router, updateTramoStore])
+    }, [updateTramoStore, router])
 
-    const handleNodeUpdate = useCallback(async (id: string, field: string, value: any) => {
-        if (!id) return
-        const numValue = parseFloat(value) || 0
-        updateNudoStore({ id, [field]: numValue } as any)
+    const handleNudoUpdate = useCallback(async (id: string, field: string, value: any) => {
+        // Handle string vs number
+        const val = field === 'codigo' ? value : (parseFloat(value) || 0)
+
+        updateNudoStore({ id, [field]: val } as any)
         try {
-            await updateNudo(id, { [field]: numValue })
+            await updateNudo(id, { [field]: val })
         } catch {
             toast.error("Error al actualizar nudo")
             router.refresh()
         }
-    }, [router, updateNudoStore])
+    }, [updateNudoStore, router])
 
-    const handleDelete = useCallback(async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation()
-        if (!confirm("¿Eliminar este tramo?")) return
-        removeTramoStore(id)
-        toast.info("Eliminando tramo...")
-        const res = await deleteTramo(id)
-        if (res.error) {
-            toast.error(res.error)
-            router.refresh()
-        } else {
-            toast.success("Tramo eliminado")
-        }
-    }, [removeTramoStore, router])
-
-    const handleRowClick = useCallback((id: string) => {
-        // Just highlight — no panel switch, no navigation
+    const handleRowClick = useCallback((id: string, type: 'tramo' | 'nudo') => {
+        // Toggle selection or select new
         setSelectedElement(
-            selectedElement?.id === id ? null : { id, type: 'tramo' }
+            selectedElement?.id === id ? null : { id, type }
         )
     }, [selectedElement, setSelectedElement])
 
+    // --- Type Emoji Helper ---
+    const getTypeEmoji = (type: string) => {
+        switch (type) {
+            case 'reservorio': return '🏗️';
+            case 'camara_rompe_presion': return '⚡';
+            case 'union': return '🔵';
+            default: return '📍';
+        }
+    }
 
     return (
-        <div className="h-full flex flex-col bg-background border-t border-border/40">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-1.5 bg-muted/20 border-b border-border/40 shrink-0">
-                <div className="flex items-center gap-2">
-                    <Droplets className="w-4 h-4 text-sky-500" />
-                    <h3 className="text-xs font-semibold text-foreground uppercase tracking-wide">
-                        Tabla Hidráulica — {tramos.length} tramos · {nudos.length} nudos
-                    </h3>
+        <div className="flex flex-col h-full bg-background border-t">
+            <Tabs defaultValue="tramos" className="flex flex-col h-full">
+                <div className="border-b px-4 py-1 flex items-center justify-between bg-muted/20">
+                    <TabsList className="h-8">
+                        <TabsTrigger value="tramos" className="text-xs h-7 px-3">
+                            <TrendingUp className="mr-1.5 w-3.5 h-3.5" />
+                            Tramos ({tramos.length})
+                        </TabsTrigger>
+                        <TabsTrigger value="nudos" className="text-xs h-7 px-3">
+                            <MapPin className="mr-1.5 w-3.5 h-3.5" />
+                            Nudos ({nudos.length})
+                        </TabsTrigger>
+                    </TabsList>
                 </div>
-            </div>
 
-            {/* Table */}
-            <div className="flex-1 overflow-auto">
-                <table className="w-full text-xs text-left border-collapse whitespace-nowrap">
-                    <thead className="bg-muted/10 sticky top-0 z-10 backdrop-blur-sm shadow-sm ring-1 ring-border/10">
-                        <tr>
-                            <HeaderGroup colSpan={2} title="CONEXIONES" color="text-blue-500" />
-                            <HeaderGroup colSpan={2} title="COTAS (m.s.n.m)" color="text-amber-600" />
-                            <HeaderGroup colSpan={3} title="DEMANDA" color="text-purple-500" />
-                            <HeaderGroup colSpan={5} title="GEOMETRÍA TRAMO" color="text-emerald-600" />
-                            <HeaderGroup colSpan={5} title="RESULTADOS" color="text-sky-600" />
-                            <th className="p-0 w-8 bg-muted/10 sticky top-0 border-b border-border/20"></th>
-                        </tr>
-                        <tr className="[&_th]:font-normal [&_th]:text-muted-foreground [&_th]:border-b [&_th]:border-r [&_th]:border-border/20 [&_th]:py-1 [&_th]:px-2">
-                            <th className="w-20">TRAMO-I</th>
-                            <th className="w-20">TRAMO-F</th>
-                            <th className="w-20 text-right">Inicio</th>
-                            <th className="w-20 text-right">Fin</th>
-                            <th className="w-16 text-right">Viv.</th>
-                            <th className="w-20 text-right">Qu (L/s)</th>
-                            <th className="w-20 text-right bg-purple-500/5 font-semibold text-purple-700 dark:text-purple-400">Q Diseño</th>
-                            <th className="w-20 text-right">Long (m)</th>
-                            <th className="w-20 text-right">S (m/km)</th>
-                            <th className="w-16 text-right">Ø Real</th>
-                            <th className="w-20 text-right">Ø Com (in)</th>
-                            <th className="w-16 text-right">Clase</th>
-                            <th className="w-20 text-right">Vel (m/s)</th>
-                            <th className="w-20 text-right">Hf (m)</th>
-                            <th className="w-20 text-right">P. Inicio</th>
-                            <th className="w-20 text-right">P. Final</th>
-                            <th className="w-8 sticky right-0 bg-background border-l border-border/20"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/10 font-mono">
-                        {rows.length === 0 ? (
-                            <tr>
-                                <td colSpan={17} className="p-8 text-center text-muted-foreground italic bg-muted/5">
-                                    No hay tramos. Conecta nudos en el mapa para crear tramos.
-                                </td>
-                            </tr>
-                        ) : (
-                            rows.map(({ tramo: t, startNode, endNode, cotaInicio, cotaFin, longitud, pendiente }) => (
-                                <tr
-                                    key={t.id}
-                                    className={cn(
-                                        "hover:bg-blue-500/5 cursor-pointer transition-colors group",
-                                        selectedElement?.id === t.id && "bg-blue-500/10 ring-1 ring-inset ring-blue-500/20"
-                                    )}
-                                    onClick={() => handleRowClick(t.id)}
-                                >
-                                    {/* CONEXIONES */}
-                                    <Cell className="font-semibold text-blue-600 dark:text-blue-400">{startNode?.codigo || '?'}</Cell>
-                                    <Cell className="font-semibold text-blue-600 dark:text-blue-400">{endNode?.codigo || '?'}</Cell>
-
-                                    {/* COTAS (Editable → updates Node) */}
-                                    <EditableCell
-                                        value={cotaInicio}
-                                        onChange={(v) => startNode && handleNodeUpdate(startNode.id, 'cota_terreno', v)}
-                                    />
-                                    <EditableCell
-                                        value={cotaFin}
-                                        onChange={(v) => endNode && handleNodeUpdate(endNode.id, 'cota_terreno', v)}
-                                    />
-
-                                    {/* DEMANDA */}
-                                    <EditableCell
-                                        value={startNode?.numero_viviendas ?? 0}
-                                        onChange={(v) => startNode && handleNodeUpdate(startNode.id, 'numero_viviendas', v)}
-                                    />
-                                    <Cell className="text-right">{(startNode?.demanda_base ?? 0).toFixed(3)}</Cell>
-                                    <Cell className="text-right bg-purple-500/5 font-bold text-purple-600">{(t.caudal ?? 0).toFixed(3)}</Cell>
-
-                                    {/* GEOMETRÍA */}
-                                    <EditableCell
-                                        value={longitud}
-                                        onChange={(v) => handleTramoUpdate(t.id, 'longitud', v)}
-                                    />
-                                    <Cell className="text-right">{pendiente.toFixed(2)}</Cell>
-                                    <Cell className="text-right">{t.diametro_interior ?? '-'}</Cell>
-                                    <Cell className="text-right">{t.diametro_comercial ?? '-'}</Cell>
-                                    <Cell className="text-right text-xs">{t.clase_tuberia ?? '-'}</Cell>
-
-                                    {/* RESULTADOS */}
-                                    <Cell className="text-right">{(t.velocidad ?? 0).toFixed(2)}</Cell>
-                                    <Cell className="text-right">{(t.perdida_carga ?? 0).toFixed(3)}</Cell>
-                                    <Cell className={cn("text-right", startNode?.presion_calc && startNode.presion_calc < 10 ? "text-red-500 font-bold" : "")}>
-                                        {startNode?.presion_calc?.toFixed(2) || '-'}
-                                    </Cell>
-                                    <Cell className={cn("text-right", endNode?.presion_calc && endNode.presion_calc < 10 ? "text-red-500 font-bold" : "")}>
-                                        {endNode?.presion_calc?.toFixed(2) || '-'}
-                                    </Cell>
-
-                                    {/* DELETE */}
-                                    <td className="p-0 text-center sticky right-0 bg-background border-l border-border/20">
-                                        <button
-                                            onClick={(e) => handleDelete(e, t.id)}
-                                            className="p-1.5 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                                            title="Eliminar tramo"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </td>
+                <div className="flex-1 overflow-auto bg-card/50">
+                    {/* --- TRAMOS TAB --- */}
+                    <TabsContent value="tramos" className="h-full mt-0 p-0 border-0">
+                        <table className="w-full text-xs font-mono border-collapse relative">
+                            <thead className="sticky top-0 z-10 bg-muted/90 backdrop-blur-sm text-foreground shadow-sm">
+                                <tr>
+                                    <HeaderCell>Código</HeaderCell>
+                                    <HeaderCell>Clase</HeaderCell>
+                                    <HeaderCell>Long (m)</HeaderCell>
+                                    <HeaderCell>Ø (pulg)</HeaderCell>
+                                    <HeaderCell>Cota In (m)</HeaderCell>
+                                    <HeaderCell>Cota Fin (m)</HeaderCell>
+                                    <HeaderCell>Vel (m/s)</HeaderCell>
+                                    <HeaderCell>Hf (m)</HeaderCell>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            </thead>
+                            <tbody>
+                                {tramoRows.map(({ tramo, startNode, endNode, cotaInicio, cotaFin, result }) => {
+                                    const isSelected = selectedElement?.id === tramo.id
+                                    return (
+                                        <tr
+                                            key={tramo.id}
+                                            onClick={() => handleRowClick(tramo.id, 'tramo')}
+                                            className={cn(
+                                                "border-b border-border/50 transition-colors cursor-pointer group",
+                                                isSelected ? "bg-primary/10 hover:bg-primary/15" : "hover:bg-muted/30"
+                                            )}
+                                        >
+                                            <Cell className="font-bold text-primary">{tramo.codigo}</Cell>
+                                            <Cell>{tramo.clase_tuberia || "S-10"}</Cell>
+                                            <EditableCell
+                                                value={tramo.longitud}
+                                                onChange={(v) => handleTramoUpdate(tramo.id, 'longitud', v)}
+                                                suffix="m"
+                                                className="bg-yellow-500/5 hover:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-bold"
+                                            />
+                                            <EditableCell
+                                                value={tramo.diametro_comercial}
+                                                onChange={(v) => handleTramoUpdate(tramo.id, 'diametro_comercial', v)}
+                                                suffix={'"'}
+                                                className="bg-blue-500/5 hover:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold"
+                                            />
+
+                                            {/* Read-only cotas linking to nodes */}
+                                            <Cell className="text-muted-foreground">
+                                                <span title={startNode?.codigo}>{cotaInicio}</span>
+                                            </Cell>
+                                            <Cell className="text-muted-foreground">
+                                                <span title={endNode?.codigo}>{cotaFin}</span>
+                                            </Cell>
+
+                                            {/* Results */}
+                                            <Cell className={cn(result && (result.velocity > 3 ? "text-red-500 font-bold" : "text-emerald-600"))}>
+                                                {result ? result.velocity.toFixed(2) : "-"}
+                                            </Cell>
+                                            <Cell>{result ? result.headloss.toFixed(2) : "-"}</Cell>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </TabsContent>
+
+                    {/* --- NUDOS TAB --- */}
+                    <TabsContent value="nudos" className="h-full mt-0 p-0 border-0">
+                        <table className="w-full text-xs font-mono border-collapse relative">
+                            <thead className="sticky top-0 z-10 bg-muted/90 backdrop-blur-sm text-foreground shadow-sm">
+                                <tr>
+                                    <HeaderCell>Código</HeaderCell>
+                                    <HeaderCell>Tipo</HeaderCell>
+                                    <HeaderCell>Cota (m)</HeaderCell>
+                                    <HeaderCell>Demanda (L/s)</HeaderCell>
+                                    <HeaderCell>Presión (m)</HeaderCell>
+                                    <HeaderCell>Altura H2O (m)</HeaderCell>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {nudoRows.map(({ nudo, result }) => {
+                                    const isSelected = selectedElement?.id === nudo.id
+                                    return (
+                                        <tr
+                                            key={nudo.id}
+                                            onClick={() => handleRowClick(nudo.id, 'nudo')}
+                                            className={cn(
+                                                "border-b border-border/50 transition-colors cursor-pointer group",
+                                                isSelected ? "bg-primary/10 hover:bg-primary/15" : "hover:bg-muted/30"
+                                            )}
+                                        >
+                                            <EditableTextCell
+                                                value={nudo.codigo}
+                                                onChange={(v) => handleNudoUpdate(nudo.id, 'codigo', v)}
+                                                className="font-bold text-primary"
+                                            />
+                                            <Cell>
+                                                <span className="flex items-center gap-1.5 opacity-80">
+                                                    <span>{getTypeEmoji(nudo.tipo)}</span>
+                                                    <span className="capitalize">{nudo.tipo.replace(/_/g, ' ')}</span>
+                                                </span>
+                                            </Cell>
+                                            <EditableCell
+                                                value={nudo.cota_terreno}
+                                                onChange={(v) => handleNudoUpdate(nudo.id, 'cota_terreno', v)}
+                                                suffix="m"
+                                                className="bg-yellow-500/5 hover:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 font-bold"
+                                            />
+                                            <EditableCell
+                                                value={nudo.demanda_base}
+                                                onChange={(v) => handleNudoUpdate(nudo.id, 'demanda_base', v)}
+                                                suffix="L/s"
+                                                className="bg-blue-500/5 hover:bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                                            />
+
+                                            {/* Results */}
+                                            <Cell className={cn(result && (result.pressure < 10 ? "text-amber-600 font-bold" : "text-emerald-600"))}>
+                                                {result ? result.pressure.toFixed(2) : "-"}
+                                            </Cell>
+
+                                            {/* Reservoir specific */}
+                                            <Cell>
+                                                {nudo.tipo === 'reservorio' ? (
+                                                    <EditableCell
+                                                        value={nudo.altura_agua}
+                                                        onChange={(v) => handleNudoUpdate(nudo.id, 'altura_agua', v)}
+                                                        className="bg-cyan-500/5 text-cyan-700"
+                                                    />
+                                                ) : <span className="text-muted-foreground/30">—</span>}
+                                            </Cell>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </TabsContent>
+                </div>
+            </Tabs>
         </div>
     )
 }
 
-// --- Helpers ---
-const HeaderGroup = ({ colSpan, title, color }: { colSpan: number, title: string, color: string }) => (
-    <th colSpan={colSpan} className={cn("text-center py-1 bg-muted/30 border-b border-r border-border/20 text-[10px] font-bold tracking-wider select-none", color)}>
-        {title}
-    </th>
-)
+function HeaderCell({ children }: { children: React.ReactNode }) {
+    return (
+        <th className="text-left px-3 py-2 font-medium text-muted-foreground bg-muted/50 whitespace-nowrap border-b border-border">
+            {children}
+        </th>
+    )
+}
 
-const Cell = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <td className={cn("px-2 py-0.5 border-r border-border/10 h-7 overflow-hidden text-ellipsis text-right", className)}>
-        {children}
-    </td>
-)
+function Cell({ children, className }: { children: React.ReactNode; className?: string }) {
+    return (
+        <td className={cn("px-3 py-1.5 whitespace-nowrap align-middle", className)}>
+            {children}
+        </td>
+    )
+}
 
-const EditableCell = ({ value, onChange }: { value: any, onChange: (val: string) => void }) => (
-    <td className="p-0 border-r border-border/10 h-7 bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 transition-colors">
-        <input
-            className="w-full h-full bg-transparent px-2 outline-none text-right font-mono text-[11px] focus:ring-1 focus:ring-inset focus:ring-primary/50"
-            defaultValue={value}
-            onBlur={(e) => {
-                if (e.target.value !== String(value)) onChange(e.target.value)
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-        />
-    </td>
-)
+function EditableCell({ value, onChange, className, suffix }: {
+    value: number | undefined
+    onChange: (val: string) => void
+    className?: string
+    suffix?: string
+}) {
+    const [localValue, setLocalValue] = useState(value?.toString() ?? "")
+
+    const handleBlur = () => {
+        if (localValue !== value?.toString()) {
+            onChange(localValue)
+        }
+    }
+
+    return (
+        <td className={cn("px-1 py-1 align-middle w-24", className)}>
+            <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded hover:ring-1 hover:ring-primary/50 transition-all bg-background/50">
+                <input
+                    className="w-full bg-transparent outline-none p-0 text-inherit font-inherit text-right"
+                    value={localValue}
+                    onChange={(e) => setLocalValue(e.target.value)}
+                    onBlur={handleBlur}
+                    onClick={(e) => e.stopPropagation()} // Prevent row selection
+                />
+                {suffix && <span className="text-[9px] opacity-50 select-none pb-0.5">{suffix}</span>}
+            </div>
+        </td>
+    )
+}
+
+function EditableTextCell({ value, onChange, className }: {
+    value: string
+    onChange: (val: string) => void
+    className?: string
+}) {
+    const [localValue, setLocalValue] = useState(value)
+
+    const handleBlur = () => {
+        if (localValue !== value) {
+            onChange(localValue)
+        }
+    }
+
+    return (
+        <td className={cn("px-1 py-1 align-middle w-24", className)}>
+            <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded hover:ring-1 hover:ring-primary/50 transition-all bg-background/50">
+                <input
+                    className="w-full bg-transparent outline-none p-0 text-inherit font-inherit"
+                    value={localValue}
+                    onChange={(e) => setLocalValue(e.target.value)}
+                    onBlur={handleBlur}
+                    onClick={(e) => e.stopPropagation()}
+                />
+            </div>
+        </td>
+    )
+}

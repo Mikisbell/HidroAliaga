@@ -54,9 +54,9 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
 
                 {/* 2 Handles — top (IN) and bottom (OUT), at diamond tips */}
                 <Handle type="target" position={Position.Top} id="in"
-                    className="!w-1.5 !h-1.5 !bg-amber-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-amber-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
                 <Handle type="source" position={Position.Bottom} id="out"
-                    className="!w-1.5 !h-1.5 !bg-amber-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2 !h-2 !bg-amber-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
             </div>
 
             {/* Cota badge outside */}

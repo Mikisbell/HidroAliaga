@@ -82,7 +82,7 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
 
                 {/* 1 Handle — SOURCE at bottom center */}
                 <Handle type="source" position={Position.Bottom} id="out"
-                    className="!w-2 !h-2 !bg-blue-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                    className="!w-2.5 !h-2.5 !bg-blue-500 !border-[1.5px] !border-white !rounded-full !min-w-0 !min-h-0" />
             </div>
 
             {/* Cota badge outside */}
