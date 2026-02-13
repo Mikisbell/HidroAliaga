@@ -61,7 +61,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link href="/proyectos/nuevo">
-          <Button className="btn-primary text-white rounded-xl px-6 h-11 font-semibold">
+          <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
             + Nuevo Proyecto
           </Button>
         </Link>
@@ -69,17 +69,17 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 animate-fade-in-up-delay-1">
-        <Card className="stat-card stat-card-blue bg-card/80">
+        <Card className="stat-card stat-card-blue bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Proyectos</p>
-            <p className="text-3xl font-bold mt-2 text-[oklch(0.70_0.18_230)] dark:text-[oklch(0.70_0.18_230)] text-blue-600 dark:text-blue-400">
+            <p className="text-3xl font-bold mt-2 text-blue-600 dark:text-blue-400">
               {totalProyectos || 0}
             </p>
             <p className="text-[10px] text-muted-foreground/60 mt-1">redes diseñadas</p>
           </CardContent>
         </Card>
 
-        <Card className="stat-card stat-card-green bg-card/80">
+        <Card className="stat-card stat-card-green bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cálculos</p>
             <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400">
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="stat-card stat-card-amber bg-card/80">
+        <Card className="stat-card stat-card-amber bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Norma</p>
             <p className="text-lg font-bold mt-2 text-amber-600 dark:text-amber-400">
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="stat-card stat-card-purple bg-card/80">
+        <Card className="stat-card stat-card-purple bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Motor</p>
             <p className="text-lg font-bold mt-2 text-purple-600 dark:text-purple-400">
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="stat-card stat-card-cyan bg-card/80">
+        <Card className="stat-card stat-card-cyan bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
           <CardContent className="p-5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">IA</p>
             <p className="text-lg font-bold mt-2 text-cyan-600 dark:text-cyan-400">
@@ -122,7 +122,7 @@ export default async function DashboardPage() {
 
       {/* Capacidades del Sistema */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in-up-delay-2">
-        <Card className="bg-card/60 border-border/30">
+        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-5 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-xl">
               🔬
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/60 border-border/30">
+        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-5 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-xl">
               🗺️
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/60 border-border/30">
+        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
           <CardContent className="p-5 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-xl">
               🧬
@@ -184,7 +184,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Últimos Proyectos */}
-      <Card className="bg-card/60 border-border/30 animate-fade-in-up-delay-3">
+      <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300 animate-fade-in-up-delay-3">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
               <p className="text-xs text-muted-foreground mt-0.5">Últimas redes diseñadas</p>
             </div>
             <Link href="/proyectos">
-              <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary">
+              <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary transition-all duration-200">
                 Ver todos →
               </Button>
             </Link>
@@ -238,7 +238,7 @@ export default async function DashboardPage() {
               <p className="font-medium">Sin proyectos aún</p>
               <p className="text-sm mt-1 text-muted-foreground/60">Comienza diseñando tu primera red de agua potable</p>
               <Link href="/proyectos/nuevo">
-                <Button className="btn-primary text-white rounded-xl mt-6 px-6">
+                <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
                   Crear Primer Proyecto
                 </Button>
               </Link>
@@ -249,24 +249,24 @@ export default async function DashboardPage() {
 
       {/* Normativa Quick Reference */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-fade-in-up-delay-3">
-        <div className="p-4 rounded-xl bg-card/40 border border-border/20">
+        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-blue-500/30 hover:shadow-lg transition-all duration-300">
           <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">P. Dinámica Mín</p>
-          <p className="text-xl font-bold mt-1 text-blue-600 dark:text-blue-400">10 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
+          <p className="text-xl md:text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">10 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
           <p className="text-[10px] text-muted-foreground/40 mt-0.5">Urbano · OS.050</p>
         </div>
-        <div className="p-4 rounded-xl bg-card/40 border border-border/20">
+        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-amber-500/30 hover:shadow-lg transition-all duration-300">
           <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">P. Estática Máx</p>
-          <p className="text-xl font-bold mt-1 text-amber-600 dark:text-amber-400">50 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
+          <p className="text-xl md:text-2xl font-bold mt-1 text-amber-600 dark:text-amber-400">50 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
           <p className="text-[10px] text-muted-foreground/40 mt-0.5">Ambos ámbitos</p>
         </div>
-        <div className="p-4 rounded-xl bg-card/40 border border-border/20">
+        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-green-500/30 hover:shadow-lg transition-all duration-300">
           <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Vel. Rango</p>
-          <p className="text-xl font-bold mt-1 text-green-600 dark:text-green-400">0.6–3.0 <span className="text-xs font-normal text-muted-foreground">m/s</span></p>
+          <p className="text-xl md:text-2xl font-bold mt-1 text-green-600 dark:text-green-400">0.6–3.0 <span className="text-xs font-normal text-muted-foreground">m/s</span></p>
           <p className="text-[10px] text-muted-foreground/40 mt-0.5">Ambos ámbitos</p>
         </div>
-        <div className="p-4 rounded-xl bg-card/40 border border-border/20">
+        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
           <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Ø Mín Urbano</p>
-          <p className="text-xl font-bold mt-1 text-purple-600 dark:text-purple-400">75 <span className="text-xs font-normal text-muted-foreground">mm</span></p>
+          <p className="text-xl md:text-2xl font-bold mt-1 text-purple-600 dark:text-purple-400">75 <span className="text-xs font-normal text-muted-foreground">mm</span></p>
           <p className="text-[10px] text-muted-foreground/40 mt-0.5">3" · OS.050</p>
         </div>
       </div>

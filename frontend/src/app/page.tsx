@@ -117,19 +117,19 @@ export default async function HomePage() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                             {user ? (
                                 <Link href="/dashboard">
-                                    <Button className="btn-primary text-white rounded-xl h-12 px-8 text-base font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all">
+                                    <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
                                         Continuar en Dashboard 🚀
                                     </Button>
                                 </Link>
                             ) : (
                                 <Link href="/login">
-                                    <Button className="btn-primary text-white rounded-xl h-12 px-8 text-base font-semibold">
+                                    <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
                                         Comenzar Gratis →
                                     </Button>
                                 </Link>
                             )}
                             <Link href="#capacidades">
-                                <Button variant="outline" className="rounded-xl h-12 px-8 text-base border-border/30 text-muted-foreground hover:text-foreground">
+                                <Button variant="outline" className="rounded-xl h-11 md:h-12 px-6 md:px-8 text-base border-border/30 text-muted-foreground hover:text-foreground hover:border-border/50 transition-all duration-200">
                                     Ver Capacidades
                                 </Button>
                             </Link>
@@ -158,25 +158,25 @@ export default async function HomePage() {
             </div>
 
             {/* Normative Quick Strip */}
-            <section className="relative z-10 px-6 md:px-12 pb-16">
+            <section className="relative z-10 px-6 md:px-12 pb-16 md:pb-20">
                 <ScrollReveal>
                     <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="p-4 rounded-xl glass-card text-center group hover:border-blue-500/30 transition-all duration-300">
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-blue-500/30 hover:shadow-lg transition-all duration-300">
                             <p className="text-2xl font-bold text-blue-400">10</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m.c.a. Presión Mín</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-blue-500/30 transition-colors">OS.050</Badge>
                         </div>
-                        <div className="p-4 rounded-xl glass-card text-center group hover:border-amber-500/30 transition-all duration-300">
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-amber-500/30 hover:shadow-lg transition-all duration-300">
                             <p className="text-2xl font-bold text-amber-400">50</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m.c.a. Presión Máx</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-amber-500/30 transition-colors">Ambos</Badge>
                         </div>
-                        <div className="p-4 rounded-xl glass-card text-center group hover:border-green-500/30 transition-all duration-300">
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-green-500/30 hover:shadow-lg transition-all duration-300">
                             <p className="text-2xl font-bold text-green-400">0.6–3.0</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m/s Velocidad</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-green-500/30 transition-colors">RNE</Badge>
                         </div>
-                        <div className="p-4 rounded-xl glass-card text-center group hover:border-purple-500/30 transition-all duration-300">
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
                             <p className="text-2xl font-bold text-purple-400">10⁻⁷</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">Tolerancia convergencia</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-purple-500/30 transition-colors">Hardy Cross</Badge>
@@ -214,7 +214,7 @@ export default async function HomePage() {
             <section className="relative z-10 px-6 md:px-12 pb-20">
                 <ScrollReveal>
                     <div className="max-w-3xl mx-auto">
-                        <div className="rounded-2xl glass-card p-8 space-y-6">
+                        <div className="rounded-2xl glass-card border border-border/20 p-6 md:p-8 space-y-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                             <div className="text-center">
                                 <Badge variant="outline" className="text-xs border-primary/30 text-primary mb-3">RM 107-2025-VIVIENDA</Badge>
                                 <h3 className="text-xl font-bold">Dotaciones por Clima</h3>
@@ -264,7 +264,7 @@ export default async function HomePage() {
                             Crea tu cuenta gratuita y diseña redes de agua potable con la precisión que exige la normativa peruana.
                         </p>
                         <Link href="/login">
-                            <Button className="btn-primary text-white rounded-xl h-12 px-10 text-base font-semibold">
+                            <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-8 md:px-10 text-base font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
                                 Crear Cuenta Gratis →
                             </Button>
                         </Link>

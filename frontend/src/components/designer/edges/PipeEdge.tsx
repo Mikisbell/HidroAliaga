@@ -169,11 +169,11 @@ function PipeEdgeComponent({
                         {/* --- TOP: Length Label --- */}
                         {isEditing ? (
                             <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center mb-1">
-                                <span className="text-[10px] font-mono text-muted-foreground pl-1">L=</span>
+                                <span className="text-[8px] font-mono text-muted-foreground pl-1">L=</span>
                                 <input
                                     ref={inputRef}
                                     type="number"
-                                    className="w-16 h-5 text-[11px] font-bold bg-transparent outline-none"
+                                    className="w-14 h-4 text-[8px] font-bold bg-transparent outline-none"
                                     value={editValue}
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onKeyDown={handleKeyDown}
@@ -193,7 +193,7 @@ function PipeEdgeComponent({
                                     onClick={() => setIsEditing(true)}
                                     title="Longitud (m) - Clic para editar"
                                 >
-                                    <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[10px] font-bold font-mono whitespace-nowrap text-foreground/80">
+                                    <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[8px] font-bold font-mono whitespace-nowrap text-foreground/80">
                                         L={longitud?.toFixed(1) || '0.0'}m
                                     </span>
                                 </div>
