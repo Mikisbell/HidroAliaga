@@ -88,9 +88,9 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
             {/* Cota badge outside */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
                 <div className="absolute pointer-events-none whitespace-nowrap"
-                    style={{ left: W + 4, top: H / 2 - 6 }}>
-                    <span className="text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-blue-200 shadow-sm">
-                        {data.cota_terreno}m
+                    style={{ left: W + 1, top: H / 2 - 5 }}>
+                    <span className="text-[7px] font-mono text-blue-600">
+                        {data.cota_terreno}
                     </span>
                 </div>
             )}
