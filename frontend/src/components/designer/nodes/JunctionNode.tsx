@@ -6,6 +6,12 @@ import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/store/project-store"
 import { JunctionData } from "@/types/models"
 
+/**
+ * Junction Node — Simple circle, 4 connection points touching the circle edge.
+ * The root div size MUST equal the circle size so React Flow handles align.
+ */
+const CIRCLE_SIZE = 28
+
 const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
     const data = initialData as JunctionData
     const label = data.codigo || data.label || id.substring(0, 1)
@@ -28,58 +34,59 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
         return simulationAlerts.some(a => a.elementId === id && a.level === 'warning')
     }, [simulationAlerts, id])
 
-    const borderColor = hasError ? "border-red-500" : hasWarning ? "border-amber-500" : "border-emerald-500"
-    const dotColor = hasError ? "bg-red-500" : hasWarning ? "bg-amber-500" : "bg-emerald-500"
+    const borderCls = hasError ? "border-red-500" : hasWarning ? "border-amber-500" : "border-emerald-500"
 
     return (
-        <div
-            className={cn(
-                "relative group cursor-pointer overflow-visible",
-                selected && "scale-110"
-            )}
-            /* Exact size matches the circle */
-            style={{ width: 32, height: 32 }}
-        >
-            {/* Circle — fills the entire container */}
-            <div className={cn(
-                "absolute inset-0 rounded-full border-[2.5px] flex items-center justify-center transition-all shadow-sm",
-                selected
-                    ? `${borderColor} ring-2 ring-emerald-300/50 shadow-md bg-emerald-50 dark:bg-emerald-950/30`
-                    : `${borderColor} bg-white dark:bg-gray-900 hover:shadow-md`
-            )}>
+        <>
+            {/* ROOT = circle itself, no wrapper. React Flow sizes from this. */}
+            <div
+                className={cn(
+                    "rounded-full border-[2.5px] flex items-center justify-center transition-all shadow-sm group",
+                    selected
+                        ? `${borderCls} ring-2 ring-emerald-300/50 shadow-md bg-emerald-50 dark:bg-emerald-950/30`
+                        : `${borderCls} bg-white dark:bg-gray-900 hover:shadow-md`
+                )}
+                style={{ width: CIRCLE_SIZE, height: CIRCLE_SIZE }}
+            >
                 <span className={cn(
-                    "text-[10px] font-bold select-none pointer-events-none leading-none text-center",
+                    "text-[9px] font-bold select-none pointer-events-none leading-none",
                     selected ? "text-emerald-800" : "text-emerald-700 dark:text-emerald-400",
                     hasError && "text-red-700", hasWarning && "text-amber-700"
                 )}>
                     {label}
                 </span>
+
+                {/* 4 Handles — React Flow positions them at edge of this div */}
+                <Handle type="target" position={Position.Top} id="top"
+                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                <Handle type="source" position={Position.Right} id="right"
+                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                <Handle type="source" position={Position.Bottom} id="bottom"
+                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                <Handle type="target" position={Position.Left} id="left"
+                    className="!w-1.5 !h-1.5 !bg-emerald-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
             </div>
 
-            {/* Cota badge — positioned outside via overflow-visible */}
+            {/* Cota badge — OUTSIDE the root div, won't affect dimensions */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-8 top-1/2 -translate-y-1/2 text-[8px] font-mono text-gray-500 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-gray-200 dark:border-gray-700 pointer-events-none shadow-sm whitespace-nowrap">
-                    {data.cota_terreno}m
-                </span>
+                <div className="absolute pointer-events-none whitespace-nowrap"
+                    style={{ left: CIRCLE_SIZE + 4, top: CIRCLE_SIZE / 2 - 6 }}>
+                    <span className="text-[8px] font-mono text-gray-500 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
+                        {data.cota_terreno}m
+                    </span>
+                </div>
             )}
 
             {/* Pressure result */}
             {result && (
-                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-1 py-0.5 rounded border shadow-sm pointer-events-none whitespace-nowrap z-20">
-                    {result.pressure.toFixed(1)}m
+                <div className="absolute pointer-events-none whitespace-nowrap"
+                    style={{ left: CIRCLE_SIZE / 2 - 15, top: CIRCLE_SIZE + 2 }}>
+                    <span className="text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-1 py-0.5 rounded border shadow-sm">
+                        {result.pressure.toFixed(1)}m
+                    </span>
                 </div>
             )}
-
-            {/* 4 Handles at the EDGE of the circle */}
-            <Handle type="target" position={Position.Top} id="top"
-                className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-            <Handle type="source" position={Position.Right} id="right"
-                className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-            <Handle type="source" position={Position.Bottom} id="bottom"
-                className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-            <Handle type="target" position={Position.Left} id="left"
-                className="!w-2 !h-2 !bg-emerald-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-        </div>
+        </>
     )
 }
 

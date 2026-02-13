@@ -13,84 +13,88 @@ interface ReservoirData extends Record<string, unknown> {
     tipo?: string
 }
 
+/**
+ * Reservoir — Tank icon. ROOT = tight SVG bounding box.
+ * Only 1 handle (SOURCE at bottom). SVG fills edge-to-edge.
+ */
+const W = 36
+const H = 30
+
 const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
     const data = initialData as ReservoirData
     const label = data.codigo || data.label || "R"
 
     return (
-        <div
-            className={cn(
-                "relative group cursor-pointer overflow-visible",
-                selected && "scale-110"
-            )}
-            title={data.nombre || "Reservorio"}
-            /* Exact size matches the SVG tank */
-            style={{ width: 48, height: 40 }}
-        >
-            {/* SVG Tank — fills the container exactly */}
-            <svg
-                width="48" height="40" viewBox="0 0 48 40"
-                className={cn(
-                    "absolute inset-0 drop-shadow-md transition-all",
-                    selected && "drop-shadow-lg"
-                )}
+        <>
+            <div
+                className="group"
+                style={{ width: W, height: H }}
+                title={data.nombre || "Reservorio"}
             >
-                {/* Tank body */}
-                <rect x="8" y="6" width="32" height="28" rx="2"
-                    className={cn(
-                        "transition-all",
-                        selected
-                            ? "fill-blue-100 stroke-blue-600 dark:fill-blue-900/30"
-                            : "fill-blue-50 stroke-blue-500 group-hover:stroke-blue-600 dark:fill-blue-950/20"
-                    )}
-                    strokeWidth="2.5"
-                />
-                {/* Water fill */}
-                <rect x="10" y="20" width="28" height="12" rx="1"
-                    className={cn(
-                        "transition-all",
-                        selected ? "fill-blue-400/40" : "fill-blue-400/25 group-hover:fill-blue-400/35"
-                    )}
-                />
-                {/* Water surface wave */}
-                <path
-                    d="M10 20 Q14.5 17.5, 19 20 Q23.5 22.5, 28 20 Q32.5 17.5, 38 20"
-                    fill="none"
-                    className={cn(selected ? "stroke-blue-500" : "stroke-blue-400")}
-                    strokeWidth="1.5" strokeLinecap="round"
-                />
-                {/* Top rim */}
-                <line x1="5" y1="6" x2="43" y2="6"
-                    className={cn(selected ? "stroke-blue-700" : "stroke-blue-600")}
-                    strokeWidth="3" strokeLinecap="round"
-                />
-                {/* Centered label */}
-                <text
-                    x="24" y="16"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    className={cn(
-                        "select-none pointer-events-none font-bold",
-                        selected ? "fill-blue-800" : "fill-blue-700"
-                    )}
-                    fontSize="11"
-                    fontFamily="system-ui, sans-serif"
+                {/* SVG fills 100% — NO internal padding */}
+                <svg
+                    width={W} height={H} viewBox={`0 0 ${W} ${H}`}
+                    className={cn("drop-shadow-sm transition-all", selected && "drop-shadow-md")}
                 >
-                    {label}
-                </text>
-            </svg>
+                    {/* Tank body — edge to edge */}
+                    <rect x="1" y="1" width={W - 2} height={H - 2} rx="2"
+                        className={cn(
+                            "transition-all",
+                            selected
+                                ? "fill-blue-100 stroke-blue-600 dark:fill-blue-900/30"
+                                : "fill-blue-50 stroke-blue-500 group-hover:stroke-blue-600 dark:fill-blue-950/20"
+                        )}
+                        strokeWidth="2"
+                    />
+                    {/* Water fill — bottom half */}
+                    <rect x="3" y={H * 0.5} width={W - 6} height={H * 0.5 - 3} rx="1"
+                        className={cn(
+                            selected ? "fill-blue-400/50" : "fill-blue-400/30 group-hover:fill-blue-400/40"
+                        )}
+                    />
+                    {/* Water wave */}
+                    <path
+                        d={`M3 ${H * 0.5} Q${W * 0.25} ${H * 0.5 - 3}, ${W * 0.5} ${H * 0.5} Q${W * 0.75} ${H * 0.5 + 3}, ${W - 3} ${H * 0.5}`}
+                        fill="none"
+                        className={cn(selected ? "stroke-blue-500" : "stroke-blue-400")}
+                        strokeWidth="1.2" strokeLinecap="round"
+                    />
+                    {/* Top rim */}
+                    <line x1="0" y1="1" x2={W} y2="1"
+                        className={cn(selected ? "stroke-blue-700" : "stroke-blue-600")}
+                        strokeWidth="2.5" strokeLinecap="round"
+                    />
+                    {/* Label CENTERED */}
+                    <text
+                        x={W / 2} y={H * 0.38}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        className={cn(
+                            "select-none pointer-events-none font-bold",
+                            selected ? "fill-blue-800" : "fill-blue-700"
+                        )}
+                        fontSize="10"
+                        fontFamily="system-ui, sans-serif"
+                    >
+                        {label}
+                    </text>
+                </svg>
 
-            {/* Cota badge */}
+                {/* 1 Handle — SOURCE at bottom center */}
+                <Handle type="source" position={Position.Bottom} id="out"
+                    className="!w-2 !h-2 !bg-blue-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+            </div>
+
+            {/* Cota badge outside */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-8 top-1/2 -translate-y-1/2 text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-blue-200 shadow-sm whitespace-nowrap">
-                    {data.cota_terreno}m
-                </span>
+                <div className="absolute pointer-events-none whitespace-nowrap"
+                    style={{ left: W + 4, top: H / 2 - 6 }}>
+                    <span className="text-[8px] font-mono text-blue-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-blue-200 shadow-sm">
+                        {data.cota_terreno}m
+                    </span>
+                </div>
             )}
-
-            {/* 1 Handle — SOURCE at bottom center of the tank */}
-            <Handle type="source" position={Position.Bottom} id="out"
-                className="!w-3 !h-3 !bg-blue-500 !border-2 !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-        </div>
+        </>
     )
 }
 

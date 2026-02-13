@@ -11,74 +11,64 @@ interface CRPData extends Record<string, unknown> {
     crp_type?: 'T6' | 'T7'
 }
 
+/**
+ * CRP — Diamond shape. Root = exact diamond bounding box.
+ * Handles at top/bottom = diamond tips.
+ */
+const SIZE = 30
+
 const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
     const data = initialData as CRPData
     const label = data.codigo || id.substring(0, 1)
 
     return (
-        <div
-            className={cn(
-                "relative group cursor-pointer overflow-visible",
-                selected && "scale-110"
-            )}
-            title={data.nombre || `CRP ${data.crp_type || ''}`}
-            /* Exact size matches the diamond SVG */
-            style={{ width: 40, height: 40 }}
-        >
-            {/* Diamond SVG — fills the container exactly */}
-            <svg
-                width="40" height="40" viewBox="0 0 40 40"
-                className={cn(
-                    "absolute inset-0 drop-shadow-md transition-all",
-                    selected && "drop-shadow-lg"
-                )}
+        <>
+            <div
+                className="group"
+                style={{ width: SIZE, height: SIZE }}
+                title={data.nombre || `CRP ${data.crp_type || ''}`}
             >
-                <path
-                    d="M20 3 L37 20 L20 37 L3 20 Z"
+                {/* Diamond = rotated square, fills the entire div */}
+                <div
                     className={cn(
-                        "transition-all",
+                        "absolute border-[2.5px] flex items-center justify-center transition-all shadow-sm",
                         selected
-                            ? "fill-amber-100 stroke-amber-600 dark:fill-amber-900/30"
-                            : "fill-amber-50 stroke-amber-500 group-hover:stroke-amber-600 dark:fill-amber-950/20"
+                            ? "border-amber-600 bg-amber-100 dark:bg-amber-900/30 shadow-md"
+                            : "border-amber-500 bg-amber-50 dark:bg-amber-950/20 hover:border-amber-600 hover:shadow-md"
                     )}
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
+                    style={{
+                        width: SIZE * 0.72,
+                        height: SIZE * 0.72,
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%) rotate(45deg)',
+                    }}
                 />
-                <text
-                    x="20" y="21"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    className={cn(
-                        "select-none pointer-events-none font-bold",
-                        selected ? "fill-amber-800" : "fill-amber-700"
-                    )}
-                    fontSize="9"
-                    fontFamily="system-ui, sans-serif"
-                >
+                {/* Label (not rotated) */}
+                <span className={cn(
+                    "absolute inset-0 flex items-center justify-center text-[8px] font-bold select-none pointer-events-none leading-none uppercase z-10",
+                    selected ? "text-amber-800" : "text-amber-700"
+                )}>
                     {label}
-                </text>
-            </svg>
-
-            {/* Type badge */}
-            {data.crp_type && (
-                <span className="absolute -left-4 top-1 text-[7px] font-mono font-bold text-amber-600 bg-amber-100/90 px-0.5 rounded pointer-events-none border border-amber-300/50 whitespace-nowrap">
-                    {data.crp_type}
                 </span>
-            )}
 
-            {/* Cota badge */}
+                {/* 2 Handles — top (IN) and bottom (OUT), at diamond tips */}
+                <Handle type="target" position={Position.Top} id="in"
+                    className="!w-1.5 !h-1.5 !bg-amber-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+                <Handle type="source" position={Position.Bottom} id="out"
+                    className="!w-1.5 !h-1.5 !bg-amber-500 !border-0 !rounded-full !opacity-0 hover:!opacity-100 !min-w-0 !min-h-0" />
+            </div>
+
+            {/* Cota badge outside */}
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
-                <span className="absolute -right-8 top-1/2 -translate-y-1/2 text-[8px] font-mono text-amber-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded pointer-events-none border border-amber-200 shadow-sm whitespace-nowrap">
-                    {data.cota_terreno}m
-                </span>
+                <div className="absolute pointer-events-none whitespace-nowrap"
+                    style={{ left: SIZE + 4, top: SIZE / 2 - 6 }}>
+                    <span className="text-[8px] font-mono text-amber-600 bg-white/90 dark:bg-gray-900/90 px-0.5 rounded border border-amber-200 shadow-sm">
+                        {data.cota_terreno}m
+                    </span>
+                </div>
             )}
-
-            {/* 2 Handles at the diamond vertices — IN (top tip), OUT (bottom tip) */}
-            <Handle type="target" position={Position.Top} id="in"
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-            <Handle type="source" position={Position.Bottom} id="out"
-                className="!w-2.5 !h-2.5 !bg-amber-500 !border-[1.5px] !border-white !rounded-full opacity-0 group-hover:opacity-100 transition-opacity !min-w-0 !min-h-0" />
-        </div>
+        </>
     )
 }
 
