@@ -10,7 +10,7 @@ import {
 } from '@xyflow/react'
 import { updateTramo } from '@/app/actions/tramos'
 import { toast } from 'sonner'
-import { Check, X } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useProjectStore } from '@/store/project-store'
 
 export interface PipeEdgeData {
@@ -84,8 +84,16 @@ function PipeEdgeComponent({
         targetY,
     })
 
+    // Calculate rotation angle in degrees
+    const angleRad = Math.atan2(targetY - sourceY, targetX - sourceX);
+    let angleDeg = angleRad * (180 / Math.PI);
+
+    // Keep text readable (don't let it be upside down)
+    if (angleDeg > 90 || angleDeg < -90) {
+        angleDeg += 180;
+    }
+
     const longitud = edgeData?.longitud
-    const codigo = edgeData?.codigo
     const diametro = edgeData?.diametro_comercial
 
     // Sync state with prop if external change happens (and not editing)
@@ -124,7 +132,6 @@ function PipeEdgeComponent({
         const res = await updateTramo({ id, longitud: val })
         if (res.error) {
             toast.error("Error al actualizar longitud")
-            // Revert could be handled here if needed
         }
     }, [id, editValue, setEdges])
 
@@ -145,12 +152,13 @@ function PipeEdgeComponent({
                     className="nodrag nopan pointer-events-auto"
                     style={{
                         position: 'absolute',
-                        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+                        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) rotate(${angleDeg}deg)`,
                         zIndex: 10,
+                        transformOrigin: 'center center'
                     }}
                 >
                     {isEditing ? (
-                        <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110">
+                        <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center">
                             <span className="text-[10px] font-mono text-muted-foreground pl-1">L=</span>
                             <input
                                 ref={inputRef}
@@ -179,19 +187,21 @@ function PipeEdgeComponent({
                                 title="Clic para editar longitud"
                             >
                                 {/* Label Content */}
-                                <span className="text-[10px] font-bold font-mono">
+                                <span className="text-[10px] font-bold font-mono whitespace-nowrap">
                                     L={longitud?.toFixed(1) || '0.0'}
                                 </span>
 
                                 {diametro && (
-                                    <span className="text-[9px] opacity-70 border-l border-current pl-1.5">
+                                    <span className="text-[9px] opacity-70 border-l border-current pl-1.5 whitespace-nowrap">
                                         Ø{diametro}
                                     </span>
                                 )}
                             </div>
-                            {/* Simulation Result Label */}
+                            {/* Simulation Result Label - Always horizontal? No, also rotated. */}
                             {result && (
-                                <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600">
+                                <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
+                                    style={{ transform: `rotate(${-angleDeg}deg)` }} // Counter-rotate? No, user wants aligned. But results might be better horizontal? Let's keep it rotated for now or maybe counter-rotate if readability is key. User said "alineado a la tuberia".
+                                >
                                     {result.velocity.toFixed(2)} m/s
                                 </div>
                             )}

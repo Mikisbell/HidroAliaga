@@ -141,6 +141,8 @@ export interface Tramo {
     velocidad_verificada: boolean
     es_bombeo: boolean
     coeficiente_rugosidad?: number
+    source_handle?: string
+    target_handle?: string
     created_at: string
     updated_at: string
 }
@@ -156,6 +158,8 @@ export interface TramoCreate {
     diametro_interior: number
     clase_tuberia?: string
     coef_hazen_williams?: number
+    source_handle?: string
+    target_handle?: string
 }
 
 // ============ RESULTADOS DETALLADOS ============

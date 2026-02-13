@@ -54,7 +54,7 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
     }
 
     // ========== OPTIMISTIC: Create pipe ==========
-    const handleConnect = async (sourceId: string, targetId: string) => {
+    const handleConnect = async (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => {
         if (!proyectoId) return
 
         const lengthStr = window.prompt("Longitud Real del Tramo (m):", "100")
@@ -73,6 +73,8 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
             codigo: `T-${storeNudos.length + 1}`,
             nudo_origen_id: sourceId,
             nudo_destino_id: targetId,
+            source_handle: sourceHandle || undefined,
+            target_handle: targetHandle || undefined,
             longitud: length,
             material: 'pvc',
             diametro_comercial: 0.75,
@@ -88,6 +90,8 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
                 proyecto_id: proyectoId,
                 nudo_origen_id: sourceId,
                 nudo_destino_id: targetId,
+                source_handle: sourceHandle || undefined,
+                target_handle: targetHandle || undefined,
                 longitud: length,
             })
             toast.success("Tramo creado")
