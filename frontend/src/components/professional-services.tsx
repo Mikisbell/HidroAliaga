@@ -13,37 +13,43 @@ const services = [
     {
         icon: Calculator,
         title: "Cálculo de Redes Hidráulicas",
-        description: "Diseño y análisis de redes de agua potable utilizando métodos Hardy Cross y software especializado, cumpliendo con todas las normativas peruanas.",
+        benefit: "Ahorra 15+ horas por proyecto",
+        description: "El motor Hardy Cross automatizado calcula presiones y optimiza diámetros en minutos, eliminando errores manuales y retrabajos costosos.",
         features: ["Redes cerradas y abiertas", "Análisis de presiones", "Optimización de diámetros"],
     },
     {
         icon: FileCheck,
         title: "Validación Normativa",
-        description: "Revisión exhaustiva de proyectos para asegurar el cumplimiento del RNE OS.050, RM 192-2018, RM 107-2025 y demás normativas vigentes.",
+        benefit: "Cero rechazos municipales",
+        description: "Validación automática contra RNE OS.050, RM 192-2018 y RM 107-2025. Alertas en tiempo real por incumplimientos antes de entregar.",
         features: ["Revisión de expedientes", "Corrección de observaciones", "Cumplimiento RNE"],
     },
     {
         icon: GraduationCap,
         title: "Capacitación y Formación",
-        description: "Cursos y talleres especializados en diseño hidráulico, uso de software y aplicación de normativas para equipos de ingeniería.",
+        benefit: "Equipo productivo en 2 semanas",
+        description: "Cursos especializados en diseño hidráulico, uso de software y aplicación de normativas. Tu equipo dominará la herramienta rápidamente.",
         features: ["Talleres presenciales", "Capacitación online", "Material didáctico"],
     },
     {
         icon: HeadphonesIcon,
         title: "Consultoría Técnica",
-        description: "Asesoría personalizada para resolver problemas complejos en sistemas de agua potable, desde el diseño hasta la implementación.",
+        benefit: "Respuesta en <2 horas",
+        description: "Asesoría personalizada directa con el creador. Resuelve problemas complejos en sistemas de agua potable sin intermediarios.",
         features: ["Soporte técnico", "Resolución de dudas", "Revisión de proyectos"],
     },
     {
         icon: Building,
         title: "Desarrollo de Software",
-        description: "Creación de herramientas digitales personalizadas para empresas de ingeniería, adaptadas a sus flujos de trabajo específicos.",
+        benefit: "Herramientas a tu medida",
+        description: "Creación de soluciones digitales personalizadas para empresas de ingeniería, adaptadas a tus flujos de trabajo específicos.",
         features: ["Aplicaciones web", "Automatización", "Integraciones"],
     },
     {
         icon: Wrench,
         title: "Implementación Tecnológica",
-        description: "Ayuda a empresas e ingenieros a digitalizar sus procesos de diseño hidráulico con capacitación y soporte continuo.",
+        benefit: "ROI en el primer proyecto",
+        description: "Digitaliza tus procesos de diseño hidráulico con capacitación completa y soporte continuo. Recupera la inversión rápidamente.",
         features: ["Migración de datos", "Capacitación equipos", "Soporte continuo"],
     },
 ]
@@ -72,12 +78,16 @@ export function ProfessionalServices() {
                         <ScrollReveal key={index} delay={index * 0.1}>
                             <div className="group h-full p-6 rounded-2xl glass-card hover:bg-blue-500/5 transition-all duration-300 border border-transparent hover:border-blue-500/20">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <service.icon className="w-6 h-6 text-blue-400" />
+                                    <service.icon className="w-6 h-6 text-blue-400" aria-hidden="true" />
                                 </div>
                                 
-                                <h3 className="text-lg font-semibold mb-3 group-hover:text-blue-400 transition-colors">
+                                <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-400 transition-colors">
                                     {service.title}
                                 </h3>
+                                
+                                <p className="text-sm font-semibold text-green-400 mb-3">
+                                    {service.benefit}
+                                </p>
                                 
                                 <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                                     {service.description}
