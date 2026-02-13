@@ -121,6 +121,24 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     updateTramo: (tramo) => set((state) => ({
         tramos: state.tramos.map((t) => (t.id === tramo.id ? { ...t, ...tramo } : t))
     })),
+    reorderTramos: (newOrder) => set((state) => {
+        if (!state.currentProject) return {};
+        const newSettings = {
+            ...state.currentProject.settings,
+            tramo_order: newOrder
+        };
+        // Ideally, we should also call the backend here to persist
+        // For now, optimistic update is enough for UI
+        import("@/app/actions/proyectos").then(({ updateProject }) => {
+            if (state.currentProject?.id) {
+                updateProject(state.currentProject.id, { settings: newSettings });
+            }
+        });
+
+        return {
+            currentProject: { ...state.currentProject, settings: newSettings }
+        };
+    }),
     updateProjectSettings: (settings) => set((state) => ({
         currentProject: state.currentProject ? { ...state.currentProject, settings } : null
     })),

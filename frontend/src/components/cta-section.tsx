@@ -16,10 +16,10 @@ export function CTASection() {
     <section className="relative z-10 px-6 md:px-12 py-16 md:py-24">
       <div className="max-w-4xl mx-auto">
         <ScrollReveal>
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600/10 via-cyan-500/10 to-blue-500/10 border border-blue-500/20 p-8 md:p-12">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600/10 via-blue-500/10 to-blue-600/10 border border-blue-500/20 p-8 md:p-12">
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-cyan-400/20 rounded-full blur-3xl" aria-hidden="true"></div>
-            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-gradient-to-tr from-cyan-500/20 to-blue-400/20 rounded-full blur-3xl" aria-hidden="true"></div>
+            <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full blur-3xl" aria-hidden="true"></div>
+            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-gradient-to-tr from-blue-600/20 to-blue-500/20 rounded-full blur-3xl" aria-hidden="true"></div>
 
             <div className="relative text-center space-y-6">
               <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20">
@@ -29,7 +29,7 @@ export function CTASection() {
 
               <h2 className="text-3xl md:text-5xl font-bold">
                 Prueba Hidroaliaga{" "}
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                   gratis por 14 días
                 </span>
               </h2>
@@ -57,7 +57,7 @@ export function CTASection() {
                 <Link href="/login">
                   <Button
                     size="lg"
-                    className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
+                    className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
                   >
                     <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
                     Comenzar Prueba Gratis

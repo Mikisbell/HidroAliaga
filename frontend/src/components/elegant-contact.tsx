@@ -27,9 +27,9 @@ const benefits = [
 ]
 
 const stats = [
-    { icon: Briefcase, value: "6+", label: "Años de Experiencia", color: "text-orange-400" },
-    { icon: Award, value: "80+", label: "Proyectos Exitosos", color: "text-pink-400" },
-    { icon: Users, value: "300+", label: "Usuarios Hidroaliaga", color: "text-violet-400" },
+    { icon: Briefcase, value: "6+", label: "Años de Experiencia", color: "text-blue-400" },
+    { icon: Award, value: "80+", label: "Proyectos Exitosos", color: "text-blue-500" },
+    { icon: Users, value: "300+", label: "Usuarios Hidroaliaga", color: "text-slate-400" },
     { icon: CheckCircle2, value: "100%", label: "Cumplimiento RNE", color: "text-green-400" },
 ]
 
@@ -38,18 +38,18 @@ export function ElegantContact() {
         <section className="relative z-10 px-6 md:px-12 py-24">
             {/* Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-0 w-96 h-96 bg-gradient-to-r from-orange-500/10 to-pink-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-gradient-to-l from-violet-500/10 to-blue-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/4 left-0 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-blue-600/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-gradient-to-l from-blue-600/10 to-blue-500/10 rounded-full blur-3xl"></div>
             </div>
             
             <div className="max-w-6xl mx-auto relative">
                 <ScrollReveal>
                     <div className="text-center mb-16">
-                        <Badge variant="outline" className="mb-4 border-orange-500/30 text-orange-400 bg-orange-500/10">
+                        <Badge variant="outline" className="mb-4 border-blue-500/30 text-blue-400 bg-blue-500/10">
                             Contacto Profesional
                         </Badge>
                         <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                            Trabajemos <span className="bg-gradient-to-r from-orange-400 via-pink-400 to-violet-400 bg-clip-text text-transparent">juntos</span>
+                            Trabajemos <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">juntos</span>
                         </h2>
                         <p className="text-slate-400 max-w-2xl mx-auto text-lg">
                             Con experiencia académica y profesional en ingeniería hidráulica, estoy listo 
@@ -75,9 +75,9 @@ export function ElegantContact() {
                     {/* Left Side - Contact Info */}
                     <div className="lg:col-span-2 space-y-6">
                         <ScrollReveal delay={0.2}>
-                            <div className="glass-card rounded-2xl p-6 border-l-4 border-l-orange-500">
+                            <div className="glass-card rounded-2xl p-6 border-l-4 border-l-blue-500">
                                 <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
+                                    <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                                         <Mail className="w-4 h-4 text-white" />
                                     </span>
                                     Información de Contacto
@@ -85,8 +85,8 @@ export function ElegantContact() {
                                 
                                 <div className="space-y-4">
                                     <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
-                                            <Mail className="w-5 h-5 text-orange-400" />
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center flex-shrink-0">
+                                            <Mail className="w-5 h-5 text-blue-400" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-1">Email</p>
@@ -96,8 +96,8 @@ export function ElegantContact() {
                                     </div>
                                     
                                     <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500/20 to-violet-500/20 flex items-center justify-center flex-shrink-0">
-                                            <Phone className="w-5 h-5 text-pink-400" />
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600/20 to-slate-500/20 flex items-center justify-center flex-shrink-0">
+                                            <Phone className="w-5 h-5 text-blue-400" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-1">Teléfono / WhatsApp</p>
@@ -107,8 +107,8 @@ export function ElegantContact() {
                                     </div>
                                     
                                     <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                            <MapPin className="w-5 h-5 text-violet-400" />
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                            <MapPin className="w-5 h-5 text-slate-400" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-1">Ubicación</p>
@@ -145,7 +145,7 @@ export function ElegantContact() {
                         <ScrollReveal delay={0.3}>
                             <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
                                 {/* Decorative gradient */}
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-500/10 via-pink-500/10 to-violet-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 via-blue-600/10 to-blue-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
                                 
                                 <div className="relative">
                                     <h3 className="text-2xl font-semibold mb-2">Envíame un mensaje</h3>
@@ -161,7 +161,7 @@ export function ElegantContact() {
                                                     id="nombre"
                                                     name="nombre"
                                                     placeholder="Juan Pérez" 
-                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-blue-500/50"
                                                     required
                                                     aria-required="true"
                                                 />
@@ -174,7 +174,7 @@ export function ElegantContact() {
                                                     id="empresa"
                                                     name="empresa"
                                                     placeholder="Tu empresa (opcional)" 
-                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-blue-500/50"
                                                 />
                                             </div>
                                         </div>
@@ -189,7 +189,7 @@ export function ElegantContact() {
                                                     name="email"
                                                     type="email"
                                                     placeholder="juan@email.com" 
-                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-blue-500/50"
                                                     required
                                                     aria-required="true"
                                                 />
@@ -203,7 +203,7 @@ export function ElegantContact() {
                                                     name="telefono"
                                                     type="tel"
                                                     placeholder="+51 999 888 777" 
-                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-orange-500/50"
+                                                    className="h-12 bg-slate-900/50 border-slate-700 focus:border-blue-500/50"
                                                 />
                                             </div>
                                         </div>
@@ -215,7 +215,7 @@ export function ElegantContact() {
                                             <select 
                                                 id="servicio"
                                                 name="servicio"
-                                                className="w-full h-12 px-4 rounded-md border border-slate-700 bg-slate-900/50 text-sm text-slate-300 focus:border-orange-500/50 focus:outline-none"
+                                                className="w-full h-12 px-4 rounded-md border border-slate-700 bg-slate-900/50 text-sm text-slate-300 focus:border-blue-500/50 focus:outline-none"
                                                 required
                                                 aria-required="true"
                                             >
@@ -237,7 +237,7 @@ export function ElegantContact() {
                                                 id="mensaje"
                                                 name="mensaje"
                                                 placeholder="Cuéntame sobre tu proyecto: ubicación, número de habitantes, tipo de red, etc." 
-                                                className="min-h-[140px] bg-slate-900/50 border-slate-700 focus:border-orange-500/50 resize-none"
+                                                className="min-h-[140px] bg-slate-900/50 border-slate-700 focus:border-blue-500/50 resize-none"
                                                 required
                                                 aria-required="true"
                                             />
@@ -245,7 +245,7 @@ export function ElegantContact() {
                                         
                                         <Button 
                                             type="submit"
-                                            className="w-full h-12 bg-gradient-to-r from-orange-500 via-pink-500 to-violet-500 hover:from-orange-400 hover:via-pink-400 hover:to-violet-400 text-white border-0 text-base font-medium"
+                                            className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 text-base font-medium"
                                         >
                                             <Send className="w-4 h-4 mr-2" aria-hidden="true" />
                                             Enviar Mensaje

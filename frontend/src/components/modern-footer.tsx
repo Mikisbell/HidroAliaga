@@ -52,7 +52,7 @@ const footerLinks = {
 const socialLinks = [
     { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:bg-blue-600" },
     { icon: Twitter, href: "#", label: "Twitter", color: "hover:bg-sky-500" },
-    { icon: Instagram, href: "#", label: "Instagram", color: "hover:bg-pink-600" },
+    { icon: Instagram, href: "#", label: "Instagram", color: "hover:bg-slate-600" },
     { icon: Youtube, href: "#", label: "YouTube", color: "hover:bg-red-600" },
 ]
 
@@ -60,19 +60,19 @@ export function ModernFooter() {
     return (
         <footer className="relative z-10 mt-20">
             {/* Gradient Border Top */}
-            <div className="h-1 w-full bg-gradient-to-r from-orange-500 via-pink-500 to-violet-500"></div>
+            <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600"></div>
             
             {/* CTA Section */}
             <div className="px-6 md:px-12 py-16 bg-gradient-to-b from-slate-900/50 to-slate-950">
                 <div className="max-w-6xl mx-auto">
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-900/50 via-purple-900/50 to-pink-900/50 p-8 md:p-12 border border-white/10">
+                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900/50 via-slate-900/50 to-blue-900/50 p-8 md:p-12 border border-white/10">
                         {/* Background decoration */}
-                        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-gradient-to-tr from-violet-500/20 to-blue-500/20 rounded-full blur-3xl"></div>
+                        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full blur-3xl"></div>
+                        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-gradient-to-tr from-blue-600/20 to-blue-500/20 rounded-full blur-3xl"></div>
                         
                         <div className="relative grid md:grid-cols-2 gap-8 items-center">
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-blue-200 to-slate-200 bg-clip-text text-transparent">
                                     ¿Listo para tu próximo proyecto?
                                 </h2>
                                 <p className="text-slate-400 mb-6">
@@ -80,7 +80,7 @@ export function ModernFooter() {
                                     puedo ayudarte con tu proyecto de ingeniería hidráulica.
                                 </p>
                                 <div className="flex flex-wrap gap-3">
-                                    <Button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white border-0">
+                                    <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0">
                                         Agendar Reunión
                                         <ArrowUpRight className="w-4 h-4 ml-2" />
                                     </Button>
@@ -93,18 +93,18 @@ export function ModernFooter() {
                             
                             {/* Contact Cards */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-orange-500/30 transition-colors">
-                                    <Phone className="w-8 h-8 text-orange-400 mb-3" />
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors">
+                                    <Phone className="w-8 h-8 text-blue-400 mb-3" />
                                     <p className="text-xs text-slate-500 mb-1">Teléfono</p>
                                     <p className="font-semibold text-slate-200">+51 999 888 777</p>
                                 </div>
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-pink-500/30 transition-colors">
-                                    <Mail className="w-8 h-8 text-pink-400 mb-3" aria-hidden="true" />
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors">
+                                    <Mail className="w-8 h-8 text-blue-400 mb-3" aria-hidden="true" />
                                     <p className="text-xs text-slate-500 mb-1">Email</p>
                                     <p className="font-semibold text-slate-200 text-sm">aaliagacontreras@gmail.com</p>
                                 </div>
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-colors">
-                                    <MapPin className="w-8 h-8 text-violet-400 mb-3" aria-hidden="true" />
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-slate-500/30 transition-colors">
+                                    <MapPin className="w-8 h-8 text-slate-400 mb-3" aria-hidden="true" />
                                     <p className="text-xs text-slate-500 mb-1">Ubicación</p>
                                     <p className="font-semibold text-slate-200">Huancayo, Junín, Perú</p>
                                 </div>
@@ -164,7 +164,7 @@ export function ModernFooter() {
                                                     href={link.href}
                                                     target={link.target || "_blank"}
                                                     rel="noopener noreferrer"
-                                                    className="text-sm text-slate-500 hover:text-orange-400 transition-colors inline-flex items-center gap-1 group"
+                                                    className="text-sm text-slate-500 hover:text-blue-400 transition-colors inline-flex items-center gap-1 group"
                                                 >
                                                     {link.label}
                                                     <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
@@ -172,7 +172,7 @@ export function ModernFooter() {
                                             ) : (
                                                 <Link 
                                                     href={link.href} 
-                                                    className="text-sm text-slate-500 hover:text-orange-400 transition-colors inline-flex items-center gap-1 group"
+                                                    className="text-sm text-slate-500 hover:text-blue-400 transition-colors inline-flex items-center gap-1 group"
                                                 >
                                                     {link.label}
                                                     <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
@@ -198,7 +198,7 @@ export function ModernFooter() {
                     </p>
                     
                     <p className="text-xs text-slate-600 flex items-center gap-1">
-                        Hecho con <Heart className="w-3 h-3 text-pink-500 fill-pink-500" aria-hidden="true" /> en Huancayo, Perú
+                        Hecho con <Heart className="w-3 h-3 text-blue-500 fill-blue-500" aria-hidden="true" /> en Huancayo, Perú
                     </p>
                 </div>
             </div>

@@ -17,6 +17,8 @@ export interface ProjectSettings {
     dotacion: number;
     k1?: number;
     k2?: number;
+    // Order of tramos in the calculation table
+    tramo_order?: string[];
     // Futuros ajustes
 }
 

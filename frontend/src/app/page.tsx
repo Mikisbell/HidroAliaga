@@ -30,35 +30,35 @@ const features = [
         title: "GIS + Cotas Automáticas",
         description: "Trazado interactivo con Leaflet, obtención de cotas por DEM, y mapa de calor de presiones y velocidades en la red.",
         badges: ["Leaflet", "DEM", "PostGIS"],
-        color: "green" as const,
+        color: "slate" as const,
     },
     {
         icon: Dna,
         title: "Optimización + Copiloto IA",
         description: "Algoritmo Genético para diámetros óptimos y copiloto normativo con LLM para consultas técnicas en tiempo real.",
         badges: ["AG", "LLM/RAG", "Copiloto"],
-        color: "purple" as const,
+        color: "blue" as const,
     },
     {
         icon: ClipboardCheck,
         title: "Validación Normativa",
         description: "Verificación automática contra RNE OS.050, RM 192-2018 y RM 107-2025. Alertas por presión, velocidad, diámetro y cobertura.",
         badges: ["OS.050", "RM 192", "RM 107"],
-        color: "amber" as const,
+        color: "slate" as const,
     },
     {
         icon: BarChart3,
         title: "Transparencia Académica",
         description: "Tabla de iteraciones Hardy Cross con evolución de ΔQ, error acumulado y convergencia. Ideal para validación y enseñanza.",
         badges: ["Iteraciones", "ΔQ", "Convergencia"],
-        color: "cyan" as const,
+        color: "blue" as const,
     },
     {
         icon: FileText,
         title: "Reportes y Exportación",
         description: "Expediente técnico digital en PDF, exportación Excel compatible con plantillas, formato INP para EPANET, GeoJSON/DXF.",
         badges: ["PDF", "Excel", "EPANET"],
-        color: "red" as const,
+        color: "slate" as const,
     },
 ]
 
@@ -127,7 +127,7 @@ export default async function HomePage() {
                                     <Link href="/dashboard">
                                         <Button 
                                             size="lg"
-                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
+                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
                                         >
                                             <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
                                             Continuar en Dashboard
@@ -137,7 +137,7 @@ export default async function HomePage() {
                                     <Link href="/login">
                                         <Button 
                                             size="lg"
-                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
+                                            className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white border-0 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200"
                                         >
                                             <Rocket className="w-5 h-5 mr-2" aria-hidden="true" />
                                             Probar Gratis 14 Días
@@ -189,20 +189,20 @@ export default async function HomePage() {
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m.c.a. Presión Mín</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-blue-500/30 transition-colors">OS.050</Badge>
                         </div>
-                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-amber-500/30 hover:shadow-lg transition-all duration-300">
-                            <p className="text-2xl font-bold text-amber-400">50</p>
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-slate-500/30 hover:shadow-lg transition-all duration-300">
+                            <p className="text-2xl font-bold text-slate-400">50</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m.c.a. Presión Máx</p>
-                            <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-amber-500/30 transition-colors">Ambos</Badge>
+                            <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-slate-500/30 transition-colors">Ambos</Badge>
                         </div>
                         <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-green-500/30 hover:shadow-lg transition-all duration-300">
                             <p className="text-2xl font-bold text-green-400">0.6–3.0</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">m/s Velocidad</p>
                             <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-green-500/30 transition-colors">RNE</Badge>
                         </div>
-                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
-                            <p className="text-2xl font-bold text-purple-400">10⁻⁷</p>
+                        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-blue-500/30 hover:shadow-lg transition-all duration-300">
+                            <p className="text-2xl font-bold text-blue-400">10⁻⁷</p>
                             <p className="text-[10px] text-muted-foreground/60 mt-1">Tolerancia convergencia</p>
-                            <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-purple-500/30 transition-colors">Hardy Cross</Badge>
+                            <Badge variant="outline" className="text-[9px] mt-1.5 border-border/20 group-hover:border-blue-500/30 transition-colors">Hardy Cross</Badge>
                         </div>
                     </div>
                 </ScrollReveal>
@@ -246,18 +246,18 @@ export default async function HomePage() {
                                 <p className="text-sm text-muted-foreground/50 mt-1">Litros por habitante por día — Nueva normativa vigente</p>
                             </div>
                             <div className="grid grid-cols-3 gap-4">
-                                <div className="text-center p-4 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 transition-colors">
-                                    <p className="text-3xl font-bold text-red-400">169</p>
+                                <div className="text-center p-4 rounded-xl bg-slate-500/5 border border-slate-500/10 hover:bg-slate-500/10 transition-colors">
+                                    <p className="text-3xl font-bold text-slate-400">169</p>
                                     <p className="text-xs text-muted-foreground/50 mt-1">L/hab/día</p>
                                     <p className="text-[10px] text-muted-foreground/30 mt-0.5 font-medium">☀️ Clima Cálido</p>
                                 </div>
-                                <div className="text-center p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors">
-                                    <p className="text-3xl font-bold text-amber-400">155</p>
+                                <div className="text-center p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 transition-colors">
+                                    <p className="text-3xl font-bold text-blue-400">155</p>
                                     <p className="text-xs text-muted-foreground/50 mt-1">L/hab/día</p>
                                     <p className="text-[10px] text-muted-foreground/30 mt-0.5 font-medium">🌤️ Clima Templado</p>
                                 </div>
-                                <div className="text-center p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 transition-colors">
-                                    <p className="text-3xl font-bold text-blue-400">129</p>
+                                <div className="text-center p-4 rounded-xl bg-slate-500/5 border border-slate-500/10 hover:bg-slate-500/10 transition-colors">
+                                    <p className="text-3xl font-bold text-slate-400">129</p>
                                     <p className="text-xs text-muted-foreground/50 mt-1">L/hab/día</p>
                                     <p className="text-[10px] text-muted-foreground/30 mt-0.5 font-medium">❄️ Clima Frío</p>
                                 </div>

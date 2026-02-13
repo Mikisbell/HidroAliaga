@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState, useRef, useEffect } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudo } from "@/app/actions/nudos"
 import { updateTramo } from "@/app/actions/tramos"
@@ -8,8 +8,27 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/store/project-store"
-import { TrendingUp, MapPin } from "lucide-react"
+import { TrendingUp, MapPin, GripVertical } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+// DnD Kit imports
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core'
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // ═══════════════════════════════════════
 //  CONSTANTS & HELPERS
@@ -28,9 +47,6 @@ const DIAM_LOOKUP: Record<number, number> = {
     6: 154.1,
     8: 202.7,
 }
-
-/** Standard commercial diameters in inches */
-const COMMERCIAL_DIAMS = [0.5, 0.75, 1, 1.5, 2, 2.5, 3, 4, 6, 8]
 
 /** Get interior diameter in mm from commercial inches */
 function getInteriorMM(comercialPulg: number): number {
@@ -81,6 +97,125 @@ function calcHf(sr: number, longitud: number): number {
 }
 
 // ═══════════════════════════════════════
+//  SORTABLE ROW COMPONENT
+// ═══════════════════════════════════════
+
+function SortableRow({ row, isSelected, onRowClick, onUpdate }: {
+    row: any,
+    isSelected: boolean,
+    onRowClick: (id: string, type: 'tramo') => void,
+    onUpdate: (id: string, field: string, val: any) => void
+}) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: row.tramo.id })
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 10 : 'auto',
+        opacity: isDragging ? 0.5 : 1,
+        position: 'relative' as const,
+    }
+
+    return (
+        <tr
+            ref={setNodeRef}
+            style={style}
+            onClick={() => onRowClick(row.tramo.id, 'tramo')}
+            className={cn(
+                "border-b border-border/30 transition-colors cursor-pointer group",
+                isSelected
+                    ? "bg-primary/8 hover:bg-primary/12"
+                    : "hover:bg-muted/20"
+            )}
+        >
+            {/* Drag Handle */}
+            <TD className="w-6 px-0 text-center cursor-grab active:cursor-grabbing touch-none">
+                <div {...attributes} {...listeners} className="opacity-20 group-hover:opacity-100 transition-opacity flex justify-center">
+                    <GripVertical className="w-3 h-3 text-muted-foreground" />
+                </div>
+            </TD>
+
+            {/* 1. TRAMO-I */}
+            <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoI}</TD>
+            {/* 2. TRAMO-F */}
+            <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoF}</TD>
+            {/* 3. Cota inicio */}
+            <TD>{row.cotaI}</TD>
+            {/* 4. Cota fin */}
+            <TD>{row.cotaF}</TD>
+            {/* 5. N° viviendas — EDITABLE */}
+            <EditNumCell
+                value={row.nViv}
+                onChange={(v) => onUpdate(row.tramo.id, 'numero_viviendas', v)}
+                className="bg-yellow-50/60 dark:bg-yellow-900/10"
+            />
+            {/* 6. Qu */}
+            <TD>{row.qu > 0 ? row.qu.toFixed(3) : '—'}</TD>
+            {/* 7. Q Diseño */}
+            <TD className="font-bold">{row.qDiseno > 0 ? row.qDiseno.toFixed(3) : '—'}</TD>
+            {/* 8. Longitud — EDITABLE */}
+            <EditNumCell
+                value={row.longitud}
+                onChange={(v) => onUpdate(row.tramo.id, 'longitud', v)}
+                className="bg-yellow-50/60 dark:bg-yellow-900/10"
+            />
+            {/* 9. S teórico */}
+            <TD>{row.sTeor.toFixed(2)}</TD>
+            {/* 10. D real */}
+            <TD>{row.dReal > 0 ? row.dReal.toFixed(3) : '—'}</TD>
+            {/* 11. D comercial — EDITABLE */}
+            <EditNumCell
+                value={row.dComercial}
+                onChange={(v) => onUpdate(row.tramo.id, 'diametro_comercial', v)}
+                className="bg-yellow-50/60 dark:bg-yellow-900/10"
+            />
+            {/* 12. Ø mm */}
+            <TD>{row.diamMM.toFixed(1)}</TD>
+            {/* 13. Velocity — color coded */}
+            <TD className={cn(
+                "font-bold",
+                row.vel > 3.0 ? "text-red-600" :
+                    row.vel > 0.6 ? "text-emerald-600" :
+                        row.vel > 0 ? "text-blue-500" : ""
+            )}>
+                {row.vel > 0 ? row.vel.toFixed(2) : '—'}
+            </TD>
+            {/* 14. Sr */}
+            <TD>{row.sr > 0 ? (row.sr * 1000).toFixed(2) : '—'}</TD>
+            {/* 15. Hf */}
+            <TD>{row.hf > 0 ? row.hf.toFixed(2) : '—'}</TD>
+            {/* 16. Cpi */}
+            <TD>{row.cpi > 0 ? row.cpi.toFixed(3) : '—'}</TD>
+            {/* 17. CPf */}
+            <TD>{row.cpf > 0 ? row.cpf.toFixed(3) : '—'}</TD>
+            {/* 18. Pi — color coded */}
+            <TD className={cn(
+                row.pi > 0 && row.pi < 10 ? "text-red-600 font-bold" :
+                    row.pi > 50 ? "text-amber-600 font-bold" :
+                        row.pi > 0 ? "text-emerald-600" : ""
+            )}>
+                {row.pi.toFixed(3)}
+            </TD>
+            {/* 19. Pf — color coded */}
+            <TD className={cn(
+                row.pf > 0 && row.pf < 10 ? "text-red-600 font-bold" :
+                    row.pf > 50 ? "text-amber-600 font-bold" :
+                        row.pf > 0 ? "text-emerald-600" : ""
+            )}>
+                {row.pf.toFixed(3)}
+            </TD>
+        </tr>
+    )
+}
+
+// ═══════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════
 
@@ -88,104 +223,82 @@ export function HydraulicTablePanel() {
     const router = useRouter()
     const nudos = useProjectStore(state => state.nudos)
     const tramos = useProjectStore(state => state.tramos)
+    const currentProject = useProjectStore(state => state.currentProject)
     const simulationResults = useProjectStore(state => state.simulationResults)
     const selectedElement = useProjectStore(state => state.selectedElement)
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const updateNudoStore = useProjectStore(state => state.updateNudo)
     const updateTramoStore = useProjectStore(state => state.updateTramo)
+    const reorderTramosStore = useProjectStore(state => state.reorderTramos)
+
+    // DnD Sensors
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    )
 
     // Total households across all tramos
     const totalViviendas = useMemo(() =>
         tramos.reduce((sum, t) => sum + (t.numero_viviendas ?? 0), 0)
         , [tramos])
 
-    // ═══ TRAMO ROWS — 19 columns with cascading piezometric heads ═══
-    const tramoRows = useMemo(() => {
+    // ═══ TRAMO ROWS CALCULATION ═══
+    const computedTramoRows = useMemo(() => {
         if (tramos.length === 0 || nudos.length === 0) return []
 
-        // ── Project parameters (from reference spreadsheet) ──
-        // Dens. Pobl = 5 hab/fam, Pt = totalViviendas * 5
         const DENS_POBL = 5
-        const Pt = totalViviendas * DENS_POBL // total population
-
-        // Total demand from junction nodes (Qmh)
+        const Pt = totalViviendas * DENS_POBL
         const Qmh = nudos
             .filter(n => n.tipo !== 'reservorio')
             .reduce((sum, n) => sum + (n.demanda_base ?? 0), 0)
 
-        // qu (unit flow per inhabitant) = Qmh / Pt
         const quUnit = Pt > 0 ? Qmh / Pt : 0
 
-        // ── Step 1: Build adjacency and compute Qu per tramo ──
         const tramoMap = new Map(tramos.map(t => [t.id, t]))
         const nudoMap = new Map(nudos.map(n => [n.id, n]))
-
-        // Build graph: which tramos go OUT of each nudo
         const outgoing = new Map<string, Tramo[]>()
+
         for (const t of tramos) {
             const list = outgoing.get(t.nudo_origen_id) || []
             list.push(t)
             outgoing.set(t.nudo_origen_id, list)
         }
 
-        // Compute Qu per tramo
         const quMap = new Map<string, number>()
         for (const t of tramos) {
             const nViv = t.numero_viviendas ?? 0
             quMap.set(t.id, quUnit * nViv * DENS_POBL)
         }
 
-        // ── Step 2: Topological sort from reservoir (BFS) ──
-        // Q(Diseño) accumulates: for each tramo, Q = Qu_self + sum(Q of downstream tramos)
-        // We traverse from leaves towards reservoir, accumulating Q.
-        // Simpler: traverse from reservoir outward, and Q gets reduced at each branch.
-
-        // Actually from the spreadsheet: Q(Diseño) for the pipe leaving the reservoir = total Qmh
-        // Then at each node, Q splits proportionally to downstream households.
-        // For a simple branching network (tree): Q at any pipe = sum of all Qu downstream of it.
-
-        // Compute cumulative Q using reverse DFS from leaves
+        // Cumulative Q (Design)
         const qDesignMap = new Map<string, number>()
-
-        // For each tramo, sum its own Qu plus all Qu of tramos downstream
         function computeQDownstream(tramoId: string, visited: Set<string>): number {
             if (visited.has(tramoId)) return 0
             visited.add(tramoId)
-
             const t = tramoMap.get(tramoId)!
             let q = quMap.get(tramoId) || 0
-
-            // Find tramos that leave from this tramo's end node
             const downstream = outgoing.get(t.nudo_destino_id) || []
             for (const dt of downstream) {
                 q += computeQDownstream(dt.id, visited)
             }
-
             qDesignMap.set(tramoId, q)
             return q
         }
 
-        // Start from reservoir outgoing tramos
         const reservoirs = nudos.filter(n => n.tipo === 'reservorio')
         for (const res of reservoirs) {
             const out = outgoing.get(res.id) || []
-            for (const t of out) {
-                computeQDownstream(t.id, new Set())
-            }
+            for (const t of out) computeQDownstream(t.id, new Set())
         }
-        // Fill any uncomputed tramos (disconnected)
         for (const t of tramos) {
-            if (!qDesignMap.has(t.id)) {
-                computeQDownstream(t.id, new Set())
-            }
+            if (!qDesignMap.has(t.id)) computeQDownstream(t.id, new Set())
         }
 
-        // ── Step 3: Topological order (BFS from reservoir) for Cpi/CPf cascade ──
+        // Topological ordering for Cpi/CPf
         const orderedTramos: Tramo[] = []
         const visitedNodes = new Set<string>()
         const queue: string[] = []
 
-        // Start with reservoir nodes
         for (const res of reservoirs) {
             queue.push(res.id)
             visitedNodes.add(res.id)
@@ -202,110 +315,101 @@ export function HydraulicTablePanel() {
                 }
             }
         }
-        // Add any remaining tramos not reachable from reservoirs
         for (const t of tramos) {
-            if (!orderedTramos.find(ot => ot.id === t.id)) {
-                orderedTramos.push(t)
-            }
+            if (!orderedTramos.find(ot => ot.id === t.id)) orderedTramos.push(t)
         }
 
-        // ── Step 4: Compute all 19 columns with cascading Cpi/CPf ──
-        // nodeCpi stores the piezometric head arriving at each node
+        // Calculations
         const nodeCpi = new Map<string, number>()
-
-        // Reservoir Cpi = its cota_terreno (or head)
         for (const res of reservoirs) {
             nodeCpi.set(res.id, res.cota_terreno ?? 0)
         }
 
-        const rows = orderedTramos.map(t => {
+        return orderedTramos.map(t => {
             const startNode = nudoMap.get(t.nudo_origen_id)
             const endNode = nudoMap.get(t.nudo_destino_id)
 
-            // EPANET results
             const linkRes = simulationResults?.linkResults?.[t.id]
                 || simulationResults?.linkResults?.[t.codigo || '']
 
-            // 1-4: Identification
             const tramoI = startNode?.codigo || '—'
             const tramoF = endNode?.codigo || '—'
             const cotaI = startNode?.cota_terreno ?? 0
             const cotaF = endNode?.cota_terreno ?? 0
-
-            // 5: Households
             const nViv = t.numero_viviendas ?? 0
-
-            // 6: Qu (per tramo)
             const qu = quMap.get(t.id) || 0
-
-            // 7: Q(Diseño) = cumulative from downstream
-            const qDiseno = linkRes?.flow != null
-                ? Math.abs(linkRes.flow)
-                : (qDesignMap.get(t.id) || 0)
-
-            // 8: Length
+            const qDiseno = linkRes?.flow != null ? Math.abs(linkRes.flow) : (qDesignMap.get(t.id) || 0)
             const longitud = t.longitud ?? 0
-
-            // 9: Theoretical slope (‰)
             const sTeor = calcSlopeTeor(cotaI, cotaF, longitud)
-
-            // 10: Real diameter (Hazen-Williams with theoretical slope)
             const dReal = calcDiamReal(qDiseno, sTeor, t.coef_hazen_williams || 150)
-
-            // 11-12: Commercial diameter
             const dComercial = t.diametro_comercial ?? 0
             const diamMM = getInteriorMM(dComercial)
-
-            // 13: Velocity
-            const vel = linkRes?.velocity != null
-                ? linkRes.velocity
-                : calcVelocity(qDiseno, diamMM)
-
-            // 14: Sr (real friction slope)
+            const vel = linkRes?.velocity != null ? linkRes.velocity : calcVelocity(qDiseno, diamMM)
             const sr = calcSr(qDiseno, diamMM, t.coef_hazen_williams || 150)
+            const hf = linkRes?.headloss != null ? linkRes.headloss : calcHf(sr, longitud)
 
-            // 15: Hf (head loss)
-            const hf = linkRes?.headloss != null
-                ? linkRes.headloss
-                : calcHf(sr, longitud)
-
-            // 16-17: Cpi / CPf — cascading from upstream
-            // If start node is CRP, reset Cpi to its cota
             const isCRP = startNode?.tipo === 'camara_rompe_presion'
-            const cpi = isCRP
-                ? cotaI
-                : (nodeCpi.get(t.nudo_origen_id) ?? cotaI)
+            const cpi = isCRP ? cotaI : (nodeCpi.get(t.nudo_origen_id) ?? cotaI)
             const cpf = cpi - hf
 
-            // Store CPf as the Cpi for the end node (for next tramo)
-            // CRP at destination resets the piezometric head
-            if (endNode?.tipo === 'camara_rompe_presion') {
-                nodeCpi.set(t.nudo_destino_id, cotaF) // CRP resets
-            } else {
-                nodeCpi.set(t.nudo_destino_id, cpf)
-            }
+            if (endNode?.tipo === 'camara_rompe_presion') nodeCpi.set(t.nudo_destino_id, cotaF)
+            else nodeCpi.set(t.nudo_destino_id, cpf)
 
-            // 18-19: Pressures
             const pi = cpi - cotaI
             const pf = cpf - cotaF
 
             return {
+                id: t.id, // For DnD
                 tramo: t,
-                tramoI, tramoF,
-                cotaI, cotaF,
-                nViv,
-                qu, qDiseno,
-                longitud,
-                sTeor, dReal,
-                dComercial, diamMM,
-                vel, sr, hf,
+                tramoI, tramoF, cotaI, cotaF, nViv,
+                qu, qDiseno, longitud, sTeor, dReal,
+                dComercial, diamMM, vel, sr, hf,
                 cpi, cpf, pi, pf,
-                startNode, endNode,
+                startNode, endNode
             }
         })
-
-        return rows
     }, [tramos, nudos, simulationResults, totalViviendas])
+
+    // ═══ APPLY SORT ORDER ═══
+    const sortedTramoRows = useMemo(() => {
+        const order = currentProject?.settings?.tramo_order || []
+        if (order.length === 0) return computedTramoRows
+
+        const map = new Map(computedTramoRows.map(r => [r.tramo.id, r]))
+        const sorted = []
+
+        // 1. Add rows in the custom order
+        for (const id of order) {
+            const row = map.get(id)
+            if (row) {
+                sorted.push(row)
+                map.delete(id)
+            }
+        }
+
+        // 2. Add remaining (new) rows at the end
+        for (const row of map.values()) {
+            sorted.push(row)
+        }
+
+        return sorted
+    }, [computedTramoRows, currentProject?.settings?.tramo_order])
+
+    // ═══ DND HANDLER ═══
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+
+        if (over && active.id !== over.id) {
+            const oldIndex = sortedTramoRows.findIndex(r => r.tramo.id === active.id)
+            const newIndex = sortedTramoRows.findIndex(r => r.tramo.id === over.id)
+
+            if (oldIndex !== -1 && newIndex !== -1) {
+                const newRows = arrayMove(sortedTramoRows, oldIndex, newIndex)
+                const newOrder = newRows.map(r => r.tramo.id)
+                reorderTramosStore(newOrder)
+            }
+        }
+    }
 
     // ═══ NUDO ROWS ═══
     const nudoRows = useMemo(() => {
@@ -372,196 +476,106 @@ export function HydraulicTablePanel() {
                 </div>
 
                 <div className="flex-1 overflow-auto">
-                    {/* ═══════ TRAMOS TAB — 19 COLUMNS ═══════ */}
+                    {/* ═══════ TRAMOS TAB — 19 COLUMNS DRAGGABLE ═══════ */}
                     <TabsContent value="tramos" className="h-full mt-0 p-0 border-0">
                         <div className="overflow-x-auto h-full">
-                            <table className="w-max min-w-full text-[10px] font-mono border-collapse">
-                                <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur-sm">
-                                    <tr className="border-b border-border">
-                                        <TH>Tramo-I</TH>
-                                        <TH>Tramo-F</TH>
-                                        <TH>Cota I</TH>
-                                        <TH>Cota F</TH>
-                                        <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">N° Viv</TH>
-                                        <TH>Qu (L/s)</TH>
-                                        <TH>Q Diseño</TH>
-                                        <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">Long (m)</TH>
-                                        <TH>S teór ‰</TH>
-                                        <TH>D real ″</TH>
-                                        <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">D com ″</TH>
-                                        <TH>Ø mm</TH>
-                                        <TH>Vel m/s</TH>
-                                        <TH>Sr ‰</TH>
-                                        <TH>Hf (m)</TH>
-                                        <TH>Cpi</TH>
-                                        <TH>CPf</TH>
-                                        <TH>Pi</TH>
-                                        <TH>Pf</TH>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tramoRows.map((row) => {
-                                        const isSelected = selectedElement?.id === row.tramo.id
-                                        return (
-                                            <tr
-                                                key={row.tramo.id}
-                                                onClick={() => handleRowClick(row.tramo.id, 'tramo')}
-                                                className={cn(
-                                                    "border-b border-border/30 transition-colors cursor-pointer",
-                                                    isSelected
-                                                        ? "bg-primary/8 hover:bg-primary/12"
-                                                        : "hover:bg-muted/20"
-                                                )}
-                                            >
-                                                {/* 1. TRAMO-I */}
-                                                <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoI}</TD>
-                                                {/* 2. TRAMO-F */}
-                                                <TD className="font-bold text-blue-600 dark:text-blue-400">{row.tramoF}</TD>
-                                                {/* 3. Cota inicio */}
-                                                <TD>{row.cotaI}</TD>
-                                                {/* 4. Cota fin */}
-                                                <TD>{row.cotaF}</TD>
-                                                {/* 5. N° viviendas — EDITABLE */}
-                                                <EditNumCell
-                                                    value={row.nViv}
-                                                    onChange={(v) => handleTramoUpdate(row.tramo.id, 'numero_viviendas', v)}
-                                                    className="bg-yellow-50/60 dark:bg-yellow-900/10"
-                                                />
-                                                {/* 6. Qu */}
-                                                <TD>{row.qu > 0 ? row.qu.toFixed(3) : '—'}</TD>
-                                                {/* 7. Q Diseño */}
-                                                <TD className="font-bold">{row.qDiseno > 0 ? row.qDiseno.toFixed(3) : '—'}</TD>
-                                                {/* 8. Longitud — EDITABLE */}
-                                                <EditNumCell
-                                                    value={row.longitud}
-                                                    onChange={(v) => handleTramoUpdate(row.tramo.id, 'longitud', v)}
-                                                    className="bg-yellow-50/60 dark:bg-yellow-900/10"
-                                                />
-                                                {/* 9. S teórico */}
-                                                <TD>{row.sTeor.toFixed(2)}</TD>
-                                                {/* 10. D real */}
-                                                <TD>{row.dReal > 0 ? row.dReal.toFixed(3) : '—'}</TD>
-                                                {/* 11. D comercial — EDITABLE */}
-                                                <EditNumCell
-                                                    value={row.dComercial}
-                                                    onChange={(v) => handleTramoUpdate(row.tramo.id, 'diametro_comercial', v)}
-                                                    className="bg-yellow-50/60 dark:bg-yellow-900/10"
-                                                />
-                                                {/* 12. Ø mm */}
-                                                <TD>{row.diamMM.toFixed(1)}</TD>
-                                                {/* 13. Velocity — color coded */}
-                                                <TD className={cn(
-                                                    "font-bold",
-                                                    row.vel > 3.0 ? "text-red-600" :
-                                                        row.vel > 0.6 ? "text-emerald-600" :
-                                                            row.vel > 0 ? "text-blue-500" : ""
-                                                )}>
-                                                    {row.vel > 0 ? row.vel.toFixed(2) : '—'}
-                                                </TD>
-                                                {/* 14. Sr */}
-                                                <TD>{row.sr > 0 ? (row.sr * 1000).toFixed(2) : '—'}</TD>
-                                                {/* 15. Hf */}
-                                                <TD>{row.hf > 0 ? row.hf.toFixed(2) : '—'}</TD>
-                                                {/* 16. Cpi */}
-                                                <TD>{row.cpi > 0 ? row.cpi.toFixed(3) : '—'}</TD>
-                                                {/* 17. CPf */}
-                                                <TD>{row.cpf > 0 ? row.cpf.toFixed(3) : '—'}</TD>
-                                                {/* 18. Pi — color coded */}
-                                                <TD className={cn(
-                                                    row.pi > 0 && row.pi < 10 ? "text-red-600 font-bold" :
-                                                        row.pi > 50 ? "text-amber-600 font-bold" :
-                                                            row.pi > 0 ? "text-emerald-600" : ""
-                                                )}>
-                                                    {row.pi.toFixed(3)}
-                                                </TD>
-                                                {/* 19. Pf — color coded */}
-                                                <TD className={cn(
-                                                    row.pf > 0 && row.pf < 10 ? "text-red-600 font-bold" :
-                                                        row.pf > 50 ? "text-amber-600 font-bold" :
-                                                            row.pf > 0 ? "text-emerald-600" : ""
-                                                )}>
-                                                    {row.pf.toFixed(3)}
-                                                </TD>
-                                            </tr>
-                                        )
-                                    })}
-                                    {tramos.length === 0 && (
-                                        <tr>
-                                            <td colSpan={19} className="text-center py-6 text-muted-foreground text-xs">
-                                                Conecta nudos en el diseñador para ver los cálculos
-                                            </td>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <table className="w-max min-w-full text-[10px] font-mono border-collapse">
+                                    <thead className="sticky top-0 z-20 bg-muted/95 backdrop-blur-sm">
+                                        <tr className="border-b border-border">
+                                            <TH className="w-6"></TH> {/* Drag handle col */}
+                                            <TH>Tramo-I</TH>
+                                            <TH>Tramo-F</TH>
+                                            <TH>Cota I</TH>
+                                            <TH>Cota F</TH>
+                                            <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">N° Viv</TH>
+                                            <TH>Qu (L/s)</TH>
+                                            <TH>Q Diseño</TH>
+                                            <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">Long (m)</TH>
+                                            <TH>S teór ‰</TH>
+                                            <TH>D real ″</TH>
+                                            <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">D com ″</TH>
+                                            <TH>Ø mm</TH>
+                                            <TH>Vel m/s</TH>
+                                            <TH>Sr ‰</TH>
+                                            <TH>Hf (m)</TH>
+                                            <TH>Cpi</TH>
+                                            <TH>CPf</TH>
+                                            <TH>Pi</TH>
+                                            <TH>Pf</TH>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="relative">
+                                        <SortableContext
+                                            items={sortedTramoRows.map(r => r.tramo.id)}
+                                            strategy={verticalListSortingStrategy}
+                                        >
+                                            {sortedTramoRows.map((row) => (
+                                                <SortableRow
+                                                    key={row.tramo.id}
+                                                    row={row}
+                                                    isSelected={selectedElement?.id === row.tramo.id}
+                                                    onRowClick={handleRowClick}
+                                                    onUpdate={handleTramoUpdate}
+                                                />
+                                            ))}
+                                        </SortableContext>
+                                    </tbody>
+                                </table>
+                            </DndContext>
                         </div>
                     </TabsContent>
 
-                    {/* ═══════ NUDOS TAB ═══════ */}
+                    {/* ═══════ NUDOS TAB — STANDARD ═══════ */}
                     <TabsContent value="nudos" className="h-full mt-0 p-0 border-0">
-                        <table className="w-full text-[10px] font-mono border-collapse">
-                            <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur-sm">
-                                <tr className="border-b border-border">
-                                    <TH>Código</TH>
-                                    <TH>Tipo</TH>
-                                    <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">Cota (m)</TH>
-                                    <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">Demanda (L/s)</TH>
-                                    <TH>Presión (m)</TH>
-                                    <TH>Carga (m)</TH>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {nudoRows.map(({ nudo, result }) => {
-                                    const isSelected = selectedElement?.id === nudo.id
-                                    return (
-                                        <tr
-                                            key={nudo.id}
-                                            onClick={() => handleRowClick(nudo.id, 'nudo')}
-                                            className={cn(
-                                                "border-b border-border/30 transition-colors cursor-pointer",
-                                                isSelected
-                                                    ? "bg-primary/8 hover:bg-primary/12"
-                                                    : "hover:bg-muted/20"
-                                            )}
-                                        >
-                                            <EditTextCell
-                                                value={nudo.codigo}
-                                                onChange={(v) => handleNudoUpdate(nudo.id, 'codigo', v)}
-                                                className="font-bold text-primary"
-                                            />
-                                            <TD>
-                                                <span className="flex items-center gap-1 opacity-80">
-                                                    <span>{typeEmoji(nudo.tipo)}</span>
-                                                    <span className="capitalize text-[9px]">{nudo.tipo.replace(/_/g, ' ')}</span>
-                                                </span>
-                                            </TD>
-                                            <EditNumCell
-                                                value={nudo.cota_terreno}
-                                                onChange={(v) => handleNudoUpdate(nudo.id, 'cota_terreno', v)}
-                                                className="bg-yellow-50/60 dark:bg-yellow-900/10"
-                                            />
-                                            <EditNumCell
-                                                value={nudo.demanda_base}
-                                                onChange={(v) => handleNudoUpdate(nudo.id, 'demanda_base', v)}
-                                                className="bg-yellow-50/60 dark:bg-yellow-900/10"
-                                            />
-                                            <TD className={cn(
-                                                result && (result.pressure < 10
-                                                    ? "text-red-600 font-bold"
-                                                    : result.pressure > 50
-                                                        ? "text-amber-600 font-bold"
-                                                        : "text-emerald-600")
-                                            )}>
-                                                {result ? result.pressure.toFixed(2) : '—'}
-                                            </TD>
-                                            <TD>
-                                                {result ? result.head.toFixed(2) : '—'}
-                                            </TD>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                        <div className="overflow-auto h-full">
+                            <table className="w-full text-[10px] font-mono border-collapse">
+                                <thead className="sticky top-0 z-10 bg-muted/95 backdrop-blur-sm text-left">
+                                    <tr className="border-b border-border">
+                                        <TH>Tipo</TH>
+                                        <TH>Código</TH>
+                                        <TH className="bg-yellow-50/50 dark:bg-yellow-900/10">Cota</TH>
+                                        <TH>Demanda</TH>
+                                        <TH>P Calc</TH>
+                                        <TH>Altura</TH>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nudoRows.map(({ nudo, result }) => {
+                                        const isSelected = selectedElement?.id === nudo.id
+                                        return (
+                                            <tr
+                                                key={nudo.id}
+                                                onClick={() => handleRowClick(nudo.id, 'nudo')}
+                                                className={cn(
+                                                    "border-b border-border/30 transition-colors cursor-pointer",
+                                                    isSelected ? "bg-primary/8" : "hover:bg-muted/20"
+                                                )}
+                                            >
+                                                <TD>{typeEmoji(nudo.tipo)}</TD>
+                                                <TD className="font-bold">{nudo.codigo}</TD>
+                                                <EditNudoCell
+                                                    value={nudo.cota_terreno}
+                                                    onChange={(v) => handleNudoUpdate(nudo.id, 'cota_terreno', v)}
+                                                    className="bg-yellow-50/60 dark:bg-yellow-900/10"
+                                                />
+                                                <TD>{nudo.demanda_base ?? 0}</TD>
+                                                <TD className={cn(
+                                                    (result?.pressure ?? 0) < 0 ? "text-red-500 font-bold" : ""
+                                                )}>
+                                                    {(result?.pressure ?? 0).toFixed(2)}
+                                                </TD>
+                                                <TD>{(result?.head ?? nudo.elevacion ?? 0).toFixed(2)}</TD>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </TabsContent>
                 </div>
             </Tabs>
@@ -569,90 +583,54 @@ export function HydraulicTablePanel() {
     )
 }
 
-// ═══════════════════════════════════════
-//  SUB-COMPONENTS (Dense table cells)
-// ═══════════════════════════════════════
-
-/** Header cell */
-function TH({ children, className }: { children: React.ReactNode; className?: string }) {
+function TH({ children, className }: { children?: React.ReactNode, className?: string }) {
     return (
-        <th className={cn(
-            "text-left px-2 py-1 font-semibold text-[9px] text-muted-foreground whitespace-nowrap border-b border-border",
-            className
-        )}>
+        <th className={cn("px-2 py-1.5 font-medium text-muted-foreground whitespace-nowrap text-center border-r border-border/20 last:border-0", className)}>
             {children}
         </th>
     )
 }
 
-/** Read-only data cell */
-function TD({ children, className }: { children: React.ReactNode; className?: string }) {
+function TD({ children, className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) {
     return (
-        <td className={cn("px-2 py-0.5 whitespace-nowrap text-right tabular-nums", className)}>
+        <td className={cn("px-2 py-0.5 border-r border-border/20 last:border-0 text-center whitespace-nowrap", className)} {...props}>
             {children}
         </td>
     )
 }
 
-/** Editable numeric cell */
-function EditNumCell({ value, onChange, className }: {
-    value: number | undefined
-    onChange: (val: string) => void
-    className?: string
-}) {
-    const [local, setLocal] = useState(value?.toString() ?? "0")
-    const prevValue = useRef(value)
+function EditNumCell({ value, onChange, className }: { value?: number, onChange: (val: number) => void, className?: string }) {
+    const [localVal, setLocalVal] = useState<string>(value?.toString() ?? "0")
 
-    // Sync from store when value changes externally
     useEffect(() => {
-        if (value !== prevValue.current) {
-            setLocal(value?.toString() ?? "0")
-            prevValue.current = value
-        }
+        setLocalVal(value?.toString() ?? "0")
     }, [value])
 
-    const handleBlur = () => {
-        if (local !== value?.toString()) {
-            onChange(local)
+    const commit = () => {
+        const parsed = parseFloat(localVal)
+        if (!isNaN(parsed) && parsed !== value) {
+            onChange(parsed)
         }
     }
 
     return (
-        <td className={cn("px-1 py-0.5 w-16", className)}>
+        <td className={cn("p-0 border-r border-border/20 min-w-[50px]", className)}>
             <input
-                className="w-full bg-transparent outline-none text-right text-[10px] font-mono tabular-nums px-1 py-0.5 rounded hover:ring-1 hover:ring-primary/30 focus:ring-1 focus:ring-primary/50 transition-all"
-                value={local}
-                onChange={(e) => setLocal(e.target.value)}
-                onBlur={handleBlur}
-                onClick={(e) => e.stopPropagation()}
+                type="text"
+                className="w-full h-full bg-transparent text-center focus:outline-none focus:bg-background focus:ring-1 ring-primary px-1 py-0.5"
+                value={localVal}
+                onChange={e => setLocalVal(e.target.value)}
+                onBlur={commit}
+                onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                        e.currentTarget.blur()
+                    }
+                }}
             />
         </td>
     )
 }
 
-/** Editable text cell */
-function EditTextCell({ value, onChange, className }: {
-    value: string
-    onChange: (val: string) => void
-    className?: string
-}) {
-    const [local, setLocal] = useState(value)
-
-    useEffect(() => { setLocal(value) }, [value])
-
-    const handleBlur = () => {
-        if (local !== value) onChange(local)
-    }
-
-    return (
-        <td className={cn("px-1 py-0.5 w-20", className)}>
-            <input
-                className="w-full bg-transparent outline-none text-[10px] font-mono px-1 py-0.5 rounded hover:ring-1 hover:ring-primary/30 focus:ring-1 focus:ring-primary/50 transition-all"
-                value={local}
-                onChange={(e) => setLocal(e.target.value)}
-                onBlur={handleBlur}
-                onClick={(e) => e.stopPropagation()}
-            />
-        </td>
-    )
+function EditNudoCell({ value, onChange, className }: { value?: number, onChange: (val: number) => void, className?: string }) {
+    return <EditNumCell value={value} onChange={onChange} className={className} />
 }

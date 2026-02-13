@@ -8,45 +8,45 @@ const problems = [
     title: "Lento y Tedioso",
     stat: "3-5 días",
     description: "Por cada red de distribución, perdiendo oportunidades de negocio y retrasando proyectos críticos",
-    color: "red" as const,
+    color: "slate" as const,
   },
   {
     icon: AlertTriangle,
     title: "Propenso a Errores",
     stat: "40% rechazos",
     description: "Municipalidades rechazan proyectos por errores de cálculo, incumplimiento normativo o documentación incompleta",
-    color: "amber" as const,
+    color: "blue" as const,
   },
   {
     icon: FileX,
     title: "Validación Compleja",
     stat: "8+ horas",
     description: "Verificar manualmente cumplimiento de RNE OS.050, RM 192-2018 y RM 107-2025 consume tiempo valioso",
-    color: "orange" as const,
+    color: "gray" as const,
   },
 ]
 
 const colorClasses = {
-  red: {
-    bg: "bg-red-500/5",
-    border: "border-red-500/20",
-    hover: "hover:bg-red-500/10 hover:border-red-500/30",
-    text: "text-red-400",
-    icon: "text-red-400",
+  slate: {
+    bg: "bg-slate-500/5",
+    border: "border-slate-500/20",
+    hover: "hover:bg-slate-500/10 hover:border-slate-500/30",
+    text: "text-slate-400",
+    icon: "text-slate-400",
   },
-  amber: {
-    bg: "bg-amber-500/5",
-    border: "border-amber-500/20",
-    hover: "hover:bg-amber-500/10 hover:border-amber-500/30",
-    text: "text-amber-400",
-    icon: "text-amber-400",
+  blue: {
+    bg: "bg-blue-500/5",
+    border: "border-blue-500/20",
+    hover: "hover:bg-blue-500/10 hover:border-blue-500/30",
+    text: "text-blue-400",
+    icon: "text-blue-400",
   },
-  orange: {
-    bg: "bg-orange-500/5",
-    border: "border-orange-500/20",
-    hover: "hover:bg-orange-500/10 hover:border-orange-500/30",
-    text: "text-orange-400",
-    icon: "text-orange-400",
+  gray: {
+    bg: "bg-gray-500/5",
+    border: "border-gray-500/20",
+    hover: "hover:bg-gray-500/10 hover:border-gray-500/30",
+    text: "text-gray-400",
+    icon: "text-gray-400",
   },
 }
 
@@ -56,12 +56,12 @@ export function ProblemSection() {
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="text-center mb-12 md:mb-16">
-            <Badge variant="outline" className="mb-4 border-red-500/30 text-red-400 bg-red-500/10">
+            <Badge variant="outline" className="mb-4 border-slate-500/30 text-slate-400 bg-slate-500/10">
               El Problema
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">
               El diseño manual de redes tiene{" "}
-              <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-slate-400 via-blue-400 to-slate-400 bg-clip-text text-transparent">
                 3 problemas críticos
               </span>
             </h2>
@@ -106,7 +106,7 @@ export function ProblemSection() {
           <div className="mt-12 p-6 md:p-8 rounded-2xl glass-card border border-border/20 text-center">
             <p className="text-sm text-muted-foreground mb-2">Impacto Económico Estimado</p>
             <p className="text-2xl md:text-3xl font-bold mb-2">
-              <span className="text-red-400">S/ 15,000 - S/ 25,000</span> perdidos por proyecto rechazado
+              <span className="text-blue-400">S/ 15,000 - S/ 25,000</span> perdidos por proyecto rechazado
             </p>
             <p className="text-xs text-muted-foreground/60">
               Entre retrabajos, tiempo perdido y oportunidades de negocio no aprovechadas

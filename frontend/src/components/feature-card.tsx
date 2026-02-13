@@ -8,51 +8,23 @@ interface FeatureCardProps {
     title: string
     description: string
     badges: string[]
-    color: "blue" | "green" | "purple" | "amber" | "cyan" | "red"
+    color: "blue" | "slate"
 }
 
 const colorMap = {
     blue: {
-        bg: "from-blue-500/20 to-cyan-400/20",
+        bg: "from-blue-500/20 to-blue-600/20",
         border: "group-hover:border-blue-500/30",
         badge: "border-blue-500/20 text-blue-400",
-        line: "from-blue-500 via-blue-400 to-cyan-400",
+        line: "from-blue-500 via-blue-400 to-blue-600",
         text: "group-hover:text-blue-400",
     },
-    green: {
-        bg: "from-green-500/20 to-emerald-400/20",
-        border: "group-hover:border-green-500/30",
-        badge: "border-green-500/20 text-green-400",
-        line: "from-green-500 via-green-400 to-emerald-400",
-        text: "group-hover:text-green-400",
-    },
-    purple: {
-        bg: "from-purple-500/20 to-pink-400/20",
-        border: "group-hover:border-purple-500/30",
-        badge: "border-purple-500/20 text-purple-400",
-        line: "from-purple-500 via-purple-400 to-pink-400",
-        text: "group-hover:text-purple-400",
-    },
-    amber: {
-        bg: "from-amber-500/20 to-yellow-400/20",
-        border: "group-hover:border-amber-500/30",
-        badge: "border-amber-500/20 text-amber-400",
-        line: "from-amber-500 via-amber-400 to-yellow-400",
-        text: "group-hover:text-amber-400",
-    },
-    cyan: {
-        bg: "from-cyan-500/20 to-sky-400/20",
-        border: "group-hover:border-cyan-500/30",
-        badge: "border-cyan-500/20 text-cyan-400",
-        line: "from-cyan-500 via-cyan-400 to-sky-400",
-        text: "group-hover:text-cyan-400",
-    },
-    red: {
-        bg: "from-red-500/20 to-rose-400/20",
-        border: "group-hover:border-red-500/30",
-        badge: "border-red-500/20 text-red-400",
-        line: "from-red-500 via-red-400 to-rose-400",
-        text: "group-hover:text-red-400",
+    slate: {
+        bg: "from-slate-500/20 to-slate-600/20",
+        border: "group-hover:border-slate-500/30",
+        badge: "border-slate-500/20 text-slate-400",
+        line: "from-slate-500 via-slate-400 to-slate-600",
+        text: "group-hover:text-slate-400",
     },
 }
 

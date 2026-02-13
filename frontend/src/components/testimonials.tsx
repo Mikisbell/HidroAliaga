@@ -43,7 +43,7 @@ const testimonials = [
 
 export function Testimonials() {
     return (
-        <section className="relative z-10 px-6 md:px-12 py-24 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
+        <section className="relative z-10 px-6 md:px-12 py-24 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent">
             <div className="max-w-6xl mx-auto">
                 <ScrollReveal>
                     <div className="text-center mb-16">
@@ -88,7 +88,7 @@ export function Testimonials() {
                                 
                                 {/* Author */}
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-semibold" aria-hidden="true">
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold" aria-hidden="true">
                                         {testimonial.avatar}
                                     </div>
                                     <div>
