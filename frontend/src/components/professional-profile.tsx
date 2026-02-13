@@ -17,25 +17,25 @@ import {
 
 const experiences = [
     {
+        role: "Docente Ordinario Auxiliar",
+        company: "Universidad Nacional Autónoma de Tayacaja Daniel Hernández Morillo",
+        period: "2024 - Presente",
+        description: "Docencia en ingeniería civil con especialización en sistemas hidráulicos. Desarrollo de Hidroaliaga, software profesional para diseño de redes de agua potable.",
+        skills: ["Docencia", "Diseño Hidráulico", "RNE OS.050", "Hardy Cross"]
+    },
+    {
+        role: "Asesor y Jurado de Tesis",
+        company: "Universidad Continental - Facultad de Ingeniería",
+        period: "2023 - Presente",
+        description: "Asesoría y evaluación de tesis de grado en ingeniería civil, con enfoque en proyectos de infraestructura hidráulica y saneamiento.",
+        skills: ["Asesoría Académica", "Investigación", "Evaluación"]
+    },
+    {
         role: "Ingeniero Civil - Especialista Hidráulico",
         company: "Consultora Independiente",
         period: "2018 - Presente",
-        description: "Diseño y supervisión de proyectos de infraestructura hidráulica. Desarrollo de Hidroaliaga.",
-        skills: ["Diseño Hidráulico", "RNE OS.050", "Hardy Cross", "EPANET"]
-    },
-    {
-        role: "Jefe de Proyectos",
-        company: "Constructora Andina S.A.C.",
-        period: "2015 - 2018",
-        description: "Liderazgo de equipos multidisciplinarios en proyectos de agua potable y saneamiento.",
-        skills: ["Gestión de Proyectos", "Equipos", "Supervisión"]
-    },
-    {
-        role: "Ingeniero de Proyectos",
-        company: "Ingeniería San Marcos E.I.R.L.",
-        period: "2012 - 2015",
-        description: "Elaboración de expedientes técnicos y cálculos hidráulicos para sistemas de agua.",
-        skills: ["Expedientes", "Cálculos", "Normativa"]
+        description: "Diseño y supervisión de proyectos de infraestructura hidráulica en 15 departamentos del Perú. Más de 80 proyectos completados.",
+        skills: ["Diseño Hidráulico", "EPANET", "Gestión de Proyectos", "Normativa"]
     }
 ]
 
@@ -79,11 +79,11 @@ export function ProfessionalProfile() {
                                 {/* Avatar */}
                                 <div className="relative -mt-24 md:-mt-28">
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-1">
-                                        <div className="w-full h-full rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-4xl md:text-5xl font-bold text-white">
-                                            JA
+                                        <div className="w-full h-full rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-3xl md:text-4xl font-bold text-white">
+                                            AAC
                                         </div>
                                     </div>
-                                    <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900"></div>
+                                    <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-slate-900" aria-label="Disponible"></div>
                                 </div>
                                 
                                 {/* Info */}
@@ -91,17 +91,17 @@ export function ProfessionalProfile() {
                                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                         <div>
                                             <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
-                                                Jhonatan Aliaga
+                                                Aron Jhonatan Aliaga Contreras
                                             </h1>
-                                            <p className="text-lg text-purple-300 mb-2">Ingeniero Civil | Especialista en Sistemas Hidráulicos</p>
+                                            <p className="text-lg text-purple-300 mb-2">Ingeniero Civil | Especialista en Sistemas Hidráulicos | Docente Universitario</p>
                                             <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
                                                 <span className="flex items-center gap-1">
-                                                    <MapPin className="w-4 h-4" />
-                                                    Lima, Perú
+                                                    <MapPin className="w-4 h-4" aria-hidden="true" />
+                                                    Huancayo, Junín, Perú
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <Users className="w-4 h-4" />
-                                                    500+ conexiones
+                                                    <Users className="w-4 h-4" aria-hidden="true" />
+                                                    300+ usuarios Hidroaliaga
                                                 </span>
                                                 <Badge variant="outline" className="border-green-500/30 text-green-400 bg-green-500/10">
                                                     Disponible para proyectos
@@ -111,16 +111,20 @@ export function ProfessionalProfile() {
                                         
                                         {/* Action Buttons */}
                                         <div className="flex flex-wrap gap-2">
-                                            <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white border-0">
-                                                <Mail className="w-4 h-4 mr-2" />
-                                                Contactar
-                                            </Button>
+                                            <a href="mailto:aaliagacontreras@gmail.com">
+                                                <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white border-0">
+                                                    <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
+                                                    Contactar
+                                                </Button>
+                                            </a>
+                                            <a href="https://orcid.org/0000-0002-5789-1946" target="_blank" rel="noopener noreferrer">
+                                                <Button variant="outline" className="border-purple-500/30 hover:bg-purple-500/10">
+                                                    <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" />
+                                                    ORCID
+                                                </Button>
+                                            </a>
                                             <Button variant="outline" className="border-purple-500/30 hover:bg-purple-500/10">
-                                                <Linkedin className="w-4 h-4 mr-2" />
-                                                LinkedIn
-                                            </Button>
-                                            <Button variant="outline" className="border-purple-500/30 hover:bg-purple-500/10">
-                                                <Download className="w-4 h-4 mr-2" />
+                                                <Download className="w-4 h-4 mr-2" aria-hidden="true" />
                                                 CV
                                             </Button>
                                         </div>
@@ -129,7 +133,7 @@ export function ProfessionalProfile() {
                                     {/* Stats */}
                                     <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-700/50">
                                         <div className="text-center">
-                                            <p className="text-2xl font-bold text-purple-400">12+</p>
+                                            <p className="text-2xl font-bold text-purple-400">6+</p>
                                             <p className="text-xs text-slate-400">Años Exp.</p>
                                         </div>
                                         <div className="text-center border-x border-slate-700/50">
@@ -138,7 +142,7 @@ export function ProfessionalProfile() {
                                         </div>
                                         <div className="text-center">
                                             <p className="text-2xl font-bold text-violet-400">300+</p>
-                                            <p className="text-xs text-slate-400">Clientes</p>
+                                            <p className="text-xs text-slate-400">Usuarios</p>
                                         </div>
                                     </div>
                                 </div>
@@ -160,20 +164,21 @@ export function ProfessionalProfile() {
                                 </h2>
                                 <div className="space-y-3 text-slate-300 leading-relaxed">
                                     <p>
-                                        Ingeniero Civil con más de 12 años de experiencia especializado en diseño, 
-                                        análisis y optimización de sistemas de agua potable y saneamiento. Fundador 
-                                        de <strong className="text-purple-400">Hidroaliaga</strong>, software profesional 
-                                        utilizado por más de 300 ingenieros en todo el Perú.
+                                        Ingeniero Civil y Docente Universitario con experiencia en diseño, análisis y 
+                                        optimización de sistemas de agua potable y saneamiento. Actualmente Docente Ordinario 
+                                        Auxiliar en la Universidad Nacional Autónoma de Tayacaja Daniel Hernández Morillo y 
+                                        Asesor de Tesis en la Universidad Continental.
                                     </p>
                                     <p>
-                                        Experto en normativa peruana (RNE OS.050, RM 192-2018, RM 107-2025) y metodologías 
-                                        de cálculo hidráulico avanzadas incluyendo Hardy Cross, Hazen-Williams y algoritmos 
-                                        genéticos de optimización.
+                                        Fundador de <strong className="text-purple-400">Hidroaliaga</strong>, software profesional 
+                                        utilizado por más de 300 ingenieros en todo el Perú. Experto en normativa peruana 
+                                        (RNE OS.050, RM 192-2018, RM 107-2025) y metodologías de cálculo hidráulico avanzadas 
+                                        incluyendo Hardy Cross, Hazen-Williams y algoritmos genéticos de optimización.
                                     </p>
                                     <p>
                                         He liderado proyectos de infraestructura hídrica en 15 departamentos del Perú, 
                                         beneficiando a más de 50,000 habitantes con sistemas de agua potable diseñados 
-                                        bajo los más altos estándares técnicos.
+                                        bajo los más altos estándares técnicos y académicos.
                                     </p>
                                 </div>
                                 

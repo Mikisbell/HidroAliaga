@@ -75,8 +75,8 @@ export function ModernFooter() {
                                     ¿Listo para tu próximo proyecto?
                                 </h2>
                                 <p className="text-slate-400 mb-6">
-                                    Agenda una consulta gratuita y descubre cómo puedo ayudarte 
-                                    con tu proyecto de ingeniería hidráulica.
+                                    Agenda una consulta gratuita con Aron Jhonatan Aliaga Contreras y descubre cómo 
+                                    puedo ayudarte con tu proyecto de ingeniería hidráulica.
                                 </p>
                                 <div className="flex flex-wrap gap-3">
                                     <Button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white border-0">
@@ -98,14 +98,14 @@ export function ModernFooter() {
                                     <p className="font-semibold text-slate-200">+51 999 888 777</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-pink-500/30 transition-colors">
-                                    <Mail className="w-8 h-8 text-pink-400 mb-3" />
+                                    <Mail className="w-8 h-8 text-pink-400 mb-3" aria-hidden="true" />
                                     <p className="text-xs text-slate-500 mb-1">Email</p>
-                                    <p className="font-semibold text-slate-200 text-sm">jhonatan@hidroaliaga.com</p>
+                                    <p className="font-semibold text-slate-200 text-sm">aaliagacontreras@gmail.com</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-colors">
-                                    <MapPin className="w-8 h-8 text-violet-400 mb-3" />
+                                    <MapPin className="w-8 h-8 text-violet-400 mb-3" aria-hidden="true" />
                                     <p className="text-xs text-slate-500 mb-1">Ubicación</p>
-                                    <p className="font-semibold text-slate-200">Lima, Perú</p>
+                                    <p className="font-semibold text-slate-200">Huancayo, Junín, Perú</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors">
                                     <div className="flex items-center gap-2 mb-3">
@@ -200,14 +200,14 @@ export function ModernFooter() {
             <div className="px-6 md:px-12 py-6 bg-slate-950 border-t border-slate-800/50">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-slate-600 text-center md:text-left">
-                        © 2026 Hidroaliaga by Jhonatan Aliaga. Todos los derechos reservados.
+                        © 2026 Hidroaliaga by Aron Jhonatan Aliaga Contreras. Todos los derechos reservados.
                         <span className="hidden md:inline mx-2">|</span>
                         <br className="md:hidden" />
                         RNE OS.050 · RM 192-2018 · RM 107-2025
                     </p>
                     
                     <p className="text-xs text-slate-600 flex items-center gap-1">
-                        Hecho con <Heart className="w-3 h-3 text-pink-500 fill-pink-500" /> en Lima, Perú
+                        Hecho con <Heart className="w-3 h-3 text-pink-500 fill-pink-500" aria-hidden="true" /> en Huancayo, Perú
                     </p>
                 </div>
             </div>

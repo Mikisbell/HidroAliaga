@@ -27,9 +27,9 @@ const benefits = [
 ]
 
 const stats = [
-    { icon: Briefcase, value: "12+", label: "Años de Experiencia", color: "text-orange-400" },
+    { icon: Briefcase, value: "6+", label: "Años de Experiencia", color: "text-orange-400" },
     { icon: Award, value: "80+", label: "Proyectos Exitosos", color: "text-pink-400" },
-    { icon: Users, value: "300+", label: "Clientes Satisfechos", color: "text-violet-400" },
+    { icon: Users, value: "300+", label: "Usuarios Hidroaliaga", color: "text-violet-400" },
     { icon: CheckCircle2, value: "100%", label: "Cumplimiento RNE", color: "text-green-400" },
 ]
 
@@ -52,7 +52,7 @@ export function ElegantContact() {
                             Trabajemos <span className="bg-gradient-to-r from-orange-400 via-pink-400 to-violet-400 bg-clip-text text-transparent">juntos</span>
                         </h2>
                         <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-                            Con más de 12 años de experiencia en ingeniería hidráulica, estoy listo 
+                            Con experiencia académica y profesional en ingeniería hidráulica, estoy listo 
                             para ayudarte a hacer realidad tu próximo proyecto.
                         </p>
                     </div>
@@ -90,7 +90,7 @@ export function ElegantContact() {
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-1">Email</p>
-                                            <p className="font-medium text-slate-200">jhonata@hidroaliaga.com</p>
+                                            <p className="font-medium text-slate-200">aaliagacontreras@gmail.com</p>
                                             <p className="text-xs text-slate-500 mt-1">Respuesta en 24h</p>
                                         </div>
                                     </div>
@@ -112,7 +112,7 @@ export function ElegantContact() {
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-1">Ubicación</p>
-                                            <p className="font-medium text-slate-200">Lima, Perú</p>
+                                            <p className="font-medium text-slate-200">Huancayo, Junín, Perú</p>
                                             <p className="text-xs text-slate-500 mt-1">Atención nacional</p>
                                         </div>
                                     </div>
