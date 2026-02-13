@@ -164,16 +164,16 @@ function PipeEdgeComponent({
                           |           <-- Gap for line (transparent)
                       [Households]    <-- Below
                     */}
-                    <div className="flex flex-col items-center select-none gap-2"> {/* gap-2 ensures space for the line */}
+                    <div className="flex flex-col items-center select-none gap-3"> {/* gap-2 ensures space for the line */}
 
                         {/* --- TOP: Length Label --- */}
                         {isEditing ? (
                             <div className="flex items-center gap-1 bg-background border border-blue-500 rounded p-0.5 shadow-lg scale-110 origin-center mb-1">
-                                <span className="text-[8px] font-mono text-muted-foreground pl-1">L=</span>
+                                <span className="text-[7px] font-mono text-muted-foreground pl-1">L=</span>
                                 <input
                                     ref={inputRef}
                                     type="number"
-                                    className="w-14 h-4 text-[8px] font-bold bg-transparent outline-none"
+                                    className="w-14 h-4 text-[7px] font-bold bg-transparent outline-none"
                                     value={editValue}
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onKeyDown={handleKeyDown}
@@ -193,7 +193,7 @@ function PipeEdgeComponent({
                                     onClick={() => setIsEditing(true)}
                                     title="Longitud (m) - Clic para editar"
                                 >
-                                    <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[8px] font-bold font-mono whitespace-nowrap text-foreground/80">
+                                    <span style={{ textShadow: '0px 0px 3px rgba(255,255,255,0.8)' }} className="text-[7px] font-bold font-mono whitespace-nowrap text-foreground/80">
                                         L={longitud?.toFixed(1) || '0.0'}m
                                     </span>
                                 </div>
@@ -204,7 +204,7 @@ function PipeEdgeComponent({
 
                         {/* --- BOTTOM: Household Count & Result --- */}
                         <div
-                            className="bg-purple-50/80 border border-purple-200/50 rounded px-1 min-w-[20px] text-center cursor-pointer hover:bg-purple-100 transition-colors shadow-sm backdrop-blur-[1px]"
+                            className="bg-transparent px-1 min-w-[20px] text-center cursor-pointer hover:bg-purple-50/50 transition-colors"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const current = typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0;
@@ -222,7 +222,7 @@ function PipeEdgeComponent({
                             }}
                             title="Viviendas abastecidas (Clic para editar)"
                         >
-                            <span className="text-[8px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
+                            <span className="text-[7px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
                         </div>
 
                         {/* Simulation Result (If exists, place it below households or alongside?) */}
