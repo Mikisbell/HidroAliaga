@@ -15,7 +15,7 @@ interface FlowParticle {
 export function HydraulicFlowAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<FlowParticle[]>([])
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current

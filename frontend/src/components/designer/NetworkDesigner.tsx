@@ -385,7 +385,7 @@ export default function NetworkDesigner({
             try {
                 // Use optimistic temporary handling or await server?
                 // Awaiting server ensures ID consistency.
-                const { success, nudo, error } = await createNudo(
+                const { success, nudo } = await createNudo(
                     currentProj.id,
                     position.x,
                     position.y,
@@ -397,7 +397,7 @@ export default function NetworkDesigner({
                     useProjectStore.getState().addNudo(nudo)
                     toast.success("Nudo creado")
                 } else {
-                    toast.error("Error creating node: " + error)
+                    toast.error("Error creating node")
                 }
 
             } catch (e) {
@@ -410,7 +410,7 @@ export default function NetworkDesigner({
                 setActiveComponentType(null)
             }, 100)
         },
-        [onAddNode, setActiveTool, setActiveComponentType, currentProject]
+        [onAddNode, setActiveTool, setActiveComponentType]
     )
 
     // ========== PANE CLICK ==========

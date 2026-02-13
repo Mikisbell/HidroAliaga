@@ -16,7 +16,7 @@ interface WaterParticle {
 export function WaterParticlesCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<WaterParticle[]>([])
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -71,7 +71,7 @@ export function WaterParticlesCanvas() {
         // Draw particle (water droplet)
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-        
+
         // Use OKLCH colors from domain (blue 230°, cyan 200°) with higher opacity
         const hue = Math.random() > 0.5 ? 230 : 200
         ctx.fillStyle = `oklch(0.75 0.08 ${hue} / ${particle.opacity * 1.5})`
