@@ -71,7 +71,7 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
                 <div className="absolute pointer-events-none whitespace-nowrap"
                     style={{ left: CIRCLE_SIZE + 1, top: CIRCLE_SIZE / 2 - 5 }}>
-                    <span className="text-[7px] font-mono text-gray-500">
+                    <span className="text-[7px] font-mono text-emerald-700 dark:text-emerald-400">
                         {data.cota_terreno}
                     </span>
                 </div>

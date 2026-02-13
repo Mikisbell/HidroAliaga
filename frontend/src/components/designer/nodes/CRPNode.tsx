@@ -63,7 +63,7 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
             {data.cota_terreno !== undefined && data.cota_terreno !== 0 && (
                 <div className="absolute pointer-events-none whitespace-nowrap"
                     style={{ left: SIZE + 1, top: SIZE / 2 - 5 }}>
-                    <span className="text-[7px] font-mono text-amber-600">
+                    <span className="text-[7px] font-mono text-amber-700">
                         {data.cota_terreno}
                     </span>
                 </div>
