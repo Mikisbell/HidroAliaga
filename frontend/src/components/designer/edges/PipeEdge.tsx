@@ -222,7 +222,7 @@ function PipeEdgeComponent({
                             }}
                             title="Viviendas abastecidas (Clic para editar)"
                         >
-                            <span className="text-[9px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
+                            <span className="text-[8px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
                         </div>
 
                         {/* Simulation Result (If exists, place it below households or alongside?) */}
