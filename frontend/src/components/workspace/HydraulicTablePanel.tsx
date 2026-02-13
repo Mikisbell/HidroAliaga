@@ -294,29 +294,36 @@ export function HydraulicTablePanel() {
             if (!qDesignMap.has(t.id)) computeQDownstream(t.id, new Set())
         }
 
-        // Topological ordering for Cpi/CPf
+        // Topological ordering for Cpi/CPf (DFS for better branch grouping)
         const orderedTramos: Tramo[] = []
-        const visitedNodes = new Set<string>()
-        const queue: string[] = []
+        const visitedTramos = new Set<string>()
 
-        for (const res of reservoirs) {
-            queue.push(res.id)
-            visitedNodes.add(res.id)
-        }
-
-        while (queue.length > 0) {
-            const nodeId = queue.shift()!
+        // Helper for DFS traversal
+        function visitNode(nodeId: string) {
             const out = outgoing.get(nodeId) || []
+
+            // Sort outgoing: Prioritize largest diameter or just generic order
+            // For now, let's stick to insertion order, which usually respects creation time
+
             for (const t of out) {
+                if (visitedTramos.has(t.id)) continue
+
+                visitedTramos.add(t.id)
                 orderedTramos.push(t)
-                if (!visitedNodes.has(t.nudo_destino_id)) {
-                    visitedNodes.add(t.nudo_destino_id)
-                    queue.push(t.nudo_destino_id)
-                }
+
+                // Recurse immediately (Depth-First)
+                visitNode(t.nudo_destino_id)
             }
         }
+
+        // Start from reservoirs
+        for (const res of reservoirs) {
+            visitNode(res.id)
+        }
+
+        // Add any disconnected/cyclic tramos that weren't visited
         for (const t of tramos) {
-            if (!orderedTramos.find(ot => ot.id === t.id)) orderedTramos.push(t)
+            if (!visitedTramos.has(t.id)) orderedTramos.push(t)
         }
 
         // Calculations
