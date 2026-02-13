@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { loginAs, TEST_USERS, goToProject, openDesignerTab as helperOpenDesignerTab } from './helpers';
 
 /**
  * Diseñador de Red — End-to-End Test
@@ -8,49 +9,9 @@ test.describe('Diseñador de Red', () => {
     test.setTimeout(90000);
 
     test.beforeEach(async ({ page }) => {
-        // Login
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'admin@hidroaliaga.com');
-        await page.fill('input[type="password"]', 'admin123');
-        await page.click('button[type="submit"]');
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
-
-        // Navigate to existing project via sidebar link with UUID pattern
-        // Sidebar has links like /proyectos/0e9f25ef-e302-4773-bf4e-8920f2bb4155
-        const projectLink = page.locator('a[href*="/proyectos/"]')
-            .filter({ hasNot: page.locator(':text("nuevo")') })
-            .filter({ hasNot: page.locator(':text("Ver todos")') })
-            .filter({ hasNot: page.locator(':text("Proyectos")') })
-            .first();
-
-        // Wait for sidebar to populate
-        await page.waitForTimeout(2000);
-
-        // Direct approach: use goto with the first project UUID we know exists
-        const links = page.locator('a[href^="/proyectos/"]');
-        const allHrefs: string[] = [];
-        const count = await links.count();
-        for (let i = 0; i < count; i++) {
-            const href = await links.nth(i).getAttribute('href');
-            if (href && href.match(/\/proyectos\/[0-9a-f]{8}-/)) {
-                allHrefs.push(href);
-                break;
-            }
-        }
-
-        if (allHrefs.length > 0) {
-            await page.goto(allHrefs[0]);
-        } else {
-            // Absolute fallback: create a project
-            await page.goto('/proyectos/nuevo');
-            await page.fill('input[placeholder*="Red de Agua"]', `Test ${Date.now()}`);
-            await page.fill('input[id="poblacion_diseno"], input[aria-label*="Población"]', '200');
-            await page.click('button:has-text("Crear Proyecto")');
-            await page.waitForURL(/\/proyectos\/[0-9a-f]{8}-/, { timeout: 30000 });
-        }
-
-        await page.waitForURL(/\/proyectos\/[0-9a-f]{8}-/, { timeout: 15000 });
-        await page.waitForLoadState('networkidle');
+        // Login and navigate to project
+        await loginAs(page, TEST_USERS.admin);
+        await goToProject(page);
     });
 
     async function openDesignerTab(page: Page) {

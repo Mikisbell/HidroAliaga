@@ -1,5 +1,6 @@
 
 import { test, expect } from '@playwright/test';
+import { loginAs, TEST_USERS, goToProject } from './helpers';
 import path from 'path';
 
 test.describe('Smoke Test: Critical Path', () => {
@@ -8,11 +9,7 @@ test.describe('Smoke Test: Critical Path', () => {
         test.setTimeout(60000); // 1 minute timeout for smoke test
 
         // 1. Login
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'admin@hidroaliaga.com');
-        await page.fill('input[type="password"]', 'admin123'); // Default dev password
-        await page.click('button[type="submit"]');
-        await page.waitForURL('/dashboard');
+        await loginAs(page, TEST_USERS.admin);
 
         // 2. Create New Project
         await page.goto('/proyectos/nuevo');

@@ -7,6 +7,8 @@ import path from 'path';
  */
 export default defineConfig({
     testDir: './tests/e2e',
+    /* Global setup to create test users */
+    globalSetup: require.resolve('./tests/e2e/setup-users.ts'),
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */

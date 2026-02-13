@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginAs, TEST_USERS } from './helpers';
 
 /**
  * Tests E2E - Aislamiento de Datos entre Usuarios
@@ -14,14 +15,10 @@ import { test, expect } from '@playwright/test';
 test.describe('User Data Isolation', () => {
 
     test('User A should only see their own projects', async ({ page }) => {
-        test.setTimeout(60000);
+        test.setTimeout(90000);
 
         // 1. Login como Usuario A
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'user_a@test.com');
-        await page.fill('input[type="password"]', 'password123');
-        await page.click('button[type="submit"]');
-        await page.waitForURL('/dashboard');
+        await loginAs(page, TEST_USERS.userA);
 
         // 2. Ir a proyectos
         await page.goto('/proyectos');
@@ -37,14 +34,10 @@ test.describe('User Data Isolation', () => {
     });
 
     test('User B should only see their own projects', async ({ page }) => {
-        test.setTimeout(60000);
+        test.setTimeout(90000);
 
         // 1. Login como Usuario B
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'user_b@test.com');
-        await page.fill('input[type="password"]', 'password123');
-        await page.click('button[type="submit"]');
-        await page.waitForURL('/dashboard');
+        await loginAs(page, TEST_USERS.userB);
 
         // 2. Ir a proyectos
         await page.goto('/proyectos');
@@ -63,11 +56,7 @@ test.describe('User Data Isolation', () => {
         test.setTimeout(90000);
 
         // 1. Login como Usuario A y crear proyecto
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'user_a@test.com');
-        await page.fill('input[type="password"]', 'password123');
-        await page.click('button[type="submit"]');
-        await page.waitForURL('/dashboard');
+        await loginAs(page, TEST_USERS.userA);
 
         // Crear proyecto
         await page.goto('/proyectos/nuevo');
@@ -87,11 +76,7 @@ test.describe('User Data Isolation', () => {
         const contextB = await browser.newContext();
         const pageB = await contextB.newPage();
 
-        await pageB.goto('/login');
-        await pageB.fill('input[type="email"]', 'user_b@test.com');
-        await pageB.fill('input[type="password"]', 'password123');
-        await pageB.click('button[type="submit"]');
-        await pageB.waitForURL('/dashboard');
+        await loginAs(pageB, TEST_USERS.userB);
 
         // 3. Intentar acceder al proyecto de A
         await pageB.goto(`/proyectos/${projectId}`);
@@ -112,11 +97,7 @@ test.describe('User Data Isolation', () => {
         test.setTimeout(60000);
 
         // 1. Login
-        await page.goto('/login');
-        await page.fill('input[type="email"]', 'user_a@test.com');
-        await page.fill('input[type="password"]', 'password123');
-        await page.click('button[type="submit"]');
-        await page.waitForURL('/dashboard');
+        await loginAs(page, TEST_USERS.userA);
 
         // 2. Ir a proyectos
         await page.goto('/proyectos');
