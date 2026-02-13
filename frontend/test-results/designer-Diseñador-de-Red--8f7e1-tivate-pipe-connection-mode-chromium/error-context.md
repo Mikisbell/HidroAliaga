@@ -1,0 +1,87 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e10]: H
+        - generic [ref=e12]:
+          - paragraph [ref=e13]: Hidroaliaga
+          - paragraph [ref=e14]: by Jhonatan Aliaga
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Plataforma Activa — v0.1.0
+          - heading "Diseño de redes de agua potable con precisión normativa" [level=1] [ref=e19]:
+            - text: Diseño de redes
+            - text: de agua potable con
+            - text: precisión normativa
+          - paragraph [ref=e20]: Motor hidráulico Hardy Cross, validación automatizada conforme al RNE OS.050 y optimización por algoritmo genético.
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: ⚡
+            - generic [ref=e24]:
+              - paragraph [ref=e25]: Hardy Cross
+              - paragraph [ref=e26]: Hazen-Williams N=1.852
+          - generic [ref=e27]:
+            - generic [ref=e28]: 🗺️
+            - generic [ref=e29]:
+              - paragraph [ref=e30]: GIS + DEM
+              - paragraph [ref=e31]: Cotas automáticas
+          - generic [ref=e32]:
+            - generic [ref=e33]: 📋
+            - generic [ref=e34]:
+              - paragraph [ref=e35]: RNE OS.050
+              - paragraph [ref=e36]: Validación normativa
+          - generic [ref=e37]:
+            - generic [ref=e38]: 🧬
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: IA Optimizer
+              - paragraph [ref=e41]: Algoritmo genético
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: OS.050
+          - generic [ref=e45]: RM 192-2018
+          - generic [ref=e46]: RM 107-2025
+        - paragraph [ref=e47]: © 2026 Hidroaliaga — by Jhonatan Aliaga
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "Bienvenido de vuelta" [level=2] [ref=e52]
+        - paragraph [ref=e53]: Ingresa tus credenciales para acceder al sistema
+      - button "Google Continuar con Google" [ref=e54]:
+        - img "Google" [ref=e55]
+        - generic [ref=e56]: Continuar con Google
+      - generic [ref=e59]: O usa tu correo
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - text: Email
+          - textbox "admin@hidroaliaga.com" [ref=e63]
+        - generic [ref=e64]:
+          - text: Contraseña
+          - generic [ref=e65]:
+            - textbox "••••••••" [ref=e66]: admin123
+            - button "👁️" [ref=e67]
+        - button "Ingresar al Sistema →" [ref=e68]:
+          - generic [ref=e70]:
+            - text: Ingresar al Sistema
+            - generic [ref=e71]: →
+      - generic [ref=e74]: ¿No tienes cuenta?
+      - button "Crear una cuenta nueva" [ref=e76]
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: OS.050·
+          - generic [ref=e80]: RM 192·
+          - generic [ref=e81]: RM 107
+        - paragraph [ref=e82]: Reglamento Nacional de Edificaciones — Perú
+        - link "← Volver al inicio" [ref=e84] [cursor=pointer]:
+          - /url: /
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
+    - generic [ref=e93]:
+      - text: Compiling
+      - generic [ref=e94]:
+        - generic [ref=e95]: .
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+  - alert [ref=e98]
+```

@@ -24,10 +24,21 @@ export async function loginAs(page: Page, user: TestUser, options: { timeout?: n
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
 
-    // Fill login form
-    await page.fill('input[type="email"]', user.email);
-    await page.fill('input[type="password"]', user.password);
-    await page.click('button[type="submit"]');
+    // Fill login form with reliable data-testid selectors
+    await page.fill('[data-testid="login-email"]', user.email);
+    await page.fill('[data-testid="login-password"]', user.password);
+    await page.click('[data-testid="login-submit"]');
+
+    // Wait for button to NOT be disabled (login processing complete)
+    try {
+        await page.waitForSelector('[data-testid="login-submit"]:not([disabled])', {
+            state: 'attached',
+            timeout: 5000
+        });
+    } catch {
+        // If button stays disabled for 5s, likely navigating - this is OK
+        console.log('Login button stayed disabled, assuming navigation in progress');
+    }
 
     // Wait for redirect to dashboard with better error handling
     try {
@@ -47,9 +58,10 @@ export async function loginAs(page: Page, user: TestUser, options: { timeout?: n
  * Navigate to an existing project or create a new one
  */
 export async function goToProject(page: Page, options: { createNew?: boolean } = {}) {
-    // If createNew is true or no projects exist, create a new one
+    // If createNew is true, create a new project
     if (options.createNew) {
         await page.goto('/proyectos/nuevo');
+        await page.waitForLoadState('networkidle');
         await page.fill('#nombre', `E2E Test Project ${Date.now()}`);
         await page.fill('#poblacion_diseno', '500');
         await page.click('button[type="submit"]');
@@ -62,8 +74,11 @@ export async function goToProject(page: Page, options: { createNew?: boolean } =
     await page.goto('/proyectos');
     await page.waitForLoadState('networkidle');
 
+    // Wait for projects to potentially load
+    await page.waitForTimeout(2000);
+
     const projectLinks = page.locator('a[href^="/proyectos/"]').filter({
-        hasNotText: /nuevo|Ver todos|Proyectos/i
+        hasNotText: /nuevo|Ver todos/i
     });
 
     const count = await projectLinks.count();

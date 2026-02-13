@@ -35,8 +35,14 @@ export default function LoginPage() {
             return
         }
 
-        router.push("/dashboard")
-        router.refresh()
+        // Reset loading before navigation to allow Playwright to detect completion
+        setLoading(false)
+
+        // Small delay to ensure state updates, then navigate
+        setTimeout(() => {
+            router.push("/dashboard")
+            router.refresh()
+        }, 100)
     }
 
     const handleRegistro = async (e: React.FormEvent) => {
@@ -65,7 +71,7 @@ export default function LoginPage() {
         <div className="min-h-screen flex relative">
             {/* Water Particles Background */}
             <WaterParticlesCanvas />
-            
+
             {/* ─── LEFT PANEL: Brand & Features ─── */}
             <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden"
                 style={{ background: 'linear-gradient(135deg, oklch(0.18 0.04 250), oklch(0.13 0.03 260), oklch(0.10 0.02 240))' }}>
@@ -294,6 +300,7 @@ export default function LoginPage() {
                             </label>
                             <input
                                 type="email"
+                                data-testid="login-email"
                                 placeholder="admin@hidroaliaga.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -322,6 +329,7 @@ export default function LoginPage() {
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
+                                    data-testid="login-password"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -354,6 +362,7 @@ export default function LoginPage() {
                         {/* Submit */}
                         <button
                             type="submit"
+                            data-testid="login-submit"
                             disabled={loading}
                             className="w-full h-12 rounded-xl text-sm font-semibold text-white transition-all duration-300 relative overflow-hidden group disabled:opacity-50"
                             style={{

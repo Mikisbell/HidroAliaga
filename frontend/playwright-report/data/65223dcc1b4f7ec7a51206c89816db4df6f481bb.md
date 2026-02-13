@@ -1,0 +1,104 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - navigation [ref=e7]:
+            - button "previous" [disabled] [ref=e8]:
+              - img "previous" [ref=e9]
+            - generic [ref=e11]:
+              - generic [ref=e12]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e13]:
+              - img "next" [ref=e14]
+          - img
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - img [ref=e18]
+            - generic "Latest available version is detected (16.1.6)." [ref=e20]: Next.js 16.1.6
+            - generic [ref=e21]: Webpack
+          - img
+      - dialog "Runtime ReferenceError" [ref=e23]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e30]: Runtime ReferenceError
+              - generic [ref=e31]:
+                - button "Copy Error Info" [ref=e32] [cursor=pointer]:
+                  - img [ref=e33]
+                - button "No related documentation found" [disabled] [ref=e35]:
+                  - img [ref=e36]
+                - button "Attach Node.js inspector" [ref=e38] [cursor=pointer]:
+                  - img [ref=e39]
+            - generic [ref=e48]: currentProject is not defined
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - paragraph [ref=e52]:
+                - img [ref=e54]
+                - generic [ref=e57]: src\components\designer\NetworkDesigner.tsx (413:60) @ NetworkDesigner
+                - button "Open in editor" [ref=e58] [cursor=pointer]:
+                  - img [ref=e60]
+              - generic [ref=e63]:
+                - generic [ref=e64]: "411 | }, 100)"
+                - generic [ref=e65]: "412 | },"
+                - generic [ref=e66]: "> 413 | [onAddNode, setActiveTool, setActiveComponentType, currentProject]"
+                - generic [ref=e67]: "| ^"
+                - generic [ref=e68]: 414 | )
+                - generic [ref=e69]: 415 |
+                - generic [ref=e70]: 416 | // ========== PANE CLICK ==========
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - paragraph [ref=e73]:
+                  - text: Call Stack
+                  - generic [ref=e74]: "17"
+                - button "Show 12 ignore-listed frame(s)" [ref=e75] [cursor=pointer]:
+                  - text: Show 12 ignore-listed frame(s)
+                  - img [ref=e76]
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - text: NetworkDesigner
+                  - button "Open NetworkDesigner in editor" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                - text: src\components\designer\NetworkDesigner.tsx (413:60)
+              - generic [ref=e83]:
+                - generic [ref=e84]:
+                  - text: WorkspaceSplitView
+                  - button "Open WorkspaceSplitView in editor" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                - text: src\components\workspace\WorkspaceSplitView.tsx (76:21)
+              - generic [ref=e88]:
+                - generic [ref=e89]:
+                  - text: DesignerWrapper
+                  - button "Open DesignerWrapper in editor" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                - text: src\components\designer\DesignerWrapper.tsx (148:17)
+              - generic [ref=e93]:
+                - generic [ref=e94]:
+                  - text: ProjectDataPanel
+                  - button "Open ProjectDataPanel in editor" [ref=e95] [cursor=pointer]:
+                    - img [ref=e96]
+                - text: src\components\proyecto\ProjectDataPanel.tsx (48:21)
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - text: ProyectoPage
+                  - button "Open ProyectoPage in editor" [ref=e100] [cursor=pointer]:
+                    - img [ref=e101]
+                - text: src\app\(dashboard)\proyectos\[id]\page.tsx (155:17)
+        - generic [ref=e103]: "1"
+        - generic [ref=e104]: "2"
+    - generic [ref=e109] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e110]:
+        - img [ref=e111]
+      - generic [ref=e114]:
+        - button "Open issues overlay" [ref=e115]:
+          - generic [ref=e116]:
+            - generic [ref=e117]: "0"
+            - generic [ref=e118]: "1"
+          - generic [ref=e119]: Issue
+        - button "Collapse issues badge" [ref=e120]:
+          - img [ref=e121]
+  - 'heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2] [ref=e125]'
+```
