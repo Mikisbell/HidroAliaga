@@ -48,6 +48,7 @@ interface ProjectState {
     removeNudo: (id: string) => void;
     replaceNudo: (tempId: string, realNudo: Nudo) => void;
     updateNudo: (nudo: Nudo) => void;
+    reorderTramos: (newOrder: string[]) => void;
     addTramo: (tramo: Tramo) => void;
     removeTramo: (id: string) => void;
     updateTramo: (tramo: Tramo) => void;
