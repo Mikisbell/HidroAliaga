@@ -33,6 +33,8 @@ import { PipeEdge } from './edges/PipeEdge'
 import { NodeEditPopover } from './nodes/NodeEditPopover'
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
+import { useUndoRedo } from '@/hooks/useUndoRedo'
+import { DesignerStatusBar } from './DesignerStatusBar'
 
 // ==================== NODE TYPES ====================
 const nodeTypes: NodeTypes = {
@@ -118,6 +120,9 @@ export default function NetworkDesigner({
     const setSelectedElement = useProjectStore(state => state.setSelectedElement)
     const reactFlowRef = useRef<ReactFlowInstance | null>(null)
 
+    // Undo/Redo
+    const { undo, redo } = useUndoRedo()
+
     // Double-click edit state
     const [editingNode, setEditingNode] = useState<{ nudo: Nudo; position: { x: number; y: number } } | null>(null)
 
@@ -158,6 +163,67 @@ export default function NetworkDesigner({
     useEffect(() => {
         setEdges(tramosToEdges(tramos))
     }, [tramos])
+
+    // ========== KEYBOARD SHORTCUTS (N8N-inspired) ==========
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Skip if user is typing in an input/textarea
+            const tag = (e.target as HTMLElement)?.tagName
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+
+            // Ctrl+Z → Undo, Ctrl+Y / Ctrl+Shift+Z → Redo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault()
+                undo()
+                return
+            }
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                e.preventDefault()
+                redo()
+                return
+            }
+
+            // Ctrl+A → Select all nodes
+            if (e.key === 'a' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                setNodes(nds => nds.map(n => ({ ...n, selected: true })))
+                return
+            }
+
+            // Don't process single-key shortcuts if Ctrl/Meta is held
+            if (e.ctrlKey || e.metaKey || e.altKey) return
+
+            switch (e.key.toLowerCase()) {
+                case 'escape':
+                    setActiveTool('select')
+                    setActiveComponentType(null)
+                    setSelectedElement(null)
+                    break
+                case 'r':
+                    setActiveTool('node')
+                    setActiveComponentType('reservorio')
+                    break
+                case 'c':
+                    setActiveTool('node')
+                    setActiveComponentType('camara_rompe_presion')
+                    break
+                case 'n':
+                    setActiveTool('node')
+                    setActiveComponentType('union')
+                    break
+                case 't':
+                    setActiveTool('pipe')
+                    setActiveComponentType(null)
+                    break
+                case 'f':
+                    reactFlowRef.current?.fitView({ padding: 0.3, duration: 300 })
+                    break
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [setActiveTool, setActiveComponentType, setSelectedElement, setNodes, undo, redo])
 
     // Handle React Flow internal changes (drag, select, resize, etc.)
     const onNodesChange: OnNodesChange = useCallback(
@@ -514,6 +580,9 @@ export default function NetworkDesigner({
                     onClose={() => setEditingNode(null)}
                 />
             )}
+
+            {/* N8N-style Status Bar */}
+            <DesignerStatusBar />
         </div>
     )
 }
