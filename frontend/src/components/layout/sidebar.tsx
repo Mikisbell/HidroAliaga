@@ -38,6 +38,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { handleApiError } from "@/lib/error-handler"
 import { BRAND } from "@/lib/constants"
 import { ProjectSettingsModal } from "@/components/project/ProjectSettingsModal"
+import { CreateProjectModal } from "@/components/project/CreateProjectModal"
 import { useProjects } from "@/hooks/use-projects"
 
 interface SidebarProject {
@@ -60,6 +61,7 @@ function NavContent() {
     const { setTheme, theme } = useTheme()
     const [projectsOpen, setProjectsOpen] = useState(true)
     const [settingsOpen, setSettingsOpen] = useState(false)
+    const [createOpen, setCreateOpen] = useState(false)
 
     // Use SWR Hook
     const { projects: allProjects, isLoading: projectsLoading } = useProjects()
@@ -112,15 +114,18 @@ function NavContent() {
 
             {/* Primary Action Button (Google Style) */}
             <div className="px-4 mb-2">
-                <Link href="/proyectos/nuevo">
-                    <Button className="w-full justify-start gap-3 rounded-xl h-11 shadow-sm bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 dark:bg-accent/40 dark:text-accent-foreground dark:border-border/50 dark:hover:bg-accent/60 transition-all font-medium">
-                        <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
-                            <Plus className="w-4 h-4" />
-                        </div>
-                        <span className="text-sm">Nuevo Proyecto</span>
-                    </Button>
-                </Link>
+                <Button
+                    onClick={() => setCreateOpen(true)}
+                    className="w-full justify-start gap-3 rounded-xl h-11 shadow-sm bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 dark:bg-accent/40 dark:text-accent-foreground dark:border-border/50 dark:hover:bg-accent/60 transition-all font-medium"
+                >
+                    <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                        <Plus className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm">Nuevo Proyecto</span>
+                </Button>
             </div>
+
+            <CreateProjectModal open={createOpen} onOpenChange={setCreateOpen} />
 
             {/* Navigation */}
             <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
