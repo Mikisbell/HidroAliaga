@@ -37,9 +37,7 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
 
     const handleDragEnd = async (id: string, lat: number, lng: number) => {
         try {
-            console.log(`Updating node ${id} to ${lat}, ${lng}`)
             await updateNudoCoordinates(id, lat, lng)
-            console.log("Node updated successfully")
         } catch (error) {
             console.error("Failed to update node:", error)
             alert("Error al actualizar la posición del nudo")
@@ -50,9 +48,7 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
         if (!proyectoId) return
         try {
             const typeToCreate = activeComponentType || 'union'
-            console.log(`Creating node (${typeToCreate}) at ${lat}, ${lng}`)
             await createNudo(proyectoId, lat, lng, typeToCreate)
-            console.log("Node created successfully")
         } catch (error) {
             console.error("Failed to create node:", error)
             alert("Error al crear el nudo")
@@ -62,13 +58,11 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
     const handleCreatePipe = async (origenId: string, destinoId: string) => {
         if (!proyectoId) return
         try {
-            console.log(`Creating pipe from ${origenId} to ${destinoId}`)
             await createTramo({
                 proyecto_id: proyectoId,
                 nudo_origen_id: origenId,
                 nudo_destino_id: destinoId
             })
-            console.log("Pipe created successfully")
         } catch (error) {
             console.error("Failed to create pipe:", error)
             alert(error instanceof Error ? error.message : "Error al crear el tramo")

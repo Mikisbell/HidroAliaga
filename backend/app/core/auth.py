@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from uuid import UUID
 import jwt
-from fastapi import HTTPException, status, Request
+from fastapi import HTTPException, status, Request, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -102,7 +102,7 @@ async def verify_supabase_token(token: str) -> UserAuth:
 
 
 async def get_current_user(
-    request: Request, credentials: HTTPAuthorizationCredentials = None
+    request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> Optional[UserAuth]:
     """
     Obtiene el usuario actual desde el token JWT
@@ -136,7 +136,9 @@ async def get_current_user(
     return await verify_supabase_token(token)
 
 
-async def get_current_active_user(current_user: UserAuth = None) -> UserAuth:
+async def get_current_active_user(
+    current_user: UserAuth = Depends(get_current_user),
+) -> UserAuth:
     """
     Obtiene el usuario actual y verifica que esté activo
 

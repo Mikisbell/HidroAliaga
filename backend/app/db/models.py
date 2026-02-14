@@ -3,7 +3,7 @@ Modelos de Base de Datos - H-Redes Perú
 Modelos SQLAlchemy con PostGIS para datos geográficos
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from enum import Enum as PyEnum
 from sqlalchemy import (
@@ -114,8 +114,8 @@ class Proyecto(Base):
     version = Column(Integer, default=1)
 
     # Metadatos - USUARIO OBLIGATORIO para aislamiento de datos
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     usuario_id = Column(UUID(as_uuid=True), nullable=False, index=True)
 
     # Relaciones
@@ -172,8 +172,8 @@ class Nudo(Base):
     notas = Column(Text, nullable=True)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relaciones
     proyecto = relationship("Proyecto", back_populates="nudos")
@@ -234,8 +234,8 @@ class Tramo(Base):
     coeficiente_rugosidad = Column(Float, nullable=True)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relaciones
     proyecto = relationship("Proyecto", back_populates="tramos")
@@ -285,7 +285,7 @@ class Calculo(Base):
     alertas = Column(JSONB, nullable=True)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     version_modelo = Column(String(20), default="1.0")
 
     # Relaciones
@@ -310,7 +310,7 @@ class Iteracion(Base):
     convergencia_alcanzada = Column(Boolean, default=False)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relaciones
     tramo = relationship("Tramo", back_populates="iteraciones")
@@ -346,7 +346,7 @@ class Optimizacion(Base):
     diametros_optimizados = Column(JSONB, nullable=True)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class Normativa(Base):
@@ -381,7 +381,7 @@ class Normativa(Base):
     # Metadatos
     vigente = Column(Boolean, default=True)
     fecha_vigencia = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class Alerta(Base):
@@ -411,4 +411,4 @@ class Alerta(Base):
     resuelta = Column(Boolean, default=False)
 
     # Metadatos
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
