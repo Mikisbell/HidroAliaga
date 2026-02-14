@@ -45,13 +45,20 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
     // Rutas públicas que NO requieren autenticación
     const publicRoutes = ['/login', '/auth', '/', '/api/auth']
     const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
+
+    let user = null
+
+    // OPTIMIZACIÓN: Solo llamar a getUser (que hace llamada a DB/Auth) si:
+    // 1. Es ruta protegida (necesitamos saber si permitir acceso)
+    // 2. Es login (necesitamos saber si redirigir al dashboard)
+    // Para la landing page (/) y otras rutas públicas, evitamos el waterfall.
+    if (!isPublicRoute || pathname.startsWith('/login')) {
+        const { data } = await supabase.auth.getUser()
+        user = data.user
+    }
 
     // Si NO hay usuario y la ruta NO es pública → redirigir a /login
     if (!user && !isPublicRoute) {

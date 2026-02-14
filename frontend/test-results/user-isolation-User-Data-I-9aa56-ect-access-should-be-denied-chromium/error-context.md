@@ -55,11 +55,11 @@
       - generic [ref=e61]:
         - generic [ref=e62]:
           - text: Email
-          - textbox "admin@hidroaliaga.com" [ref=e63]: user_a@test.com
+          - textbox "admin@hidroaliaga.com" [ref=e63]
         - generic [ref=e64]:
           - text: Contraseña
           - generic [ref=e65]:
-            - textbox "••••••••" [ref=e66]: password123
+            - textbox "••••••••" [ref=e66]
             - button "👁️" [ref=e67]
         - button "Ingresar al Sistema →" [ref=e68]:
           - generic [ref=e70]:
@@ -76,7 +76,4 @@
         - link "← Volver al inicio" [ref=e84] [cursor=pointer]:
           - /url: /
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
-    - img [ref=e91]
-  - alert [ref=e94]
 ```

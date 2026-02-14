@@ -77,6 +77,11 @@
           - /url: /
   - region "Notifications alt+T"
   - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
-    - img [ref=e91]
-  - alert [ref=e94]
+    - generic [ref=e93]:
+      - text: Rendering
+      - generic [ref=e94]:
+        - generic [ref=e95]: .
+        - generic [ref=e96]: .
+        - generic [ref=e97]: .
+  - alert [ref=e98]
 ```

@@ -5,6 +5,7 @@ import useEmblaCarousel from "embla-carousel-react"
 import Autoplay from "embla-carousel-autoplay"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import Image from "next/image"
 
 interface Project {
   id: string
@@ -21,8 +22,8 @@ interface ProjectCarouselProps {
 
 export function ProjectCarousel({ projects }: ProjectCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { 
-      loop: true, 
+    {
+      loop: true,
       align: "start",
       slidesToScroll: 1,
     },
@@ -81,10 +82,11 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
                 {/* Image with overlay */}
                 <div className="relative h-48 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 overflow-hidden">
                   {project.imagen ? (
-                    <img
+                    <Image
                       src={project.imagen}
                       alt={project.nombre}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">
@@ -140,11 +142,10 @@ export function ProjectCarousel({ projects }: ProjectCarouselProps) {
           <button
             key={index}
             onClick={() => scrollTo(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === selectedIndex
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === selectedIndex
                 ? "bg-primary w-8"
                 : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-            }`}
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

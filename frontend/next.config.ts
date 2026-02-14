@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "hmwaoxbluljfqmsytyjv.supabase.co",
+      },
+    ],
+  },
   // Silence Turbopack vs Webpack error in Next.js 16
   turbopack: {},
   webpack: (config, { isServer }) => {

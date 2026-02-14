@@ -78,7 +78,7 @@
   - region "Notifications alt+T"
   - button "Open Next.js Dev Tools" [ref=e90] [cursor=pointer]:
     - generic [ref=e93]:
-      - text: Compiling
+      - text: Rendering
       - generic [ref=e94]:
         - generic [ref=e95]: .
         - generic [ref=e96]: .

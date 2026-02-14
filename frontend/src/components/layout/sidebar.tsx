@@ -38,6 +38,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { handleApiError } from "@/lib/error-handler"
 import { BRAND } from "@/lib/constants"
 import { ProjectSettingsModal } from "@/components/project/ProjectSettingsModal"
+import { useProjects } from "@/hooks/use-projects"
 
 interface SidebarProject {
     id: string
@@ -57,32 +58,14 @@ function NavContent() {
     const router = useRouter()
     const { profile, loading, isAdmin } = useProfile()
     const { setTheme, theme } = useTheme()
-    const [projects, setProjects] = useState<SidebarProject[]>([])
     const [projectsOpen, setProjectsOpen] = useState(true)
-    const [projectsLoading, setProjectsLoading] = useState(true)
     const [settingsOpen, setSettingsOpen] = useState(false)
 
-    const fetchProjects = useCallback(async () => {
-        try {
-            const res = await fetch("/api/proyectos")
-            if (res.ok) {
-                const data = await res.json()
-                setProjects(data.slice(0, 6)) // Show max 6 recent projects
-            } else {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-            }
-        } catch (error) {
-            // Show non-intrusive error — sidebar projects are non-critical
-            handleApiError(error, "cargar proyectos")
-        } finally {
-            setProjectsLoading(false)
-        }
-    }, [])
+    // Use SWR Hook
+    const { projects: allProjects, isLoading: projectsLoading } = useProjects()
 
-    // Fetch projects on mount and when pathname changes (e.g., after creating a new project)
-    useEffect(() => {
-        fetchProjects()
-    }, [fetchProjects, pathname])
+    // Filter and slice projects (client-side for now)
+    const projects = allProjects?.slice(0, 6) || []
 
     const handleSignOut = async () => {
         if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import Image from "next/image"
 import { WaterParticlesCanvas } from "@/components/water-particles-canvas"
 
 export default function LoginPage() {
@@ -234,7 +235,7 @@ export default function LoginPage() {
                             boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
                         }}
                     >
-                        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                        <Image src="https://www.google.com/favicon.ico" alt="Google" width={20} height={20} className="w-5 h-5" />
                         <span>Continuar con Google</span>
                     </button>
 
