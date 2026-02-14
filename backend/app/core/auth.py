@@ -3,13 +3,13 @@ Módulo de Autenticación - HidroAliaga
 Validación de tokens JWT de Supabase Auth
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from uuid import UUID
 import jwt
 from fastapi import HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.config.settings import settings
 
@@ -26,15 +26,12 @@ class UserAuth(BaseModel):
     app_metadata: Dict[str, Any] = Field(default_factory=dict)
     user_metadata: Dict[str, Any] = Field(default_factory=dict)
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     @property
     def is_admin(self) -> bool:
         """Verifica si el usuario es administrador"""
         return self.role == "admin" or self.app_metadata.get("role") == "admin"
-
-    class Config:
-        """Configuración de Pydantic"""
-
-        arbitrary_types_allowed = True
 
     def __repr__(self):
         return f"<UserAuth(id={self.id}, email={self.email}, role={self.role})>"

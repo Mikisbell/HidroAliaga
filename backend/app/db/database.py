@@ -10,9 +10,14 @@ from app.config.settings import settings
 
 
 # Engine asíncrono para PostgreSQL
+# Validar echo para evitar KeyError si settings.DEBUG es string "False"
+debug_mode = settings.DEBUG
+if isinstance(debug_mode, str):
+    debug_mode = debug_mode.lower() == "true"
+
 async_engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.DEBUG,
+    echo=debug_mode,
     pool_size=20,
     max_overflow=10,
     pool_pre_ping=True,
@@ -23,7 +28,7 @@ from sqlalchemy import create_engine
 
 sync_engine = create_engine(
     settings.DATABASE_URL_SYNC,
-    echo=settings.DEBUG,
+    echo=debug_mode,
     pool_size=10,
     max_overflow=5,
     pool_pre_ping=True,

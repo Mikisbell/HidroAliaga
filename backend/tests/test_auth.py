@@ -4,7 +4,7 @@ Tests Unitarios - Sistema de Autenticación y Autorización
 
 import pytest
 from uuid import uuid4, UUID
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi import HTTPException
 import sys
@@ -72,15 +72,15 @@ class TestTokenVerification:
             "sub": str(uuid4()),
             "email": "test@example.com",
             "role": "authenticated",
-            "exp": datetime.utcnow() + timedelta(hours=1),
-            "iat": datetime.utcnow(),
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "iat": datetime.now(timezone.utc),
         }
 
     @pytest.fixture
     def valid_token(self, valid_token_payload):
         """Genera un token JWT válido para tests"""
-        # Para tests, usar un secret conocido
-        test_secret = "test-secret-key-for-testing-only"
+        # Para tests, usar un secret conocido de al menos 32 bytes
+        test_secret = "test-secret-key-for-testing-only-32bytes"
         token = jwt.encode(valid_token_payload, test_secret, algorithm="HS256")
         return token, test_secret, valid_token_payload
 
@@ -102,12 +102,12 @@ class TestTokenVerification:
     @pytest.mark.asyncio
     async def test_verify_expired_token(self, monkeypatch):
         """Test verificación de token expirado"""
-        test_secret = "test-secret-key-for-testing-only"
+        test_secret = "test-secret-key-for-testing-only-32bytes"
         expired_payload = {
             "sub": str(uuid4()),
             "email": "test@example.com",
-            "exp": datetime.utcnow() - timedelta(hours=1),  # Expirado
-            "iat": datetime.utcnow() - timedelta(hours=2),
+            "exp": datetime.now(timezone.utc) - timedelta(hours=1),  # Expirado
+            "iat": datetime.now(timezone.utc) - timedelta(hours=2),
         }
 
         token = jwt.encode(expired_payload, test_secret, algorithm="HS256")
@@ -122,11 +122,11 @@ class TestTokenVerification:
     @pytest.mark.asyncio
     async def test_verify_invalid_token(self, monkeypatch):
         """Test verificación de token inválido"""
-        monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", "correct-secret")
+        monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", "correct-secret-key-for-testing-32bytes")
 
         # Token firmado con secret incorrecto
         wrong_payload = {"sub": str(uuid4()), "email": "test@example.com"}
-        wrong_token = jwt.encode(wrong_payload, "wrong-secret", algorithm="HS256")
+        wrong_token = jwt.encode(wrong_payload, "wrong-secret-key-for-testing-32bytes-long", algorithm="HS256")
 
         with pytest.raises(HTTPException) as exc_info:
             await verify_supabase_token(wrong_token)
@@ -136,10 +136,10 @@ class TestTokenVerification:
     @pytest.mark.asyncio
     async def test_verify_token_without_sub(self, monkeypatch):
         """Test verificación de token sin user ID"""
-        test_secret = "test-secret-key-for-testing-only"
+        test_secret = "test-secret-key-for-testing-only-32bytes"
         payload = {
             "email": "test@example.com",
-            "exp": datetime.utcnow() + timedelta(hours=1),
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
             # Falta "sub"
         }
 

@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import List
 from functools import lru_cache
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -109,10 +109,11 @@ class Settings(BaseSettings):
     EXPORT_PATH: Path = Path("./exports")
     TEMPLATE_PATH: Path = Path("./templates")
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-        extra = "allow"  # Permitir variables extra en .env
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="allow"
+    )
 
 
 @lru_cache()
