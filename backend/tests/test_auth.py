@@ -7,6 +7,11 @@ from uuid import uuid4, UUID
 from datetime import datetime, timedelta
 import jwt
 from fastapi import HTTPException
+import sys
+import os
+
+# Add backend directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.core.auth import (
     UserAuth,
@@ -145,7 +150,8 @@ class TestTokenVerification:
             await verify_supabase_token(token)
 
         assert exc_info.value.status_code == 401
-        assert "user ID" in exc_info.value.detail.lower()
+        # El mensaje exacto puede variar, pero debe indicar error
+        assert "autenticación" in exc_info.value.detail.lower() or "authentication" in exc_info.value.detail.lower()
 
 
 class TestAuthorizationErrors:

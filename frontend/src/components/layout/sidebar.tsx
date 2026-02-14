@@ -150,95 +150,31 @@ function NavContent() {
                     )
                 })}
 
-                {/* === Mis Proyectos (Dynamic) === */}
-                <div className="my-3 px-3">
-                    <Separator className="opacity-30" />
-                </div>
-                <button
-                    onClick={() => setProjectsOpen(!projectsOpen)}
-                    className="flex items-center justify-between w-full px-4 py-1 group"
-                >
-                    <p className="text-[10px] font-medium text-blue-500/70 uppercase tracking-wider">Mis Proyectos</p>
-                    <ChevronDown className={cn(
-                        "w-3 h-3 text-muted-foreground/40 transition-transform duration-200",
-                        projectsOpen ? "rotate-0" : "-rotate-90"
-                    )} />
-                </button>
-
-                {projectsOpen && (
-                    <div className="mt-1 space-y-0.5">
-                        {projectsLoading ? (
-                            // Skeleton loader
-                            Array.from({ length: 3 }).map((_, i) => (
-                                <div key={i} className="flex items-center gap-2.5 px-3 py-2 animate-pulse">
-                                    <div className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-700" />
-                                    <div className="h-3 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
-                                </div>
-                            ))
-                        ) : projects.length === 0 ? (
-                            <p className="px-4 py-2 text-[11px] text-muted-foreground/40 italic">
-                                Sin proyectos aún
-                            </p>
-                        ) : (
-                            <>
-                                {projects.map((project) => {
-                                    const isActive = activeProjectId === project.id
-                                    return (
-                                        <Link
-                                            key={project.id}
-                                            href={`/proyectos/${project.id}`}
-                                            className={cn(
-                                                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-150",
-                                                isActive
-                                                    ? "bg-blue-50 text-blue-700 font-medium dark:bg-blue-900/20 dark:text-blue-300"
-                                                    : "text-muted-foreground hover:bg-slate-50 hover:text-slate-800 dark:hover:bg-slate-800/40 dark:hover:text-slate-200"
-                                            )}
-                                        >
-                                            <Droplets className={cn(
-                                                "w-3.5 h-3.5 flex-shrink-0",
-                                                isActive ? "text-blue-500" : "text-muted-foreground/40"
-                                            )} />
-                                            <span className="truncate flex-1">{project.nombre}</span>
-                                            <span className={cn(
-                                                "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                                                project.estado === 'calculado' ? "bg-green-400" : "bg-slate-300 dark:bg-slate-600"
-                                            )} />
-                                        </Link>
-                                    )
-                                })}
-                                <Link
-                                    href="/proyectos"
-                                    className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-muted-foreground/50 hover:text-blue-500 transition-colors"
-                                >
-                                    <ArrowRight className="w-3 h-3" />
-                                    Ver todos
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                )}
+                {/* Section removed as per user request to avoid duplication with main Proyectos link */}
 
                 {/* Admin Link */}
-                {isAdmin && (
-                    <>
-                        <div className="my-4 px-3">
-                            <Separator className="opacity-50" />
-                        </div>
-                        <p className="px-4 text-[10px] font-medium text-purple-500/70 uppercase tracking-wider mb-2">Administración</p>
-                        <Link
-                            href="/admin"
-                            className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                                pathname.startsWith("/admin")
-                                    ? "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300"
-                                    : "text-muted-foreground hover:bg-purple-50/50 hover:text-purple-600 dark:hover:bg-purple-900/10"
-                            )}
-                        >
-                            <Shield className="w-4 h-4 text-purple-500" />
-                            Admin Panel
-                        </Link>
-                    </>
-                )}
+                {
+                    isAdmin && (
+                        <>
+                            <div className="my-4 px-3">
+                                <Separator className="opacity-50" />
+                            </div>
+                            <p className="px-4 text-[10px] font-medium text-purple-500/70 uppercase tracking-wider mb-2">Administración</p>
+                            <Link
+                                href="/admin"
+                                className={cn(
+                                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                                    pathname.startsWith("/admin")
+                                        ? "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300"
+                                        : "text-muted-foreground hover:bg-purple-50/50 hover:text-purple-600 dark:hover:bg-purple-900/10"
+                                )}
+                            >
+                                <Shield className="w-4 h-4 text-purple-500" />
+                                Admin Panel
+                            </Link>
+                        </>
+                    )
+                }
             </nav>
 
             {/* User Profile Footer */}
@@ -297,11 +233,11 @@ function NavContent() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </div>
+            </div >
 
             {/* Settings Modal */}
-            <ProjectSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
-        </div>
+            < ProjectSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+        </div >
     )
 }
 

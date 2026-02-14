@@ -12,8 +12,10 @@ from sqlalchemy.pool import StaticPool
 
 # Importar la app y modelos
 import sys
+import os
 
-sys.path.insert(0, "E:/FREECLOUD/FREECLOUD-IA/PROYECTOS/HidroAliaga/backend")
+# Add backend directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from main import app
 from app.db.database import Base, get_async_session

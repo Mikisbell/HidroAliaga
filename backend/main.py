@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 
 from app.config.settings import settings
 from app.routers import proyectos, calculos, gis, optimizacion, normativa, reportes
-from app.db.database import engine, Base
+from app.db.database import sync_engine as engine, Base
 from app.dependencies.auth import AuthorizationError, AuthenticationError
 
 

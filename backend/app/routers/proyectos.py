@@ -11,7 +11,7 @@ from sqlalchemy import select, delete, and_
 from sqlalchemy.orm import selectinload
 
 from app.db.database import get_async_session
-from app.db.models import Proyecto, Nudo, Tramo, Calculo
+from app.db.models import Proyecto, Nudo, Tramo, Calculo, Alerta, Optimizacion
 from app.schemas.schemas import (
     ProyectoCreate,
     ProyectoUpdate,
@@ -163,7 +163,9 @@ async def eliminar_proyecto(
             detail="Proyecto no encontrado o no tienes permiso para eliminarlo",
         )
 
-    # Eliminar nudos, tramos y cálculos asociados
+    # Eliminar dependencias (manualmente para asegurar integridad)
+    await session.execute(delete(Alerta).where(Alerta.proyecto_id == proyecto_id))
+    await session.execute(delete(Optimizacion).where(Optimizacion.proyecto_id == proyecto_id))
     await session.execute(delete(Nudo).where(Nudo.proyecto_id == proyecto_id))
     await session.execute(delete(Tramo).where(Tramo.proyecto_id == proyecto_id))
     await session.execute(delete(Calculo).where(Calculo.proyecto_id == proyecto_id))

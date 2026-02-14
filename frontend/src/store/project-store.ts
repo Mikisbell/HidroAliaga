@@ -107,21 +107,121 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         simulationMode: 'design'
     }),
 
+    // Actions
     setProject: (project) => set({ currentProject: project, error: null }),
     setElements: (nudos, tramos) => set({ nudos, tramos }),
-    addNudo: (nudo) => set((state) => ({ nudos: [...state.nudos, nudo] })),
-    removeNudo: (id) => set((state) => ({ nudos: state.nudos.filter(n => n.id !== id) })),
+
+    addNudo: async (nudo) => {
+        // Optimistic Update
+        set((state) => ({ nudos: [...state.nudos, nudo] }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.post(`/proyectos/${projectId}/nudos`, nudo)
+            );
+        } catch (error) {
+            // Rollback
+            set((state) => ({ nudos: state.nudos.filter(n => n.id !== nudo.id) }));
+            import("sonner").then(({ toast }) => toast.error("Error al guardar el nudo"));
+        }
+    },
+
+    removeNudo: async (id) => {
+        // Snapshot for rollback
+        const previousNudos = get().nudos;
+        // Optimistic Update
+        set((state) => ({ nudos: state.nudos.filter(n => n.id !== id) }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.delete(`/proyectos/${projectId}/nudos/${id}`)
+            );
+        } catch (error) {
+            // Rollback
+            set({ nudos: previousNudos });
+            import("sonner").then(({ toast }) => toast.error("Error al eliminar el nudo"));
+        }
+    },
+
     replaceNudo: (tempId, realNudo) => set((state) => ({
         nudos: state.nudos.map(n => n.id === tempId ? realNudo : n)
     })),
-    updateNudo: (nudo) => set((state) => ({
-        nudos: state.nudos.map((n) => (n.id === nudo.id ? { ...n, ...nudo } : n))
-    })),
-    addTramo: (tramo) => set((state) => ({ tramos: [...state.tramos, tramo] })),
-    removeTramo: (id) => set((state) => ({ tramos: state.tramos.filter(t => t.id !== id) })),
-    updateTramo: (tramo) => set((state) => ({
-        tramos: state.tramos.map((t) => (t.id === tramo.id ? { ...t, ...tramo } : t))
-    })),
+
+    updateNudo: async (nudo) => {
+        // Snapshot
+        const previousNudos = get().nudos;
+        // Optimistic
+        set((state) => ({
+            nudos: state.nudos.map((n) => (n.id === nudo.id ? { ...n, ...nudo } : n))
+        }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.put(`/proyectos/${projectId}/nudos/${nudo.id}`, nudo)
+            );
+        } catch (error) {
+            set({ nudos: previousNudos });
+            // Don't toast on every drag update, might be too noisy. Maybe debounce?
+            // For now, silent fail on drag, or specific error handling.
+            console.error("Error updating node", error);
+        }
+    },
+
+    addTramo: async (tramo) => {
+        set((state) => ({ tramos: [...state.tramos, tramo] }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.post(`/proyectos/${projectId}/tramos`, tramo)
+            );
+        } catch (error) {
+            set((state) => ({ tramos: state.tramos.filter(t => t.id !== tramo.id) }));
+            import("sonner").then(({ toast }) => toast.error("Error al guardar el tramo"));
+        }
+    },
+
+    removeTramo: async (id) => {
+        const previousTramos = get().tramos;
+        set((state) => ({ tramos: state.tramos.filter(t => t.id !== id) }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.delete(`/proyectos/${projectId}/tramos/${id}`)
+            );
+        } catch (error) {
+            set({ tramos: previousTramos });
+            import("sonner").then(({ toast }) => toast.error("Error al eliminar el tramo"));
+        }
+    },
+
+    updateTramo: async (tramo) => {
+        const previousTramos = get().tramos;
+        set((state) => ({
+            tramos: state.tramos.map((t) => (t.id === tramo.id ? { ...t, ...tramo } : t))
+        }));
+        const projectId = get().currentProject?.id;
+        if (!projectId) return;
+
+        try {
+            await import("@/lib/api-client").then(({ api }) =>
+                api.put(`/proyectos/${projectId}/tramos/${tramo.id}`, tramo)
+            );
+        } catch (error) {
+            set({ tramos: previousTramos });
+            console.error("Error updating pipe", error);
+        }
+    },
+
     reorderTramos: (newOrder) => set((state) => {
         if (!state.currentProject) return {};
         const newSettings = {
