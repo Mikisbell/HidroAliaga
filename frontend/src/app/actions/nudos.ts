@@ -6,8 +6,10 @@ import { Nudo } from "@/types/models"
 import { nudoCreateSchema, nudoUpdateSchema } from "@/lib/schemas"
 import { ActionState } from "./types"
 import { z } from "zod"
+import { getCodigoPrefix } from "@/lib/nudo-codes"
 
 const idSchema = z.string().uuid()
+
 
 export async function updateNudoCoordinates(id: string, latitud: number, longitud: number): Promise<ActionState> {
     const supabase = await createClient()
@@ -80,9 +82,10 @@ export async function createNudo(proyectoId: string, latitud: number, longitud: 
         return { success: false, message: "Datos de entrada inválidos", errors: parsedInput.error.flatten().fieldErrors }
     }
 
-    // Generar código automático (N-X)
-    const { count } = await supabase.from("nudos").select("*", { count: "exact", head: true }).eq("proyecto_id", proyectoId)
-    const codigo = `N-${(count || 0) + 1}`
+    // Generar código automático con prefijo por tipo (R-1, CRP-1, N-1...)
+    const prefix = getCodigoPrefix(parsedInput.data.tipo)
+    const { count } = await supabase.from("nudos").select("*", { count: "exact", head: true }).eq("proyecto_id", proyectoId).eq("tipo", parsedInput.data.tipo)
+    const codigo = `${prefix}${(count || 0) + 1}`
 
     const { data, error } = await supabase.from("nudos").insert({
         proyecto_id: proyectoId,

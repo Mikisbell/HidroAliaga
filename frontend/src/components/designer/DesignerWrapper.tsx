@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudoCoordinates, createNudo } from "@/app/actions/nudos"
+import { getCodigoPrefix } from "@/lib/nudo-codes"
 import { createTramo } from "@/app/actions/tramos"
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
@@ -117,7 +118,7 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
         const tempNudo: Nudo = {
             id: tempId,
             proyecto_id: proyectoId,
-            codigo: `N-${nudoCount + 1}`,
+            codigo: `${getCodigoPrefix(typeToCreate)}${nudoCount + 1}`,
             tipo: typeToCreate,
             latitud: y / 1000,
             longitud: x / 1000,
