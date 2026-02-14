@@ -131,8 +131,8 @@ function PipeEdgeComponent({
 
         // Backend update
         const res = await updateTramo({ id, longitud: val })
-        if (res.error) {
-            toast.error("Error al actualizar longitud")
+        if (!res.success) {
+            toast.error(res.message || "Error al actualizar longitud")
         }
     }, [id, editValue, setEdges])
 
@@ -222,7 +222,9 @@ function PipeEdgeComponent({
                                             if (ed.id === id) return { ...ed, data: { ...ed.data, numero_viviendas: num } }
                                             return ed
                                         }));
-                                        updateTramo({ id, numero_viviendas: num });
+                                        updateTramo({ id, numero_viviendas: num }).then(res => {
+                                            if (!res.success) toast.error(res.message)
+                                        });
                                     }
                                 }
                             }}

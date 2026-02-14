@@ -39,8 +39,8 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         payload[field] = numValue
 
         const res = await updateTramo(payload)
-        if (res.error) {
-            toast.error(res.error)
+        if (!res.success) {
+            toast.error(res.message)
         } else {
             toast.success("Actualizado")
             router.refresh()
@@ -51,7 +51,7 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         const num = parseInt(value)
         if (isNaN(num)) return
         const res = await updateNudoViviendasAction(nudoId, num)
-        if (res.error) toast.error(res.error)
+        if (!res.success) toast.error(res.message)
         else {
             toast.success("Viviendas actualizadas")
             router.refresh()
@@ -91,8 +91,8 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
             clase_tuberia: newRow.clase_tuberia || 'CL-10'
         })
 
-        if (res.error) {
-            toast.error(res.error)
+        if (!res.success) {
+            toast.error(res.message)
         } else {
             toast.success("Tramo creado")
             setNewRow({
@@ -129,8 +129,8 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
         const ids = Array.from(selectedIds)
         const res = await deleteBatchTramos(ids)
 
-        if (res.error) {
-            toast.error(res.error)
+        if (!res.success) {
+            toast.error(res.message)
         } else {
             toast.success("Tramos eliminados")
             setSelectedIds(new Set())
@@ -207,10 +207,10 @@ export function TramosGrid({ tramos, nudos, proyectoId }: TramosGridProps) {
 
         if (newTramos.length > 0) {
             const res = await createBatchTramos(newTramos, proyectoId)
-            if (res.error) {
-                toast.error(`Error al importar: ${res.error}`)
+            if (!res.success) {
+                toast.error(`Error al importar: ${res.message}`)
             } else {
-                toast.success(`Importados ${res.count} tramos correctamente`)
+                toast.success(`Importados ${res.data?.count} tramos correctamente`)
                 if (errors > 0) toast.warning(`${errors} filas se ignoraron (nudos no encontrados)`)
                 router.refresh()
             }

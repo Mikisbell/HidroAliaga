@@ -458,7 +458,12 @@ export function HydraulicTablePanel() {
         const numValue = parseFloat(value) || 0
         updateTramoStore({ id, [field]: numValue } as any)
         try {
-            await updateTramo({ id, [field]: numValue })
+            const res = await updateTramo({ id, [field]: numValue })
+            if (!res.success) {
+                toast.error(res.message)
+                // Revert?
+                router.refresh()
+            }
         } catch {
             toast.error("Error al actualizar tramo")
             router.refresh()
@@ -469,7 +474,11 @@ export function HydraulicTablePanel() {
         const val = field === 'codigo' ? value : (parseFloat(value) || 0)
         updateNudoStore({ id, [field]: val } as any)
         try {
-            await updateNudo(id, { [field]: val })
+            const res = await updateNudo(id, { [field]: val })
+            if (!res.success) {
+                toast.error(res.message)
+                router.refresh()
+            }
         } catch {
             toast.error("Error al actualizar nudo")
             router.refresh()

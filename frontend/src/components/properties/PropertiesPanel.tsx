@@ -67,13 +67,15 @@ function NudoProperties({ nudo }: { nudo: Nudo }) {
     const handleSave = () => {
         startTransition(async () => {
             try {
-                await updateNudo(nudo.id, {
+                const res = await updateNudo(nudo.id, {
                     cota_terreno: parseFloat(cota),
                     demanda_base: parseFloat(demanda)
                 })
+                if (!res.success) throw new Error(res.message)
+
                 toast.success(`Nudo ${nudo.codigo} actualizado`)
             } catch (error) {
-                toast.error("Error al actualizar el nudo")
+                toast.error(error instanceof Error ? error.message : "Error al actualizar el nudo")
             }
         })
     }

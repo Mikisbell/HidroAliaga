@@ -34,8 +34,8 @@ export function HydraulicDataGrid() {
 
         // Optimistic UI could happen here if store exposed updateTramo action
         const res = await updateTramo({ id, [field]: numValue })
-        if (res.error) {
-            toast.error(res.error)
+        if (!res.success) {
+            toast.error(res.message)
         } else {
             router.refresh() // Sync with server
         }
@@ -48,7 +48,8 @@ export function HydraulicDataGrid() {
         }
 
         try {
-            await updateNudo(id, { [field]: numValue })
+            const res = await updateNudo(id, { [field]: numValue })
+            if (!res.success) throw new Error(res.message)
             router.refresh()
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Error al actualizar nudo")
@@ -93,9 +94,9 @@ export function HydraulicDataGrid() {
 
         if (newTramos.length > 0) {
             const res = await createBatchTramos(newTramos, currentProject.id)
-            if (res.error) toast.error(res.error)
+            if (!res.success) toast.error(res.message)
             else {
-                toast.success(`${res.count} tramos importados`)
+                toast.success(`${res.data?.count} tramos importados`)
                 router.refresh()
             }
         } else {

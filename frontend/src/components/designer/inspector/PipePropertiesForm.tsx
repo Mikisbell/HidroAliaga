@@ -6,6 +6,7 @@ import { Tramo } from "@/types/models"
 import { useProjectStore } from "@/store/project-store"
 import { updateTramo } from "@/app/actions/tramos"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface PipePropertiesFormProps {
     tramo: Tramo
@@ -48,10 +49,14 @@ export default function PipePropertiesForm({ tramo }: PipePropertiesFormProps) {
             useProjectStore.getState().updateTramo?.(updatedTramo)
 
             // 2. Server Action
-            await updateTramo(updatedTramo)
+            const res = await updateTramo(updatedTramo)
+            if (!res.success) throw new Error(res.message)
+
+            toast.success("Tubería actualizada")
 
         } catch (error) {
             console.error("Error updating pipe:", error)
+            toast.error(error instanceof Error ? error.message : "Error al actualizar tubería")
         } finally {
             setIsSaving(false)
         }

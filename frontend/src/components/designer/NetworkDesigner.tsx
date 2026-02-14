@@ -222,24 +222,21 @@ export default function NetworkDesigner({
             const currentProj = useProjectStore.getState().currentProject
             if (connection.source && connection.target && currentProj) {
                 // 1. Create Tramo on Server
-                const response = await createTramo({
+                const result = await createTramo({
                     proyecto_id: currentProj.id,
                     nudo_origen_id: connection.source,
-                    nudo_destino_id: connection.target
+                    nudo_destino_id: connection.target,
+                    codigo: undefined // Auto-generate
                 })
 
-                if (response.error) {
-                    toast.error("Error creating pipe: " + response.error)
+                if (!result.success) {
+                    toast.error("Error creating pipe: " + result.message)
                     return
                 }
 
                 // 2. Add to Store & Visuals
                 // @ts-ignore - Temporary until prop type is updated
                 onConnectProp?.(connection.source, connection.target, connection.sourceHandle, connection.targetHandle)
-
-                // If the store action 'addTramo' relies on an ID, we should ideally use response.tramo.id
-                // But onConnectProp might be handling ID generation internally.
-                // For now, validation is: "It exists on server".
             }
         },
         [onConnectProp] // removed currentProject dep since we read from store
@@ -385,19 +382,19 @@ export default function NetworkDesigner({
             try {
                 // Use optimistic temporary handling or await server?
                 // Awaiting server ensures ID consistency.
-                const { success, nudo } = await createNudo(
+                const result = await createNudo(
                     currentProj.id,
                     position.x,
                     position.y,
                     nodeType as Nudo['tipo']
                 )
 
-                if (success && nudo) {
+                if (result.success && result.data?.nudo) {
                     // 2. Add to Store with REAL ID
-                    useProjectStore.getState().addNudo(nudo)
+                    useProjectStore.getState().addNudo(result.data.nudo)
                     toast.success("Nudo creado")
                 } else {
-                    toast.error("Error creating node")
+                    toast.error(result.message || "Error creating node")
                 }
 
             } catch (e) {

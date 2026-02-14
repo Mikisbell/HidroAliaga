@@ -42,7 +42,9 @@ export function ProjectSettingsModal({ open, onOpenChange }: ProjectSettingsModa
         }
     }, [project, open])
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        if (!project?.id) return
+
         const newSettings: ProjectSettings = {
             normativa,
             dotacion,
@@ -53,11 +55,22 @@ export function ProjectSettingsModal({ open, onOpenChange }: ProjectSettingsModa
         // Update Store (Optimistic)
         updateSettings(newSettings)
 
-        // TODO: Persist settings to backend if separate from project update
-        // Current implementation assumes local state or separate endpoint
+        // Persist to backend
+        try {
+            const { updateProject } = await import("@/app/actions/proyectos")
+            const res = await updateProject(project.id, { settings: newSettings })
 
-        toast.success("Configuración del proyecto actualizada")
-        onOpenChange(false)
+            if (!res.success) {
+                toast.error("Error al guardar configuración: " + res.message)
+                // TODO: Revert store?
+            } else {
+                toast.success("Configuración del proyecto actualizada")
+                onOpenChange(false)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("Error al guardar configuración")
+        }
     }
 
     const handleDelete = async () => {

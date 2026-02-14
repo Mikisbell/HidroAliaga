@@ -1,31 +1,29 @@
-'use server'
+"use server"
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { tramoCreateSchema, tramoUpdateSchema } from "@/lib/schemas"
+import { ActionState } from "./types"
+import { Tramo } from "@/types/models"
 
-const updateTramoSchema = z.object({
-    id: z.string().uuid(),
-    longitud: z.number().positive().optional(),
-    diametro_comercial: z.number().positive().optional(),
-    material: z.string().optional(),
-    diametro_interior: z.number().positive().optional(),
-    numero_viviendas: z.number().nonnegative().optional(),
-    coef_hazen_williams: z.number().positive().optional(),
-})
+const idSchema = z.string().uuid()
 
-const updateNudoSchema = z.object({
-    id: z.string().uuid(),
-    numero_viviendas: z.number().int().min(0).optional(),
-})
-
-export async function updateTramoAction(data: any) {
+export async function updateTramo(data: any): Promise<ActionState> {
     const supabase = await createClient()
 
-    // Validate
-    const parsed = updateTramoSchema.safeParse(data)
+    // Validate ID and data
+    const schema = tramoUpdateSchema.extend({
+        id: z.string().uuid()
+    })
+
+    const parsed = schema.safeParse(data)
     if (!parsed.success) {
-        return { error: "Datos inválidos: " + parsed.error.issues.map(i => i.message).join(", ") }
+        return {
+            success: false,
+            message: "Datos inválidos",
+            errors: parsed.error.flatten().fieldErrors as any
+        }
     }
 
     const { id, ...updates } = parsed.data
@@ -35,80 +33,78 @@ export async function updateTramoAction(data: any) {
         .update(updates)
         .eq('id', id)
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
     revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }
 
-// Create a new Tramo
-export async function createTramoAction(input: any) {
+// Alias for backwards compatibility if needed, but prefer direct import
+export const updateTramoAction = updateTramo
+
+export async function createTramo(input: any): Promise<ActionState<{ tramo: Tramo }>> {
     const supabase = await createClient()
 
-    // Basic validation
-    if (!input.nudo_origen_id || !input.nudo_destino_id || !input.proyecto_id) {
-        return { error: "Faltan datos requeridos (Nudos o Proyecto)" }
+    // Validate with tramoCreateSchema (includes project_id, nudos, etc.)
+    const parsed = tramoCreateSchema.safeParse(input)
+    if (!parsed.success) {
+        return {
+            success: false,
+            message: "Datos inválidos",
+            errors: parsed.error.flatten().fieldErrors as any
+        }
     }
 
+    const dataRaw = parsed.data
+
     // Generate code if not provided
-    let codigo = input.codigo
+    let codigo = dataRaw.codigo
     if (!codigo) {
-        const { count } = await supabase.from('tramos').select('*', { count: 'exact', head: true }).eq('proyecto_id', input.proyecto_id)
+        const { count } = await supabase.from('tramos').select('*', { count: 'exact', head: true }).eq('proyecto_id', dataRaw.proyecto_id)
         codigo = `T-${(count || 0) + 1}`
     }
 
     const { data: created, error } = await supabase
         .from('tramos')
         .insert({
-            ...input,
+            ...dataRaw,
             codigo,
-            coef_hazen_williams: 150 // Default
+            coef_hazen_williams: dataRaw.coef_hazen_williams || 150
         })
         .select()
         .single()
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
     // No revalidatePath — tramo is managed optimistically by the Zustand store
-    return { success: true, tramo: created }
+    return { success: true, data: { tramo: created } }
 }
 
 // Alias for backwards compatibility
-export { createTramoAction as createTramo }
-export { updateTramoAction as updateTramo }
+export const createTramoAction = createTramo
 
-export async function updateNudoViviendasAction(nudoId: string, viviendas: number) {
+export async function updateNudoViviendasAction(nudoId: string, viviendas: number): Promise<ActionState> {
     const supabase = await createClient()
 
-    // Simple validation
-    if (!nudoId || viviendas < 0) return { error: "Datos inválidos" }
+    const parseId = idSchema.safeParse(nudoId)
+    if (!parseId.success) return { success: false, message: "ID de nudo inválido" }
+
+    if (viviendas < 0) return { success: false, message: "El número de viviendas no puede ser negativo" }
 
     const { error } = await supabase
         .from('nudos')
         .update({ numero_viviendas: viviendas })
         .eq('id', nudoId)
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
     revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }
-// ... existing exports
 
-const createTramoSchema = z.object({
-    nudo_origen_id: z.string().uuid(),
-    nudo_destino_id: z.string().uuid(),
-    proyecto_id: z.string().uuid(),
-    longitud: z.number().nonnegative().default(0),
-    diametro_comercial: z.number().positive().default(0.75),
-    material: z.string().default("pvc"),
-    clase_tuberia: z.string().default("CL-10"),
-    codigo: z.string().optional(),
-})
+const createBatchTramosSchema = z.array(tramoCreateSchema)
 
-const createBatchTramosSchema = z.array(createTramoSchema)
-
-export async function createBatchTramos(data: any[], proyectoId: string) {
+export async function createBatchTramos(data: any[], proyectoId: string): Promise<ActionState<{ count: number }>> {
     const supabase = await createClient()
 
     // Validate input
@@ -117,7 +113,11 @@ export async function createBatchTramos(data: any[], proyectoId: string) {
     const parsed = createBatchTramosSchema.safeParse(dataWithProject)
 
     if (!parsed.success) {
-        return { error: "Datos inválidos: " + parsed.error.issues.map(i => i.message).join(", ") }
+        return {
+            success: false,
+            message: "Datos de lote inválidos",
+            errors: parsed.error.flatten().fieldErrors as any // Flatten on array is weird, just cast to any or Record
+        }
     }
 
     const tramosToInsert = parsed.data
@@ -128,7 +128,7 @@ export async function createBatchTramos(data: any[], proyectoId: string) {
         .select('*', { count: 'exact', head: true })
         .eq('proyecto_id', proyectoId)
 
-    if (countError) return { error: "Error al obtener conteo de tramos" }
+    if (countError) return { success: false, message: "Error al obtener conteo de tramos" }
 
     let currentCount = count || 0
 
@@ -138,7 +138,7 @@ export async function createBatchTramos(data: any[], proyectoId: string) {
         return {
             ...t,
             codigo: t.codigo || `T-${currentCount}`,
-            coef_hazen_williams: 150
+            coef_hazen_williams: t.coef_hazen_williams || 150
         }
     })
 
@@ -146,39 +146,42 @@ export async function createBatchTramos(data: any[], proyectoId: string) {
         .from('tramos')
         .insert(rows)
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
-    // No revalidatePath — tramos managed optimistically by the Zustand store
-    return { success: true, count: rows.length }
+    return { success: true, data: { count: rows.length } }
 }
 
-export async function deleteBatchTramos(ids: string[]) {
+export async function deleteBatchTramos(ids: string[]): Promise<ActionState> {
     const supabase = await createClient()
 
-    if (!ids || ids.length === 0) return { error: "No se seleccionaron tramos" }
+    const idsSchema = z.array(z.string().uuid())
+    const parsed = idsSchema.safeParse(ids)
+
+    if (!parsed.success || parsed.data.length === 0) return { success: false, message: "IDs inválidos o vacíos" }
 
     const { error } = await supabase
         .from('tramos')
         .delete()
-        .in('id', ids)
+        .in('id', parsed.data)
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
     revalidatePath('/proyectos/[id]/tramos')
     return { success: true }
 }
 
-export async function deleteTramo(id: string) {
+export async function deleteTramo(id: string): Promise<ActionState> {
     const supabase = await createClient()
 
-    if (!id) return { error: "ID requerido" }
+    const parseId = idSchema.safeParse(id)
+    if (!parseId.success) return { success: false, message: "ID inválido" }
 
     const { error } = await supabase
         .from('tramos')
         .delete()
         .eq('id', id)
 
-    if (error) return { error: error.message }
+    if (error) return { success: false, message: error.message }
 
     // No revalidatePath — store is the source of truth (optimistic)
     return { success: true }

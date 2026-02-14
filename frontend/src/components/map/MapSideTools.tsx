@@ -47,16 +47,21 @@ export function MapSideTools() {
 
         // 2. BACKGROUND: Persist to DB
         try {
-            if (type === 'nudo') {
-                const res = await deleteNudo(id)
-                if (res?.error) throw new Error(res.error)
-            } else {
-                const res = await deleteTramo(id)
-                if (res?.error) throw new Error(res.error)
+            if (selectedElement.type === 'nudo') {
+                const res = await deleteNudo(selectedElement.id)
+                if (!res.success) throw new Error(res.message)
+                toast.success('Nudo eliminado')
+            } else if (selectedElement.type === 'tramo') {
+                const res = await deleteTramo(selectedElement.id)
+                if (!res.success) throw new Error(res.message)
+                toast.success('Tramo eliminado')
             }
-            toast.success("Elemento eliminado")
+
+            // Clear selection
+            useProjectStore.getState().setSelectedElement(null)
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Error al eliminar")
+            console.error("Error deleting element:", error)
+            toast.error(error instanceof Error ? error.message : "Error al eliminar elemento")
         }
     }
 

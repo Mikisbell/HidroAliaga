@@ -58,6 +58,7 @@ export type NudoUpdateInput = z.infer<typeof nudoUpdateSchema>
 
 export const tramoCreateSchema = z.object({
     codigo: z.string().min(1, 'El código es requerido').max(50),
+    proyecto_id: z.string().uuid('ID de proyecto inválido'),
     nombre: z.string().optional(),
     tipo: tipoTramoSchema.default('tuberia'),
     nudo_origen_id: z.string().uuid('ID de nudo origen inválido'),

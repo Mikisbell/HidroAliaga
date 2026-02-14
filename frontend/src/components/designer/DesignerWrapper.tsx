@@ -86,7 +86,7 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
 
         // 2. BACKGROUND: Persist to DB
         try {
-            await createTramo({
+            const result = await createTramo({
                 proyecto_id: proyectoId,
                 nudo_origen_id: sourceId,
                 nudo_destino_id: targetId,
@@ -94,6 +94,9 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
                 target_handle: targetHandle || undefined,
                 longitud: length,
             })
+            if (!result.success) {
+                throw new Error(result.message)
+            }
             toast.success("Tramo creado")
         } catch (error) {
             // Rollback on failure
@@ -131,9 +134,11 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
         // 2. BACKGROUND: Persist to DB (user doesn't wait for this)
         try {
             const result = await createNudo(proyectoId, y / 1000, x / 1000, typeToCreate)
-            if (result.nudo) {
+            if (result.success && result.data?.nudo) {
                 // Replace temp node with real DB node (has real UUID)
-                replaceNudo(tempId, result.nudo as Nudo)
+                replaceNudo(tempId, result.data.nudo)
+            } else {
+                throw new Error(result.message || "Error creating node")
             }
         } catch (error) {
             // Rollback: remove the optimistic node

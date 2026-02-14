@@ -230,9 +230,13 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         };
         // Ideally, we should also call the backend here to persist
         // For now, optimistic update is enough for UI
-        import("@/app/actions/proyectos").then(({ updateProject }) => {
+        import("@/app/actions/proyectos").then(async ({ updateProject }) => {
             if (state.currentProject?.id) {
-                updateProject(state.currentProject.id, { settings: newSettings });
+                const res = await updateProject(state.currentProject.id, { settings: newSettings });
+                if (!res.success) {
+                    console.error("Failed to update project settings:", res.message);
+                    // Minimal error handling for background save
+                }
             }
         });
 

@@ -7,6 +7,7 @@ import { createTramo } from "@/app/actions/tramos"
 import { MapBottomPalette } from "./MapBottomPalette"
 import { MapSideTools } from "./MapSideTools"
 import { useProjectStore } from "@/store/project-store"
+import { toast } from "sonner"
 
 const MapEditor = dynamic(() => import("./MapEditor"), {
     ssr: false,
@@ -36,36 +37,52 @@ export default function MapWrapper({ nudos, tramos, proyectoId, initialPlanoConf
     const activeComponentType = useProjectStore(state => state.activeComponentType)
 
     const handleDragEnd = async (id: string, lat: number, lng: number) => {
-        try {
-            await updateNudoCoordinates(id, lat, lng)
-        } catch (error) {
-            console.error("Failed to update node:", error)
-            alert("Error al actualizar la posición del nudo")
+        const result = await updateNudoCoordinates(id, lat, lng)
+        if (!result.success) {
+            console.error("Failed to update node:", result.message)
+            toast.error(result.message || "Error al actualizar la posición del nudo")
         }
     }
 
     const handleMapClick = async (lat: number, lng: number) => {
         if (!proyectoId) return
-        try {
-            const typeToCreate = activeComponentType || 'union'
-            await createNudo(proyectoId, lat, lng, typeToCreate)
-        } catch (error) {
-            console.error("Failed to create node:", error)
-            alert("Error al crear el nudo")
+
+        const typeToCreate = activeComponentType || 'union'
+        const result = await createNudo(proyectoId, lat, lng, typeToCreate)
+
+        if (!result.success) {
+            console.error("Failed to create node:", result.message)
+            if (result.errors) {
+                // Show first validation error
+                const firstError = Object.values(result.errors).flat()[0]
+                toast.error(firstError || "Datos inválidos")
+            } else {
+                toast.error(result.message || "Error al crear el nudo")
+            }
+        } else {
+            toast.success("Nudo creado correctamente")
         }
     }
 
     const handleCreatePipe = async (origenId: string, destinoId: string) => {
         if (!proyectoId) return
-        try {
-            await createTramo({
-                proyecto_id: proyectoId,
-                nudo_origen_id: origenId,
-                nudo_destino_id: destinoId
-            })
-        } catch (error) {
-            console.error("Failed to create pipe:", error)
-            alert(error instanceof Error ? error.message : "Error al crear el tramo")
+
+        const result = await createTramo({
+            proyecto_id: proyectoId,
+            nudo_origen_id: origenId,
+            nudo_destino_id: destinoId
+        })
+
+        if (!result.success) {
+            console.error("Failed to create pipe:", result.message)
+            if (result.errors) {
+                const firstError = Object.values(result.errors).flat()[0]
+                toast.error(firstError || "Datos inválidos")
+            } else {
+                toast.error(result.message || "Error al crear el tramo")
+            }
+        } else {
+            toast.success("Tramo creado correctamente")
         }
     }
 
