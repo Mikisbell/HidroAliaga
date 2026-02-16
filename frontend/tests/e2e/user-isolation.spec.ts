@@ -8,8 +8,7 @@ import { loginAs, TEST_USERS } from './helpers';
  * 1. Usuario A solo ve sus proyectos
  * 2. Usuario B solo ve sus proyectos  
  * 3. Usuario A no puede acceder a proyectos de B
- * 4. Usuario B no puede acceder a proyectos de A
- * 5. El aislamiento es completo en la UI
+ * 4. El aislamiento persiste después de refresh
  */
 
 test.describe('User Data Isolation', () => {
@@ -84,7 +83,7 @@ test.describe('User Data Isolation', () => {
 
         // 4. Verificar que muestra error 403 o redirige
         const currentUrl = pageB.url();
-        const hasError = await pageB.locator('text=/403| Forbidden | No tienes permiso/i').count() > 0;
+        const hasError = await pageB.locator('text=/403|Forbidden|No tienes permiso/i').count() > 0;
         const isRedirected = !currentUrl.includes(projectId);
 
         expect(hasError || isRedirected).toBeTruthy();
@@ -117,15 +116,14 @@ test.describe('User Data Isolation', () => {
     test('New user should see empty project list', async ({ page }) => {
         test.setTimeout(60000);
 
-        // 1. Login con usuario nuevo
+        // 1. Login con usuario nuevo - use data-testid selectors
         await page.goto('/login');
-        await page.fill('input[type="email"]', `newuser_${Date.now()}@test.com`);
-        await page.fill('input[type="password"]', 'password123');
-        await page.click('button[type="submit"]');
+        await page.waitForLoadState('networkidle');
+        await page.fill('[data-testid="login-email"]', `newuser_${Date.now()}@test.com`);
+        await page.fill('[data-testid="login-password"]', 'password123');
+        await page.click('[data-testid="login-submit"]');
 
         // Si el usuario no existe, puede que necesitemos registrarnos primero
-        // Por ahora asumimos que ya existe o manejamos ambos casos
-
         try {
             await page.waitForURL('/dashboard', { timeout: 5000 });
         } catch {

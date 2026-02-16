@@ -35,6 +35,9 @@ import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 import { useUndoRedo } from '@/hooks/useUndoRedo'
 import { DesignerStatusBar } from './DesignerStatusBar'
+import { ScenarioManager } from './scenarios/ScenarioManager'
+import { Button } from '@/components/ui/button'
+import { Layers } from 'lucide-react'
 
 // ==================== NODE TYPES ====================
 const nodeTypes: NodeTypes = {
@@ -142,6 +145,12 @@ export default function NetworkDesigner({
 
     const [nodes, setNodes] = useState<Node[]>(() => nudosToNodes(nudos))
     const [edges, setEdges] = useState<Edge[]>(() => tramosToEdges(tramos))
+
+    // Scenario State
+    const [scenarioManagerOpen, setScenarioManagerOpen] = useState(false)
+    const scenarios = useProjectStore(state => state.scenarios)
+    const activeScenarioId = useProjectStore(state => state.activeScenarioId)
+    const activeScenario = scenarios.find(s => s.id === activeScenarioId) || scenarios.find(s => s.is_base)
 
     // ★ KEY: Sync local state whenever Zustand store data changes
     // This is what makes it "real-time" — when addNudo/addTramo updates
@@ -580,6 +589,22 @@ export default function NetworkDesigner({
                     onClose={() => setEditingNode(null)}
                 />
             )}
+
+            {/* Scenario Button (Top Right) */}
+            <Panel position="top-right" className="flex gap-2">
+                <Button
+                    variant="outline"
+                    className="bg-background/80 backdrop-blur shadow-sm border-border hover:bg-background"
+                    onClick={() => setScenarioManagerOpen(true)}
+                >
+                    <Layers className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <span className="font-medium">
+                        Escenario: {activeScenario?.name || 'Base'}
+                    </span>
+                </Button>
+            </Panel>
+
+            <ScenarioManager open={scenarioManagerOpen} onOpenChange={setScenarioManagerOpen} />
 
             {/* N8N-style Status Bar */}
             <DesignerStatusBar />

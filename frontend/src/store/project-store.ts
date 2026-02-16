@@ -1,7 +1,7 @@
 
 import { create } from 'zustand'
 
-import { Nudo, Tramo, Project } from '@/types/models';
+import { Nudo, Tramo, Project, Scenario } from '@/types/models';
 import { IterationStep } from "@/types/simulation"
 
 interface ProjectState {
@@ -64,6 +64,13 @@ interface ProjectState {
     // Validation State (The Referee)
     simulationAlerts: import('@/lib/hydraulics/validator').ValidationResult[];
     setSimulationAlerts: (alerts: import('@/lib/hydraulics/validator').ValidationResult[]) => void;
+
+    // Scenario Management
+    scenarios: Scenario[];
+    activeScenarioId: string | null;
+    createScenario: (name: string, parentId?: string | null) => void;
+    switchScenario: (id: string) => void;
+    deleteScenario: (id: string) => void;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -108,13 +115,28 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }),
 
     // Actions
-    setProject: (project) => set({ currentProject: project, error: null }),
+    setProject: (project) => {
+        let scenarios = project.settings?.scenarios || [];
+        if (!scenarios.some(s => s.is_base)) {
+            scenarios = [{
+                id: crypto.randomUUID(),
+                name: 'Base',
+                parent_id: null,
+                is_base: true,
+                created_at: new Date().toISOString()
+            }, ...scenarios];
+        }
+        set({ currentProject: project, scenarios, activeScenarioId: null, error: null });
+    },
     setElements: (nudos, tramos) => set({ nudos, tramos }),
 
     addNudo: async (nudo) => {
         // Optimistic Update
         set((state) => ({ nudos: [...state.nudos, nudo] }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -133,7 +155,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         const previousNudos = get().nudos;
         // Optimistic Update
         set((state) => ({ nudos: state.nudos.filter(n => n.id !== id) }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -158,7 +183,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         set((state) => ({
             nudos: state.nudos.map((n) => (n.id === nudo.id ? { ...n, ...nudo } : n))
         }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -175,7 +203,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     addTramo: async (tramo) => {
         set((state) => ({ tramos: [...state.tramos, tramo] }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -191,7 +222,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     removeTramo: async (id) => {
         const previousTramos = get().tramos;
         set((state) => ({ tramos: state.tramos.filter(t => t.id !== id) }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -209,7 +243,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         set((state) => ({
             tramos: state.tramos.map((t) => (t.id === tramo.id ? { ...t, ...tramo } : t))
         }));
-        const projectId = get().currentProject?.id;
+        const { currentProject, activeScenarioId } = get();
+        if (activeScenarioId) return;
+
+        const projectId = currentProject?.id;
         if (!projectId) return;
 
         try {
@@ -292,5 +329,97 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     // Validation (The Referee)
     simulationAlerts: [],
-    setSimulationAlerts: (alerts) => set({ simulationAlerts: alerts })
+    setSimulationAlerts: (alerts) => set({ simulationAlerts: alerts }),
+
+    // Scenario Management
+    scenarios: [],
+    activeScenarioId: null,
+
+    createScenario: (name, parentId) => set((state) => {
+        const parent = parentId
+            ? state.scenarios.find(s => s.id === parentId)
+            : state.scenarios.find(s => s.is_base);
+
+        // Deep copy parent data
+        const isParentActive = (parent?.id === state.activeScenarioId) || (parent?.is_base && state.activeScenarioId === null);
+
+        const sourceData = isParentActive
+            ? { nudos: state.nudos, tramos: state.tramos }
+            : parent?.snapshot || { nudos: [], tramos: [] };
+
+        const newScenario: Scenario = {
+            id: crypto.randomUUID(),
+            name,
+            parent_id: parent?.id || null,
+            is_base: false,
+            created_at: new Date().toISOString(),
+            snapshot: JSON.parse(JSON.stringify(sourceData))
+        };
+
+        const updatedScenarios = [...state.scenarios, newScenario];
+
+        // Persist to Backend
+        if (state.currentProject?.id) {
+            import("@/app/actions/proyectos").then(({ updateProject }) => {
+                updateProject(state.currentProject!.id, {
+                    settings: { ...state.currentProject!.settings, scenarios: updatedScenarios }
+                });
+            });
+        }
+
+        return { scenarios: updatedScenarios };
+    }),
+
+    switchScenario: (id) => set((state) => {
+        if (id === state.activeScenarioId) return {};
+
+        // Snapshot current
+        const currentId = state.activeScenarioId || state.scenarios.find(s => s.is_base)?.id;
+
+        const currentData = { nudos: state.nudos, tramos: state.tramos };
+
+        const updatedScenarios = state.scenarios.map(s =>
+            s.id === currentId ? { ...s, snapshot: currentData } : s
+        );
+
+        const target = updatedScenarios.find(s => s.id === id);
+        if (!target) return {};
+
+        // Persist snapshots to Backend
+        if (state.currentProject?.id) {
+            import("@/app/actions/proyectos").then(({ updateProject }) => {
+                updateProject(state.currentProject!.id, {
+                    settings: {
+                        ...state.currentProject!.settings,
+                        scenarios: updatedScenarios,
+                        active_scenario_id: id // Also persist active state? Useful for reload.
+                    }
+                });
+            });
+        }
+
+        return {
+            scenarios: updatedScenarios,
+            activeScenarioId: id,
+            nudos: target.snapshot?.nudos || [],
+            tramos: target.snapshot?.tramos || [],
+            selectedElement: null
+        };
+    }),
+
+    deleteScenario: (id) => set((state) => {
+        if (state.activeScenarioId === id) return {};
+        const updatedScenarios = state.scenarios.filter(s => s.id !== id);
+
+        // Persist
+        if (state.currentProject?.id) {
+            import("@/app/actions/proyectos").then(({ updateProject }) => {
+                updateProject(state.currentProject!.id, {
+                    settings: { ...state.currentProject!.settings, scenarios: updatedScenarios }
+                });
+            });
+        }
+
+        return { scenarios: updatedScenarios };
+    })
 }));

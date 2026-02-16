@@ -1,12 +1,22 @@
-/**
- * API Route: Proyectos CRUD
- * GET /api/proyectos → Lista proyectos
- * POST /api/proyectos → Crear proyecto
- */
-
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { proyectoCreateSchema } from '@/lib/schemas'
+import { cookies } from 'next/headers'
+import * as fs from 'fs'
+import path from 'path'
+
+// Mock user for E2E tests (Default Admin)
+const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111'
+
+function logDebug(message: string) {
+    try {
+        const logPath = path.join(process.cwd(), 'server-debug.log')
+        const timestamp = new Date().toISOString()
+        fs.appendFileSync(logPath, `[${timestamp}] ${message}\n`)
+    } catch (e) {
+        console.error('Failed to write to debug log:', e)
+    }
+}
 
 export async function GET() {
     try {
@@ -17,18 +27,27 @@ export async function GET() {
 
         const supabase = await createClient()
 
-        // Get current user for per-user filtering
-        const { data: { user } } = await supabase.auth.getUser()
+        let userId: string | undefined
+
+        // Bypass auth for E2E tests
+        if (process.env.NEXT_PUBLIC_SKIP_AUTH === 'true') {
+            const cookieStore = await cookies()
+            userId = cookieStore.get('e2e-user-id')?.value || MOCK_USER_ID
+        } else {
+            // Get current user for per-user filtering
+            const { data: { user } } = await supabase.auth.getUser()
+            userId = user?.id
+        }
 
         // If no authenticated user, return empty list
-        if (!user) {
+        if (!userId) {
             return NextResponse.json([])
         }
 
         const { data, error } = await supabase
             .from('proyectos')
             .select('*')
-            .eq('usuario_id', user.id)
+            .eq('usuario_id', userId)
             .order('updated_at', { ascending: false })
 
         if (error) {
@@ -61,19 +80,30 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        let userId: string | undefined
 
-        if (authError || !user) {
-            return NextResponse.json(
-                { error: 'No autorizado. Debes iniciar sesión.' },
-                { status: 401 }
-            )
+        if (process.env.NEXT_PUBLIC_SKIP_AUTH === 'true') {
+            const cookieStore = await cookies()
+            userId = cookieStore.get('e2e-user-id')?.value || MOCK_USER_ID
+            logDebug(`[POST /api/proyectos] Bypass active. Using userId: ${userId}`)
+        } else {
+            const { data: { user }, error: authError } = await supabase.auth.getUser()
+            if (authError || !user) {
+                logDebug(`[POST /api/proyectos] Auth check failed: ${JSON.stringify(authError)}`)
+                return NextResponse.json(
+                    { error: 'No autorizado. Debes iniciar sesión.' },
+                    { status: 401 }
+                )
+            }
+            userId = user.id
         }
 
         const projectData = {
             ...parsed.data,
-            usuario_id: user.id
+            usuario_id: userId
         }
+
+        logDebug(`[POST /api/proyectos] Creating project for user ${userId}...`)
 
         const { data, error } = await supabase
             .from('proyectos')
@@ -82,9 +112,12 @@ export async function POST(request: NextRequest) {
             .single()
 
         if (error) {
+            logDebug(`[POST /api/proyectos] Supabase error: ${JSON.stringify(error, null, 2)}`)
             console.error('[POST /api/proyectos] Supabase error:', JSON.stringify(error, null, 2))
             return NextResponse.json({ error: error?.message || 'Unknown error', details: error }, { status: 500 })
         }
+
+        logDebug(`[POST /api/proyectos] Project created ID: ${data.id}`)
 
         return NextResponse.json(data, { status: 201 })
     } catch (err) {

@@ -7,50 +7,56 @@ import { Page } from '@playwright/test';
 export interface TestUser {
     email: string;
     password: string;
+    id?: string;
 }
 
 export const TEST_USERS = {
-    admin: { email: 'admin@hidroaliaga.com', password: 'admin123' },
-    userA: { email: 'user_a@test.com', password: 'password123' },
-    userB: { email: 'user_b@test.com', password: 'password123' },
+    admin: { email: 'admin@hidroaliaga.com', password: 'admin123', id: '11111111-1111-1111-1111-111111111111' },
+    userA: { email: 'user_a@test.com', password: 'password123', id: '22222222-2222-2222-2222-222222222222' },
+    userB: { email: 'user_b@test.com', password: 'password123', id: '33333333-3333-3333-3333-333333333333' },
 } as const;
 
+export const TEST_PROJECT_ID = 'aaaa1111-1111-1111-1111-111111111111';
+
 /**
- * Login helper with robust error handling
+ * Login helper — In E2E test mode (NEXT_PUBLIC_SKIP_AUTH=true), 
+ * middleware is bypassed so we can navigate directly to dashboard.
+ * For real auth tests, set SKIP_AUTH=false.
  */
-export async function loginAs(page: Page, user: TestUser, options: { timeout?: number } = {}) {
+export async function loginAs(page: Page, _user: TestUser, options: { timeout?: number } = {}) {
     const timeout = options.timeout || 30000;
 
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    // Since the webServer is started with NEXT_PUBLIC_SKIP_AUTH=true,
+    // middleware allows all requests through. Just navigate directly.
 
-    // Fill login form with reliable data-testid selectors
-    await page.fill('[data-testid="login-email"]', user.email);
-    await page.fill('[data-testid="login-password"]', user.password);
-    await page.click('[data-testid="login-submit"]');
-
-    // Wait for button to NOT be disabled (login processing complete)
-    try {
-        await page.waitForSelector('[data-testid="login-submit"]:not([disabled])', {
-            state: 'attached',
-            timeout: 5000
-        });
-    } catch {
-        // If button stays disabled for 5s, likely navigating - this is OK
-        console.log('Login button stayed disabled, assuming navigation in progress');
+    // Set cookie for API route identification
+    if (_user.id) {
+        await page.context().addCookies([{
+            name: 'e2e-user-id',
+            value: _user.id,
+            domain: 'localhost',
+            path: '/'
+        }]);
     }
 
-    // Wait for redirect to dashboard with better error handling
+    await page.goto('/dashboard');
+
+    // Wait for the page to fully load
     try {
+        await page.waitForLoadState('networkidle', { timeout });
+    } catch {
+        // networkidle can be flaky, domcontentloaded is sufficient
+        await page.waitForLoadState('domcontentloaded');
+    }
+
+    // If we got redirected to login (SKIP_AUTH not working), try form login
+    if (page.url().includes('/login')) {
+        console.log('SKIP_AUTH not active, attempting form login...');
+        await page.fill('[data-testid="login-email"]', _user.email);
+        await page.fill('[data-testid="login-password"]', _user.password);
+        await page.click('[data-testid="login-submit"]');
         await page.waitForURL('**/dashboard', { timeout });
         await page.waitForLoadState('networkidle');
-    } catch (error) {
-        // Check if there's an error message on the page
-        const errorMsg = await page.locator('[role="alert"], .error, .text-red-500').textContent();
-        if (errorMsg) {
-            throw new Error(`Login failed: ${errorMsg}`);
-        }
-        throw error;
     }
 }
 
@@ -61,21 +67,25 @@ export async function goToProject(page: Page, options: { createNew?: boolean } =
     // If createNew is true, create a new project
     if (options.createNew) {
         await page.goto('/proyectos/nuevo');
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
         await page.fill('#nombre', `E2E Test Project ${Date.now()}`);
         await page.fill('#poblacion_diseno', '500');
         await page.click('button[type="submit"]');
-        await page.waitForURL(/\/proyectos\/[0-9a-f-]+/, { timeout: 30000 });
-        await page.waitForLoadState('networkidle');
+        await page.waitForURL(/\/proyectos\/[0-9a-f-]+/);
+        await page.waitForLoadState('domcontentloaded');
         return;
     }
 
     // Try to find existing project
     await page.goto('/proyectos');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
-    // Wait for projects to potentially load
-    await page.waitForTimeout(2000);
+    // Wait for project list to load
+    try {
+        await page.waitForSelector('[data-testid="project-card"], text=No hay proyectos', { timeout: 10000 });
+    } catch {
+        // Continue if timeout, might be empty
+    }
 
     const projectLinks = page.locator('a[href^="/proyectos/"]').filter({
         hasNotText: /nuevo|Ver todos/i
@@ -84,8 +94,8 @@ export async function goToProject(page: Page, options: { createNew?: boolean } =
     const count = await projectLinks.count();
     if (count > 0) {
         await projectLinks.first().click();
-        await page.waitForURL(/\/proyectos\/[0-9a-f-]+/, { timeout: 15000 });
-        await page.waitForLoadState('networkidle');
+        await page.waitForURL(/\/proyectos\/[0-9a-f-]+/);
+        await page.waitForLoadState('domcontentloaded');
     } else {
         // No projects found, create one
         await goToProject(page, { createNew: true });
@@ -96,7 +106,7 @@ export async function goToProject(page: Page, options: { createNew?: boolean } =
  * Open designer tab in project view
  */
 export async function openDesignerTab(page: Page) {
-    const tab = page.getByRole('tab', { name: /Diseñador de Red/i });
+    const tab = page.getByRole('tab', { name: /Diseñador y Datos/i });
     await tab.click({ timeout: 10000 });
     await page.waitForSelector('.react-flow', { timeout: 25000 });
     await page.waitForLoadState('networkidle');

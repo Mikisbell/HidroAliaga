@@ -1,41 +1,18 @@
 import { test, expect } from '@playwright/test';
+import { loginAs, TEST_USERS } from './helpers';
 
 /**
  * E2E Test: Project Creation Flow
  * 
- * Login form selectors:
- *   - Email: input with placeholder="admin@hidroaliaga.com"
- *   - Password: input with placeholder="••••••••"
- *   - Submit: button with type="submit" containing "Iniciar Sesión" or "Ingresar"
- *
  * Nuevo Proyecto form:
  *   - Inputs use id attributes: #nombre, #departamento, #poblacion_diseno, etc.
  *   - Selects have defaultValue (ambito=urbano, tipo_red=cerrada)
  */
 
-const TEST_EMAIL = 'admin@hidroaliaga.com';
-const TEST_PASSWORD = 'admin123';
-
 test.describe('Project Creation Flow', () => {
 
     test.beforeEach(async ({ page }) => {
-        // Navigate to login
-        await page.goto('/login');
-        await page.waitForLoadState('networkidle');
-
-        // Fill email and password using placeholders (proven to work)
-        await page.getByPlaceholder('admin@hidroaliaga.com').fill(TEST_EMAIL);
-
-        // Handle potential dynamic password field
-        const passwordInput = page.getByPlaceholder('••••••••');
-        await passwordInput.fill(TEST_PASSWORD);
-
-        // Click submit
-        await page.locator('button[type="submit"]').click();
-
-        // Wait for redirect to dashboard
-        // increasing timeout to 30s just in case
-        await page.waitForURL('**/dashboard', { timeout: 30000 });
+        await loginAs(page, TEST_USERS.admin);
     });
 
     test('should navigate to new project form', async ({ page }) => {
@@ -83,8 +60,9 @@ test.describe('Project Creation Flow', () => {
         await page.click('button[type="submit"]');
         await page.waitForURL(/\/proyectos\/[0-9a-f-]+/, { timeout: 15000 });
 
-        await expect(page.locator('text=Nudos')).toBeVisible({ timeout: 10000 });
-        await expect(page.locator('text=Tramos')).toBeVisible();
-        await expect(page.locator('text=Mapa Visual')).toBeVisible();
+        // Verify the new tab structure
+        await expect(page.getByRole('tab', { name: /Diseñador y Datos/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('tab', { name: /Resultados/i })).toBeVisible();
+        await expect(page.getByRole('tab', { name: /Configuración/i })).toBeVisible();
     });
 });

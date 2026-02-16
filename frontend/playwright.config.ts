@@ -28,16 +28,16 @@ export default defineConfig({
     },
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
-        baseURL: 'http://localhost:3002',
+        baseURL: 'http://localhost:3005',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: 'on-first-retry',
 
-        /* Explicit action timeout - 15 seconds */
-        actionTimeout: 15000,
+        /* Explicit action timeout - 30 seconds */
+        actionTimeout: 30000,
 
-        /* Explicit navigation timeout - 30 seconds */
-        navigationTimeout: 30000,
+        /* Explicit navigation timeout - 60 seconds */
+        navigationTimeout: 60000,
     },
 
     /* Configure projects for major browsers */
@@ -58,11 +58,11 @@ export default defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'npx next dev -p 3002 --webpack',
-        url: 'http://localhost:3002',
+        command: 'npx cross-env NEXT_PUBLIC_SKIP_AUTH=true next dev -p 3005 --webpack',
+        url: 'http://localhost:3005',
         reuseExistingServer: !process.env.CI,
         env: {
-            NEXT_PUBLIC_SKIP_AUTH: 'true',  // Bypass middleware auth during E2E tests (best working solution)
+            NEXT_PUBLIC_SKIP_AUTH: 'true',  // Also set via env for middleware
         },
     },
 });

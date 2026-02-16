@@ -19,6 +19,8 @@ export interface ProjectSettings {
     k2?: number;
     // Order of tramos in the calculation table
     tramo_order?: string[];
+    scenarios?: Scenario[];
+    active_scenario_id?: string;
     // Futuros ajustes
 }
 
@@ -249,6 +251,7 @@ export interface Alerta {
 
 export interface JunctionData extends Record<string, unknown> {
     label?: string;
+    nombre?: string;
     codigo?: string;
     cota_terreno?: number;
     demanda_base?: number;
@@ -258,7 +261,21 @@ export interface JunctionData extends Record<string, unknown> {
 
 export interface ReservoirData extends Record<string, unknown> {
     label?: string;
+    nombre?: string;
     codigo?: string;
     cota_terreno?: number;
     altura_agua?: number;
+}
+
+export interface Scenario {
+    id: string;
+    name: string;
+    description?: string;
+    parent_id: string | null;
+    is_base: boolean;
+    created_at: string;
+    snapshot?: {
+        nudos: Nudo[];
+        tramos: Tramo[];
+    };
 }

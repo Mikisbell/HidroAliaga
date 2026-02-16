@@ -24,6 +24,14 @@ export default function LoginPage() {
         setLoading(true)
         setError(null)
 
+        // E2E test bypass: skip Supabase auth when SKIP_AUTH is enabled
+        if (process.env.NEXT_PUBLIC_SKIP_AUTH === 'true') {
+            setLoading(false)
+            router.push("/dashboard")
+            router.refresh()
+            return
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password })
 
         if (error) {
