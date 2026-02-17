@@ -1,0 +1,34 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.1, pluggy-1.6.0 -- C:\Users\Mateo\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: E:\FREECLOUD\FREECLOUD-IA\PROYECTOS\HidroAliaga\backend
+configfile: pyproject.toml
+plugins: anyio-4.10.0, hypothesis-6.138.14, asyncio-1.1.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 22 items
+
+tests/test_auth.py::TestUserAuth::test_user_auth_creation PASSED         [  4%]
+tests/test_auth.py::TestUserAuth::test_user_admin_detection PASSED       [  9%]
+tests/test_auth.py::TestTokenVerification::test_verify_valid_token PASSED [ 13%]
+tests/test_auth.py::TestTokenVerification::test_verify_expired_token PASSED [ 18%]
+tests/test_auth.py::TestTokenVerification::test_verify_invalid_token PASSED [ 22%]
+tests/test_auth.py::TestTokenVerification::test_verify_token_without_sub PASSED [ 27%]
+tests/test_auth.py::TestAuthorizationErrors::test_authorization_error PASSED [ 31%]
+tests/test_auth.py::TestAuthorizationErrors::test_authentication_error PASSED [ 36%]
+tests/test_auth.py::TestGetCurrentActiveUser::test_get_active_user_success PASSED [ 40%]
+tests/test_auth.py::TestGetCurrentActiveUser::test_get_active_user_none PASSED [ 45%]
+tests/test_auth.py::TestSecurityEdgeCases::test_user_auth_repr PASSED    [ 50%]
+tests/test_auth.py::TestSecurityEdgeCases::test_malformed_token PASSED   [ 54%]
+tests/test_auth.py::TestSecurityEdgeCases::test_empty_token PASSED       [ 59%]
+tests/test_integration.py::TestAuthentication::test_listar_proyectos_sin_token PASSED [ 63%]
+tests/test_integration.py::TestAuthentication::test_crear_proyecto_sin_token PASSED [ 68%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_vee_sus_proyectos PASSED [ 72%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_vee_proyectos_usuario_b PASSED [ 77%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_accede_proyecto_usuario_b PASSED [ 81%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_modifica_proyecto_usuario_b PASSED [ 86%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_elimina_proyecto_usuario_b PASSED [ 90%]
+tests/test_integration.py::TestProjectCreation::test_crear_proyecto_asigna_usuario PASSED [ 95%]
+tests/test_integration.py::TestNestedEndpoints::test_listar_nudos_proyecto_otro_usuario PASSED [100%]
+
+============================= 22 passed in 1.74s ==============================

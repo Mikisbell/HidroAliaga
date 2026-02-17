@@ -1,7 +1,7 @@
 
 import { create } from 'zustand'
 
-import { Nudo, Tramo, Project, Scenario } from '@/types/models';
+import { Nudo, Tramo, Project, Scenario, CurvaCaracteristica } from '@/types/models';
 import { IterationStep } from "@/types/simulation"
 
 interface ProjectState {
@@ -71,6 +71,19 @@ interface ProjectState {
     createScenario: (name: string, parentId?: string | null) => void;
     switchScenario: (id: string) => void;
     deleteScenario: (id: string) => void;
+
+    // Demand Patterns
+    patrones: import('@/types/models').PatronDemanda[];
+    addPattern: (patron: import('@/types/models').PatronDemanda) => void;
+    updatePattern: (patron: import('@/types/models').PatronDemanda) => void;
+    deletePattern: (id: string) => void;
+    assignPatternToNode: (nodeId: string, patternId: string | null) => void;
+
+    // Curvas Caracteristicas
+    curvas: CurvaCaracteristica[];
+    addCurve: (curva: CurvaCaracteristica) => void;
+    updateCurve: (curva: CurvaCaracteristica) => void;
+    deleteCurve: (id: string) => void;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -114,6 +127,73 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         simulationMode: 'design'
     }),
 
+    // Validations & Engine
+    simulationResults: null,
+    setSimulationResults: (results) => set({ simulationResults: results }),
+    simulationAlerts: [],
+    setSimulationAlerts: (alerts) => set({ simulationAlerts: alerts }),
+
+    // Curvas Caracteristicas
+    curvas: [],
+    addCurve: async (curva) => {
+        set((state) => ({ curvas: [...state.curvas, curva] }));
+        const { currentProject } = get();
+        const projectId = currentProject?.id;
+        if (!projectId) return;
+        try {
+            await import("@/app/actions/curves").then(async ({ addCurve }) => {
+                const { success, data } = await addCurve(projectId, curva);
+                if (!success || !data) {
+                    throw new Error("Failed to add curve");
+                }
+                set((state) => ({
+                    curvas: state.curvas.map(c => c.id === curva.id ? data : c)
+                }));
+            });
+        } catch (error) {
+            set((state) => ({ curvas: state.curvas.filter(c => c.id !== curva.id) }));
+            import("sonner").then(({ toast }) => toast.error("Error al guardar la curva"));
+        }
+    },
+    updateCurve: async (curva) => {
+        const previousCurvas = get().curvas;
+        set((state) => ({
+            curvas: state.curvas.map((c) => (c.id === curva.id ? curva : c))
+        }));
+        const { currentProject } = get();
+        const projectId = currentProject?.id;
+        if (!projectId) return;
+        try {
+            await import("@/app/actions/curves").then(async ({ updateCurve }) => {
+                const { success } = await updateCurve(projectId, curva.id, curva);
+                if (!success) {
+                    throw new Error("Failed to update curve");
+                }
+            });
+        } catch (error) {
+            set({ curvas: previousCurvas });
+            import("sonner").then(({ toast }) => toast.error("Error al actualizar la curva"));
+        }
+    },
+    deleteCurve: async (id) => {
+        const previousCurvas = get().curvas;
+        set((state) => ({ curvas: state.curvas.filter((c) => c.id !== id) }));
+        const { currentProject } = get();
+        const projectId = currentProject?.id;
+        if (!projectId) return;
+        try {
+            await import("@/app/actions/curves").then(async ({ deleteCurve }) => {
+                const { success } = await deleteCurve(projectId, id);
+                if (!success) {
+                    throw new Error("Failed to delete curve");
+                }
+            });
+        } catch (error) {
+            set({ curvas: previousCurvas });
+            import("sonner").then(({ toast }) => toast.error("Error al eliminar la curva"));
+        }
+    },
+
     // Actions
     setProject: (project) => {
         let scenarios = project.settings?.scenarios || [];
@@ -127,6 +207,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             }, ...scenarios];
         }
         set({ currentProject: project, scenarios, activeScenarioId: null, error: null });
+
+        // Load Patterns
+        if (project.id) {
+            import("@/app/actions/patterns").then(async ({ getPatterns }) => {
+                const { success, data } = await getPatterns(project.id);
+                if (success && data) {
+                    set({ patrones: data });
+                }
+            });
+        }
     },
     setElements: (nudos, tramos) => set({ nudos, tramos }),
 
@@ -293,11 +383,13 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         // Import dynamically to avoid SSR issues if any, though solver is pure JS.
         import('@/lib/hydraulics/solver').then(({ solveNetwork }) => {
             const state = get();
-            const result = solveNetwork(state.nudos, state.tramos);
+            // Use simulationStep as time (hour)
+            const result = solveNetwork(state.nudos, state.tramos, state.patrones, state.curvas, state.simulationStep);
 
             // Merge results
             const newNudos = state.nudos.map(n => {
                 const res = result.nudos.find(rn => rn.id === n.id);
+                // Also update demand? For now just pressure.
                 return res ? { ...n, presion_calc: res.presion_calc } : n;
             });
 
@@ -323,13 +415,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         });
     },
 
-    // New Hydraulic Engine
-    simulationResults: null,
-    setSimulationResults: (results) => set({ simulationResults: results }),
 
-    // Validation (The Referee)
-    simulationAlerts: [],
-    setSimulationAlerts: (alerts) => set({ simulationAlerts: alerts }),
 
     // Scenario Management
     scenarios: [],
@@ -421,5 +507,76 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         }
 
         return { scenarios: updatedScenarios };
-    })
+        return { scenarios: updatedScenarios };
+    }),
+
+    // Demand Patterns
+    patrones: [],
+
+    addPattern: async (patron) => {
+        set((state) => ({ patrones: [...state.patrones, patron] }));
+
+        // Persist to Server
+        try {
+            await import("@/app/actions/patterns").then(({ createPattern }) =>
+                createPattern(patron)
+            );
+        } catch (error) {
+            set((state) => ({ patrones: state.patrones.filter(p => p.id !== patron.id) }));
+            console.error("Failed to create pattern", error);
+        }
+    },
+
+    updatePattern: async (patron) => {
+        const prevPatterns = get().patrones;
+        set((state) => ({
+            patrones: state.patrones.map(p => p.id === patron.id ? patron : p)
+        }));
+
+        try {
+            await import("@/app/actions/patterns").then(({ updatePattern }) =>
+                updatePattern(patron.id, patron)
+            );
+        } catch (error) {
+            set({ patrones: prevPatterns });
+            console.error("Failed to update pattern", error);
+        }
+    },
+
+    deletePattern: async (id) => {
+        const prevPatterns = get().patrones;
+        set((state) => ({
+            patrones: state.patrones.filter(p => p.id !== id),
+            // Also clear assignments from nodes locally? Optional, maybe keep ID ref.
+            nudos: state.nudos.map(n => n.patron_demanda_id === id ? { ...n, patron_demanda_id: null } : n)
+        }));
+
+        try {
+            await import("@/app/actions/patterns").then(({ deletePattern }) =>
+                deletePattern(id)
+            );
+        } catch (error) {
+            set({ patrones: prevPatterns });
+            console.error("Failed to delete pattern", error);
+        }
+    },
+
+    assignPatternToNode: async (nodeId, patternId) => {
+        const prevNudos = get().nudos;
+        set((state) => ({
+            nudos: state.nudos.map(n => n.id === nodeId ? { ...n, patron_demanda_id: patternId } : n)
+        }));
+
+        const project = get().currentProject;
+        if (!project) return;
+
+        try {
+            await import("@/app/actions/nudos").then(({ updateNudo }) =>
+                updateNudo(nodeId, { patron_demanda_id: patternId })
+            );
+        } catch (error) {
+            set({ nudos: prevNudos });
+            console.error("Failed to assign pattern", error);
+        }
+    }
 }));

@@ -7,17 +7,41 @@ import { useProjectStore } from "@/store/project-store"
 import { updateNudo } from "@/app/actions/nudos"
 import { Loader2 } from "lucide-react"
 
+import { PatternList } from "@/components/patterns/PatternList"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+
 interface NodePropertiesFormProps {
     nudo: Nudo
 }
 
 export default function NodePropertiesForm({ nudo }: NodePropertiesFormProps) {
     const updateNudoStore = useProjectStore(state => state.updateNudo)
+    const patrones = useProjectStore(state => state.patrones)
+    const scenarios = useProjectStore(state => state.scenarios)
+    const activeScenarioId = useProjectStore(state => state.activeScenarioId)
+
+    // Calculate Parent Node for Overrides
+    const parentNudo = (() => {
+        if (!activeScenarioId) return null;
+        const activeScenario = scenarios.find(s => s.id === activeScenarioId);
+        if (!activeScenario || !activeScenario.parent_id) return null;
+        const parentScenario = scenarios.find(s => s.id === activeScenario.parent_id);
+        if (!parentScenario?.snapshot?.nudos) return null;
+        return parentScenario.snapshot.nudos.find(n => n.id === nudo.id);
+    })();
+
     const [formData, setFormData] = useState({
         codigo: nudo.codigo,
         cota_terreno: nudo.cota_terreno,
         demanda_base: nudo.demanda_base,
-        tipo: nudo.tipo
+        tipo: nudo.tipo,
+        patron_demanda_id: nudo.patron_demanda_id || ""
     })
     const [isSaving, setIsSaving] = useState(false)
 
@@ -27,9 +51,10 @@ export default function NodePropertiesForm({ nudo }: NodePropertiesFormProps) {
             codigo: nudo.codigo,
             cota_terreno: nudo.cota_terreno,
             demanda_base: nudo.demanda_base,
-            tipo: nudo.tipo
+            tipo: nudo.tipo,
+            patron_demanda_id: nudo.patron_demanda_id || ""
         })
-    }, [nudo.id]) // Only when ID changes (new selection)
+    }, [nudo.id, nudo])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -39,30 +64,60 @@ export default function NodePropertiesForm({ nudo }: NodePropertiesFormProps) {
         }))
     }
 
+    const handleReset = async (field: keyof typeof formData) => {
+        if (!parentNudo) return;
+        const parentValue = parentNudo[field as keyof Nudo];
+
+        // Optimistic
+        const newValue = field === 'patron_demanda_id' ? (parentValue || "") : (parentValue ?? 0); // Handle nulls/undefined
+
+        setFormData(prev => ({ ...prev, [field]: newValue }));
+
+        const updatedNudo = { ...nudo, [field]: parentValue }; // Use raw parent value
+        updateNudoStore(updatedNudo as Nudo);
+
+        await updateNudo(nudo.id, { [field]: parentValue });
+    }
+
     const handleSave = async () => {
         setIsSaving(true)
         try {
-            // 1. Optimistic Update (Zustand)
             const updatedNudo = { ...nudo, ...formData }
-            updateNudoStore(updatedNudo)
-
-            // 2. Server Action (Background)
-            // Note: updateNudo in actions usually has revalidatePath, but for this interactive
-            // component we rely on the store. Ideally we should have an action WITHOUT revalidatePath
-            // for these granular updates if we don't want to trigger full page refresh.
-            // For now, let's see if the existing action triggers a reload that might be annoying.
-            // If so, we might need a specific 'updateNudoProperties' action without revalidate.
-
-            await updateNudo(updatedNudo.id, updatedNudo) // This currently has revalidatePath according to previous edits check?
-            // Actually, we checked nudos.ts and updateNudo HAS revalidatePath because it's used by DataGrid.
-            // We might need to handle this.
-
+            // Ensure types match Nudo
+            updateNudoStore(updatedNudo as Nudo)
+            await updateNudo(updatedNudo.id, updatedNudo)
         } catch (error) {
             console.error("Error updating node:", error)
-            // Revert on error? (Store logic would need undo)
         } finally {
             setIsSaving(false)
         }
+    }
+
+    // Helper to render override indicator
+    const renderOverride = (field: keyof typeof formData) => {
+        if (!parentNudo) return null;
+
+        const currentValue = formData[field];
+        // Normalize for comparison (handle null/undefined/empty string)
+        const parentValueRaw = parentNudo[field as keyof Nudo];
+        const parentValue = field === 'patron_demanda_id' ? (parentValueRaw || "") : (parentValueRaw ?? 0);
+
+        // Simple equality check (works for primitive types)
+        if (currentValue != parentValue) {
+            return (
+                <div className="flex items-center gap-1 ml-auto">
+                    <span className="text-[10px] text-orange-500 font-semibold bg-orange-500/10 px-1 rounded">Modificado</span>
+                    <button
+                        onClick={() => handleReset(field)}
+                        className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                        title={`Resetear a valor original: ${parentValue}`}
+                    >
+                        Reset
+                    </button>
+                </div>
+            );
+        }
+        return null;
     }
 
     return (
@@ -95,25 +150,65 @@ export default function NodePropertiesForm({ nudo }: NodePropertiesFormProps) {
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-xs font-medium text-muted-foreground">Cota (m)</label>
+                    <div className="flex justify-between items-center">
+                        <label className="text-xs font-medium text-muted-foreground">Cota (m)</label>
+                        {renderOverride('cota_terreno')}
+                    </div>
                     <input
                         type="number"
                         name="cota_terreno"
                         value={formData.cota_terreno}
                         onChange={handleChange}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        className={`flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${parentNudo && formData.cota_terreno != (parentNudo.cota_terreno ?? 0) ? 'border-orange-500/50 bg-orange-500/5' : 'border-input'}`}
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-medium text-muted-foreground">Demanda (L/s)</label>
+                    <div className="flex justify-between items-center">
+                        <label className="text-xs font-medium text-muted-foreground">Demanda (L/s)</label>
+                        {renderOverride('demanda_base')}
+                    </div>
                     <input
                         type="number"
                         name="demanda_base"
                         value={formData.demanda_base}
                         onChange={handleChange}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        className={`flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${parentNudo && formData.demanda_base != (parentNudo.demanda_base ?? 0) ? 'border-orange-500/50 bg-orange-500/5' : 'border-input'}`}
                     />
                 </div>
+            </div>
+
+            {/* Demand Pattern Selector */}
+            <div className="space-y-2 pt-2 border-t">
+                <div className="flex justify-between items-center">
+                    <label className="text-xs font-medium text-muted-foreground mr-2">Patrón de Demanda</label>
+                    {renderOverride('patron_demanda_id')}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <button className="text-[10px] text-primary hover:underline ml-auto">
+                                Gestionar Patrones
+                            </button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Gestión de Patrones</DialogTitle>
+                            </DialogHeader>
+                            <PatternList onSelect={(id) => {
+                                setFormData(prev => ({ ...prev, patron_demanda_id: id }))
+                            }} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
+                <select
+                    name="patron_demanda_id"
+                    value={formData.patron_demanda_id || ""}
+                    onChange={handleChange}
+                    className={`flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${parentNudo && (formData.patron_demanda_id || "") != (parentNudo.patron_demanda_id || "") ? 'border-orange-500/50 bg-orange-500/5' : 'border-input'}`}
+                >
+                    <option value="">(Ninguno - Constante)</option>
+                    {patrones.map(p => (
+                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                    ))}
+                </select>
             </div>
 
             <div className="pt-2">

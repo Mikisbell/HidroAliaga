@@ -1,0 +1,21 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.1, pluggy-1.6.0 -- C:\Users\Mateo\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: E:\FREECLOUD\FREECLOUD-IA\PROYECTOS\HidroAliaga\backend
+configfile: pyproject.toml
+plugins: anyio-4.10.0, hypothesis-6.138.14, asyncio-1.1.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 9 items
+
+tests/test_integration.py::TestAuthentication::test_listar_proyectos_sin_token PASSED [ 11%]
+tests/test_integration.py::TestAuthentication::test_crear_proyecto_sin_token PASSED [ 22%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_vee_sus_proyectos PASSED [ 33%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_vee_proyectos_usuario_b PASSED [ 44%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_accede_proyecto_usuario_b PASSED [ 55%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_modifica_proyecto_usuario_b PASSED [ 66%]
+tests/test_integration.py::TestAuthorization::test_usuario_a_no_elimina_proyecto_usuario_b PASSED [ 77%]
+tests/test_integration.py::TestProjectCreation::test_crear_proyecto_asigna_usuario PASSED [ 88%]
+tests/test_integration.py::TestNestedEndpoints::test_listar_nudos_proyecto_otro_usuario PASSED [100%]
+
+============================== 9 passed in 2.09s ==============================

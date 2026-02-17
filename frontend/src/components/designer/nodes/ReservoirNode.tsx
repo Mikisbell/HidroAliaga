@@ -13,6 +13,7 @@ interface ReservoirData extends Record<string, unknown> {
     cota_terreno?: number
     altura_agua?: number
     tipo?: string
+    diffStatus?: 'added' | 'modified' | 'removed' | 'unchanged'
 }
 
 const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
@@ -42,6 +43,7 @@ const ReservoirNode = ({ id, data: initialData, selected }: NodeProps) => {
             color="blue"
             selected={selected}
             status={status}
+            diffStatus={data.diffStatus}
         // Actions could be passed here if we lift state up or use local
         // onEdit={() => console.log('Edit', id)}
         />

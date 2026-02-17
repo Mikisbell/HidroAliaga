@@ -1,13 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ReactFlowProvider } from "@xyflow/react"
 import { useProjectStore } from "@/store/project-store"
 import { Nudo, Tramo, Calculo } from "@/types/models"
+import { cn } from "@/lib/utils"
 
 import { EditorTopBar } from "./EditorTopBar"
-import { EditorStatsBar } from "./EditorStatsBar"
+import { EditorFooterBar } from "./EditorFooterBar"
+import { EditorSideTools } from "./EditorSideTools"
 import { EditorSidePanel } from "./EditorSidePanel"
+import { EditorStatsBar } from "./EditorStatsBar"
 import { ValidationPanel } from "@/components/designer/ValidationPanel"
 
 import dynamic from "next/dynamic"
@@ -48,6 +51,9 @@ export function EditorCanvas({
     initialCost
 }: EditorCanvasProps) {
     const [sidePanelOpen, setSidePanelOpen] = useState(false)
+    const [activeTab, setActiveTab] = useState("editor")
+    const isGridOpen = useProjectStore(state => state.isGridOpen)
+    const setGridOpen = useProjectStore(state => state.setGridOpen)
 
     // Store state
     const activeComponentType = useProjectStore(state => state.activeComponentType)
@@ -63,6 +69,14 @@ export function EditorCanvas({
 
     const nudos = storeNudos.length > 0 ? storeNudos : serverNudos
     const tramos = storeTramos.length > 0 ? storeTramos : serverTramos
+
+    // Tab handler — certain tabs auto-open the side panel
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab)
+        if (tab === "resultados" || tab === "validacion") {
+            setSidePanelOpen(true)
+        }
+    }
 
     // ========== Handlers (same logic as DesignerWrapper) ==========
     const handleNodeDragStop = async (id: string, x: number, y: number) => {
@@ -155,19 +169,21 @@ export function EditorCanvas({
     }
 
     return (
-        <div className="relative w-full h-[calc(100vh-0px)] overflow-hidden">
+        <div className="relative w-full h-screen overflow-hidden bg-background">
             <ReactFlowProvider>
-                {/* ===== TOP BAR OVERLAY ===== */}
+                {/* ===== TOP BAR: Breadcrumb + Center Tabs + Right Actions ===== */}
                 <EditorTopBar
                     proyecto={proyecto}
                     nudos={nudos}
                     tramos={tramos}
                     ultimoCalculo={ultimoCalculo}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
                     onToggleSidePanel={() => setSidePanelOpen(prev => !prev)}
                 />
 
-                {/* ===== FULL-VIEWPORT CANVAS ===== */}
-                <div className="absolute inset-0 pt-12">
+                {/* ===== MAIN CANVAS AREA (between top bar & footer) ===== */}
+                <div className="absolute inset-0 pt-12 pb-9">
                     <WorkspaceSplitView
                         nudos={nudos}
                         tramos={tramos}
@@ -178,8 +194,13 @@ export function EditorCanvas({
                     />
                 </div>
 
-                {/* ===== FLOATING STATS ===== */}
-                <EditorStatsBar ultimoCalculo={ultimoCalculo} />
+                {/* ===== RIGHT SIDE TOOLS (n8n: +, Search, Copy, Layout, AI) ===== */}
+                <EditorSideTools />
+
+                {/* ===== FLOATING STATS (bottom-left, above footer) ===== */}
+                <div className="absolute bottom-12 left-4 z-[500]">
+                    <EditorStatsBar ultimoCalculo={ultimoCalculo} />
+                </div>
 
                 {/* ===== VALIDATION PANEL ===== */}
                 <ValidationPanel />
@@ -191,6 +212,12 @@ export function EditorCanvas({
                     proyectoId={proyecto.id}
                     initialCost={initialCost}
                     ultimoCalculo={ultimoCalculo}
+                />
+
+                {/* ===== FOOTER BAR (n8n: zoom controls + info + Open Chat → Tabla) ===== */}
+                <EditorFooterBar
+                    onToggleTable={() => setGridOpen(!isGridOpen)}
+                    isTableOpen={isGridOpen}
                 />
             </ReactFlowProvider>
         </div>

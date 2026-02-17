@@ -13,7 +13,7 @@ export function EditorStatsBar({ ultimoCalculo }: EditorStatsBarProps) {
     const tramos = useProjectStore(state => state.tramos)
 
     return (
-        <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
+        <div className="flex items-center gap-2">
             {/* Nudos */}
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md border border-border/40 text-xs">
                 <span className="font-semibold text-blue-400">{nudos.length}</span>

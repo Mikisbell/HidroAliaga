@@ -43,6 +43,7 @@ const JunctionNode = ({ id, data: initialData, selected }: NodeProps) => {
             color="emerald"
             selected={selected}
             status={status}
+            diffStatus={data.diffStatus}
         />
     )
 }

@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 
 import NetworkDesigner from "@/components/designer/NetworkDesigner"
 import { MapBottomPalette } from "@/components/map/MapBottomPalette"
-import { MapSideTools } from "@/components/map/MapSideTools"
 import { HydraulicTablePanel } from "./HydraulicTablePanel"
 import { Nudo, Tramo } from "@/types/models"
 
@@ -72,7 +71,6 @@ export function WorkspaceSplitView({
             >
                 <div className="flex-1 relative w-full h-full">
                     <MapBottomPalette />
-                    <MapSideTools />
                     <NetworkDesigner
                         nudos={nudos}
                         tramos={tramos}

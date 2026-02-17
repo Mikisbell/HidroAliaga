@@ -24,6 +24,24 @@ export interface ProjectSettings {
     // Futuros ajustes
 }
 
+// ============ PATRONES DE DEMANDA ============
+
+export interface PatronDemanda {
+    id: string
+    proyecto_id: string
+    nombre: string
+    descripcion?: string
+    multiplicadores: number[] // Array of 24 floats
+    created_at: string
+    updated_at: string
+}
+
+export interface PatronDemandaCreate {
+    nombre: string
+    descripcion?: string
+    multiplicadores?: number[]
+}
+
 // ============ PROYECTO ============
 
 export interface Proyecto {
@@ -104,6 +122,7 @@ export interface Nudo {
     notas?: string
     numero_viviendas?: number // Manual input for demand calculation
     altura_agua?: number // For Reservoirs (Water Level)
+    patron_demanda_id?: string | null
     created_at: string
     updated_at: string
 }
@@ -121,9 +140,33 @@ export interface NudoCreate {
     es_critico?: boolean
     numero_viviendas?: number
     altura_agua?: number
+    patron_demanda_id?: string | null
+}
+
+// ============ CURVAS CARACTERISTICAS ============
+
+export type TipoCurva = 'bomba' | 'volumen' | 'eficiencia'
+
+export interface CurvaCaracteristica {
+    id: string
+    proyecto_id: string
+    nombre: string
+    tipo: TipoCurva
+    puntos: { x: number; y: number }[] // x=Caudal, y=Altura/Eficiencia
+    created_at: string
+    updated_at: string
+}
+
+export interface CurvaCaracteristicaCreate {
+    nombre: string
+    tipo?: TipoCurva
+    puntos?: { x: number; y: number }[]
 }
 
 // ============ TRAMO ============
+
+export type TipoValvulaControl = 'PRV' | 'PSV' | 'FCV' | 'TCV' | 'GPV'
+export type EstadoValvula = 'open' | 'closed' | 'active'
 
 export interface Tramo {
     id: string
@@ -150,6 +193,11 @@ export interface Tramo {
     numero_viviendas?: number
     created_at: string
     updated_at: string
+    // Bombas y Válvulas
+    curva_bomba_id?: string | null
+    estado_inicial?: EstadoValvula
+    consigna_valvula?: number // Setting (e.g. Pressure in m)
+    tipo_valvula?: TipoValvulaControl
 }
 
 export interface TramoCreate {
@@ -166,6 +214,11 @@ export interface TramoCreate {
     source_handle?: string
     target_handle?: string
     numero_viviendas?: number
+    // Bombas y Válvulas
+    curva_bomba_id?: string | null
+    estado_inicial?: EstadoValvula
+    consigna_valvula?: number
+    tipo_valvula?: TipoValvulaControl
 }
 
 // ============ RESULTADOS DETALLADOS ============
@@ -257,6 +310,7 @@ export interface JunctionData extends Record<string, unknown> {
     demanda_base?: number;
     numero_viviendas?: number;
     color?: string;
+    diffStatus?: 'added' | 'modified' | 'removed' | 'unchanged';
 }
 
 export interface ReservoirData extends Record<string, unknown> {
@@ -265,6 +319,7 @@ export interface ReservoirData extends Record<string, unknown> {
     codigo?: string;
     cota_terreno?: number;
     altura_agua?: number;
+    diffStatus?: 'added' | 'modified' | 'removed' | 'unchanged';
 }
 
 export interface Scenario {
@@ -277,5 +332,6 @@ export interface Scenario {
     snapshot?: {
         nudos: Nudo[];
         tramos: Tramo[];
+        patrones?: PatronDemanda[];
     };
 }

@@ -14,6 +14,7 @@ interface NodeCardProps {
     selected?: boolean
     status?: "success" | "warning" | "error" | "neutral"
     statusMessage?: string
+    diffStatus?: "added" | "modified" | "removed" | "unchanged" // New Prop
     onDelete?: () => void
     onEdit?: () => void
     className?: string
@@ -88,6 +89,7 @@ export function NodeCard({
     color,
     selected,
     status = "neutral",
+    diffStatus,
     onDelete,
     onEdit,
     className,
@@ -95,10 +97,17 @@ export function NodeCard({
 }: NodeCardProps) {
     const styles = colorStyles[color]
 
+    // Diff Styling
+    let diffClasses = "";
+    if (diffStatus === 'added') diffClasses = "ring-2 ring-green-500 ring-offset-2";
+    if (diffStatus === 'modified') diffClasses = "ring-2 ring-orange-500 ring-offset-2 border-orange-500";
+    if (diffStatus === 'removed') diffClasses = "opacity-50 grayscale";
+
     return (
         <div className={cn(
             "group relative flex min-w-[180px] h-[64px] bg-white dark:bg-slate-900 rounded-lg shadow-sm border transition-all duration-200",
             selected ? `ring-2 ring-primary border-transparent shadow-lg` : `border-border hover:border-border/80 hover:shadow-md`,
+            diffClasses,
             className
         )}>
             {/* Status Indicator (Top Right Dot) */}

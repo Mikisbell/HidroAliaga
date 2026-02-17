@@ -12,6 +12,7 @@ interface CRPData extends Record<string, unknown> {
     nombre?: string
     crp_type?: 'T6' | 'T7'
     tipo?: string
+    diffStatus?: 'added' | 'modified' | 'removed' | 'unchanged'
 }
 
 const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
@@ -42,6 +43,7 @@ const CRPNode = ({ id, data: initialData, selected }: NodeProps) => {
             color="amber"
             selected={selected}
             status={status}
+            diffStatus={data.diffStatus}
         />
     )
 }

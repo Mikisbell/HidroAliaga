@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useRef, useState, useEffect, DragEvent } from 'react'
 import {
     ReactFlow,
-    Controls,
     Background,
     BackgroundVariant,
     MiniMap,
@@ -34,7 +33,7 @@ import { NodeEditPopover } from './nodes/NodeEditPopover'
 import { Nudo, Tramo } from '@/types/models'
 import { useProjectStore } from '@/store/project-store'
 import { useUndoRedo } from '@/hooks/useUndoRedo'
-import { DesignerStatusBar } from './DesignerStatusBar'
+
 import { ScenarioManager } from './scenarios/ScenarioManager'
 import { Button } from '@/components/ui/button'
 import { Layers } from 'lucide-react'
@@ -60,8 +59,12 @@ function nudoToNodeType(tipo: string): string {
     return 'union'
 }
 
+import { useScenarioDiff, ChangeType } from '@/hooks/useScenarioDiff'
+
+// ... imports
+
 // ==================== CONVERTERS ====================
-function nudosToNodes(nudos: Nudo[]): Node[] {
+function nudosToNodes(nudos: Nudo[], diffs?: Record<string, ChangeType>): Node[] {
     return nudos.map((nudo, index) => ({
         id: nudo.id,
         type: nudoToNodeType(nudo.tipo),
@@ -77,10 +80,12 @@ function nudosToNodes(nudos: Nudo[]): Node[] {
             numero_viviendas: nudo.numero_viviendas,
             altura_agua: nudo.altura_agua,
             tipo: nudo.tipo,
+            diffStatus: diffs ? diffs[nudo.id] : undefined
         },
     }))
 }
 
+// ... tramosToEdges ...
 function tramosToEdges(tramos: Tramo[]): Edge[] {
     return tramos.map(tramo => ({
         id: tramo.id,
@@ -143,6 +148,11 @@ export default function NetworkDesigner({
     //     → onNodeDragStop → persist to DB (optimistic, no re-derive)
     // ================================================================
 
+    // Scenario Diff
+    const { nodes: nodeDiffs, links: linkDiffs } = useScenarioDiff();
+
+    // ...
+
     const [nodes, setNodes] = useState<Node[]>(() => nudosToNodes(nudos))
     const [edges, setEdges] = useState<Edge[]>(() => tramosToEdges(tramos))
 
@@ -152,12 +162,11 @@ export default function NetworkDesigner({
     const activeScenarioId = useProjectStore(state => state.activeScenarioId)
     const activeScenario = scenarios.find(s => s.id === activeScenarioId) || scenarios.find(s => s.is_base)
 
-    // ★ KEY: Sync local state whenever Zustand store data changes
-    // This is what makes it "real-time" — when addNudo/addTramo updates
-    // the store, this effect fires and pushes new data to React Flow.
+    // ...
+
     useEffect(() => {
         setNodes(prev => {
-            const newNodes = nudosToNodes(nudos)
+            const newNodes = nudosToNodes(nudos, nodeDiffs)
             // Preserve positions of existing nodes (user may have dragged them)
             return newNodes.map(newNode => {
                 const existing = prev.find(n => n.id === newNode.id)
@@ -167,11 +176,20 @@ export default function NetworkDesigner({
                 return newNode
             })
         })
-    }, [nudos])
+    }, [nudos, nodeDiffs]) // Add nodeDiffs dependency
 
+    // Also update edges with Diff? (Edges don't have Card component yet directly visible, but could style stroke)
     useEffect(() => {
-        setEdges(tramosToEdges(tramos))
-    }, [tramos])
+        const newEdges = tramosToEdges(tramos);
+        // Apply diff styles to edges if needed (e.g., animated or colored)
+        // For now just passing standard edges.
+        setEdges(newEdges.map(e => ({
+            ...e,
+            style: linkDiffs[e.id] === 'modified' ? { stroke: '#f97316', strokeWidth: 3, strokeDasharray: '5 5' } :
+                linkDiffs[e.id] === 'added' ? { stroke: '#22c55e', strokeWidth: 3 } : undefined
+        })))
+    }, [tramos, linkDiffs])
+
 
     // ========== KEYBOARD SHORTCUTS (N8N-inspired) ==========
     useEffect(() => {
@@ -547,10 +565,7 @@ export default function NetworkDesigner({
                     size={1}
                     className="!bg-gray-50 dark:!bg-gray-950"
                 />
-                <Controls
-                    showInteractive={false}
-                    className="!bg-background/90 !border-border/40 !shadow-xl !rounded-xl"
-                />
+
                 <MiniMap
                     className="!bg-background/90 !border-border/40 !shadow-xl !rounded-xl"
                     nodeColor={(node) => {
@@ -606,8 +621,7 @@ export default function NetworkDesigner({
 
             <ScenarioManager open={scenarioManagerOpen} onOpenChange={setScenarioManagerOpen} />
 
-            {/* N8N-style Status Bar */}
-            <DesignerStatusBar />
+
         </div>
     )
 }

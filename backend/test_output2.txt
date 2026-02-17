@@ -1,0 +1,22 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.1, pluggy-1.6.0 -- C:\Users\Mateo\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: E:\FREECLOUD\FREECLOUD-IA\PROYECTOS\HidroAliaga\backend
+configfile: pyproject.toml
+plugins: anyio-4.10.0, hypothesis-6.138.14, asyncio-1.1.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+tests/test_integration.py::TestProjectCreation::test_crear_proyecto_asigna_usuario CREATE FAILED: 422 {"detail":[{"type":"missing","loc":["body","scheme"],"msg":"Field required","input":{"nombre":"Proyecto Nuevo","tipo_red":"cerrada","ambito":"urbano"},"url":"https://errors.pydantic.dev/2.11/v/missing"},{"type":"missing","loc":["body","credentials"],"msg":"Field required","input":{"nombre":"Proyecto Nuevo","tipo_red":"cerrada","ambito":"urbano"},"url":"https://errors.pydantic.dev/2.11/v/missing"},{"type":"missing","loc":["body","proyecto"],"msg":"Field required","input":null,"url":"https://errors.pydantic.dev/2.11/v/missing"}]}
+FAILED
+
+================================== FAILURES ===================================
+___________ TestProjectCreation.test_crear_proyecto_asigna_usuario ____________
+tests\test_integration.py:279: in test_crear_proyecto_asigna_usuario
+    assert response.status_code == 201
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+=========================== short test summary info ===========================
+FAILED tests/test_integration.py::TestProjectCreation::test_crear_proyecto_asigna_usuario
+============================== 1 failed in 1.71s ==============================
