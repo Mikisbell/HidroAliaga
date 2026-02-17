@@ -64,9 +64,6 @@ export function EditorCanvas({
     const addNudo = useProjectStore(state => state.addNudo)
     const removeNudo = useProjectStore(state => state.removeNudo)
     const replaceNudo = useProjectStore(state => state.replaceNudo)
-    const addTramo = useProjectStore(state => state.addTramo)
-    const removeTramo = useProjectStore(state => state.removeTramo)
-    const replaceTramo = useProjectStore(state => state.replaceTramo)
 
     // Store State
     const nudos = useProjectStore(state => state.nudos)
@@ -93,56 +90,6 @@ export function EditorCanvas({
         updateNudoCoordinates(id, y / 1000, x / 1000).catch(err => {
             console.error("Failed to save node position:", err)
         })
-    }
-
-    const handleConnect = async (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => {
-        if (!proyecto.id) return
-
-        const lengthStr = window.prompt("Longitud Real del Tramo (m):", "100")
-        if (lengthStr === null) return
-        const length = parseFloat(lengthStr)
-        if (isNaN(length) || length <= 0) {
-            toast.error("Longitud inválida")
-            return
-        }
-
-        const tempId = `temp-tramo-${Date.now()}`
-        const tempTramo: Tramo = {
-            id: tempId,
-            proyecto_id: proyecto.id,
-            codigo: `T-${nudos.length + 1}`,
-            nudo_origen_id: sourceId,
-            nudo_destino_id: targetId,
-            source_handle: sourceHandle || undefined,
-            target_handle: targetHandle || undefined,
-            longitud: length,
-            material: 'pvc',
-            diametro_comercial: 0.75,
-            diametro_interior: 0,
-            coef_hazen_williams: 150,
-            clase_tuberia: 'CL-10',
-        } as Tramo
-        addTramo(tempTramo)
-
-        try {
-            const result = await createTramo({
-                proyecto_id: proyecto.id,
-                nudo_origen_id: sourceId,
-                nudo_destino_id: targetId,
-                source_handle: sourceHandle || undefined,
-                target_handle: targetHandle || undefined,
-                longitud: length,
-            })
-            if (result.success && result.data?.tramo) {
-                replaceTramo(tempId, result.data.tramo)
-                toast.success("Tramo creado")
-            } else {
-                throw new Error(result.message || "Error creating tramo")
-            }
-        } catch (error) {
-            removeTramo(tempId)
-            toast.error(error instanceof Error ? error.message : "Error al crear tramo")
-        }
     }
 
     const handleAddNode = async (x: number, y: number, tipo?: string) => {
@@ -202,7 +149,6 @@ export function EditorCanvas({
                         nudos={nudos}
                         tramos={tramos}
                         onNodeDragStop={handleNodeDragStop}
-                        onConnect={handleConnect}
                         onNodeClick={() => { }} // Inspector handles selection automatically via store
                         onAddNode={handleAddNode}
                     />

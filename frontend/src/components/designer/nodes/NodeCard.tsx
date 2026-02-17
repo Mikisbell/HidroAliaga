@@ -177,11 +177,31 @@ export function NodeCard({
                 )}
             </div>
 
-            {/* Connection Handles - 4 Sides */}
-            <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-muted-foreground/30 !border-none !rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="source" position={Position.Right} className="!w-2 !h-2 !bg-muted-foreground/30 !border-none !rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="source" position={Position.Bottom} className="!w-2 !h-2 !bg-muted-foreground/30 !border-none !rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-muted-foreground/30 !border-none !rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            {/* Connection Handles - 4 Sides (n8n-style: always visible, hover glow) */}
+            <Handle
+                id="top"
+                type="target"
+                position={Position.Top}
+                className="!w-3 !h-3 !bg-slate-300 dark:!bg-slate-600 !border-2 !border-white dark:!border-slate-800 !rounded-full hover:!bg-blue-400 hover:!border-blue-200 hover:!shadow-[0_0_6px_rgba(59,130,246,0.5)] transition-all !-top-1.5"
+            />
+            <Handle
+                id="right"
+                type="source"
+                position={Position.Right}
+                className="!w-3 !h-3 !bg-slate-300 dark:!bg-slate-600 !border-2 !border-white dark:!border-slate-800 !rounded-full hover:!bg-green-400 hover:!border-green-200 hover:!shadow-[0_0_6px_rgba(34,197,94,0.5)] transition-all !-right-1.5"
+            />
+            <Handle
+                id="bottom"
+                type="source"
+                position={Position.Bottom}
+                className="!w-3 !h-3 !bg-slate-300 dark:!bg-slate-600 !border-2 !border-white dark:!border-slate-800 !rounded-full hover:!bg-green-400 hover:!border-green-200 hover:!shadow-[0_0_6px_rgba(34,197,94,0.5)] transition-all !-bottom-1.5"
+            />
+            <Handle
+                id="left"
+                type="target"
+                position={Position.Left}
+                className="!w-3 !h-3 !bg-slate-300 dark:!bg-slate-600 !border-2 !border-white dark:!border-slate-800 !rounded-full hover:!bg-blue-400 hover:!border-blue-200 hover:!shadow-[0_0_6px_rgba(59,130,246,0.5)] transition-all !-left-1.5"
+            />
         </div>
     )
 }

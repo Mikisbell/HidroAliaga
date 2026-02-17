@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 import { Nudo, Tramo } from "@/types/models"
 import { updateNudoCoordinates, createNudo } from "@/app/actions/nudos"
 import { getCodigoPrefix } from "@/lib/nudo-codes"
-import { createTramo } from "@/app/actions/tramos"
+
 import { useProjectStore } from "@/store/project-store"
 import { ReactFlowProvider } from "@xyflow/react"
 import { ValidationPanel } from "./ValidationPanel"
@@ -36,8 +36,6 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
     const addNudo = useProjectStore(state => state.addNudo)
     const removeNudo = useProjectStore(state => state.removeNudo)
     const replaceNudo = useProjectStore(state => state.replaceNudo)
-    const addTramo = useProjectStore(state => state.addTramo)
-    const removeTramo = useProjectStore(state => state.removeTramo)
     const storeNudos = useProjectStore(state => state.nudos)
     const storeTramos = useProjectStore(state => state.tramos)
 
@@ -54,57 +52,7 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
         })
     }
 
-    // ========== OPTIMISTIC: Create pipe ==========
-    const handleConnect = async (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => {
-        if (!proyectoId) return
 
-        const lengthStr = window.prompt("Longitud Real del Tramo (m):", "100")
-        if (lengthStr === null) return
-        const length = parseFloat(lengthStr)
-        if (isNaN(length) || length <= 0) {
-            toast.error("Longitud inválida")
-            return
-        }
-
-        // 1. INSTANT: Create temporary tramo in store
-        const tempId = `temp-tramo-${Date.now()}`
-        const tempTramo: Tramo = {
-            id: tempId,
-            proyecto_id: proyectoId,
-            codigo: `T-${storeNudos.length + 1}`,
-            nudo_origen_id: sourceId,
-            nudo_destino_id: targetId,
-            source_handle: sourceHandle || undefined,
-            target_handle: targetHandle || undefined,
-            longitud: length,
-            material: 'pvc',
-            diametro_comercial: 0.75,
-            diametro_interior: 0,
-            coef_hazen_williams: 150,
-            clase_tuberia: 'CL-10',
-        } as Tramo
-        addTramo(tempTramo)
-
-        // 2. BACKGROUND: Persist to DB
-        try {
-            const result = await createTramo({
-                proyecto_id: proyectoId,
-                nudo_origen_id: sourceId,
-                nudo_destino_id: targetId,
-                source_handle: sourceHandle || undefined,
-                target_handle: targetHandle || undefined,
-                longitud: length,
-            })
-            if (!result.success) {
-                throw new Error(result.message)
-            }
-            toast.success("Tramo creado")
-        } catch (error) {
-            // Rollback on failure
-            removeTramo(tempId)
-            toast.error(error instanceof Error ? error.message : "Error al crear tramo")
-        }
-    }
 
     // ========== OPTIMISTIC: Create node (drag & drop OR click) ==========
     const handleAddNode = async (x: number, y: number, tipo?: string) => {
@@ -155,7 +103,7 @@ export default function DesignerWrapper({ nudos: serverNudos, tramos: serverTram
                     nudos={nudos}
                     tramos={tramos}
                     onNodeDragStop={handleNodeDragStop}
-                    onConnect={handleConnect}
+
                     onNodeClick={() => { }} // Selection handled by NetworkDesigner via store
                     onAddNode={handleAddNode}
                 />

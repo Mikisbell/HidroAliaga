@@ -8,6 +8,7 @@ import {
     MiniMap,
     applyNodeChanges,
     applyEdgeChanges,
+    addEdge,
     type Connection,
     type Node,
     type Edge,
@@ -108,7 +109,6 @@ interface NetworkDesignerProps {
     nudos: Nudo[]
     tramos: Tramo[]
     onNodeDragStop?: (id: string, x: number, y: number) => void
-    onConnect?: (sourceId: string, targetId: string, sourceHandle?: string | null, targetHandle?: string | null) => void
     onNodeClick?: (nudo: Nudo) => void
     onAddNode?: (x: number, y: number, tipo?: string) => void
 }
@@ -117,7 +117,6 @@ export default function NetworkDesigner({
     nudos,
     tramos,
     onNodeDragStop,
-    onConnect: onConnectProp,
     onNodeClick,
     onAddNode,
 }: NetworkDesignerProps) {
@@ -272,40 +271,24 @@ export default function NetworkDesigner({
     // NOTE: onConnectProp signature needs to be updated in the prop definition if we want to pass handles up
     // But since onConnectProp is used for creating tramos, we should pass the handles there.
 
-    // VALIDATION: Prevent multiple connections per handle
+    // VALIDATION: Allow multi-pipe connections (hydraulic junctions need 3+ pipes)
+    // Only prevent: self-connections and exact duplicate edges
     const isValidConnection = useCallback(
         (connection: Connection | Edge) => {
-            // Check if source handle is already used
-            const targetHandle = 'targetHandle' in connection ? connection.targetHandle : null;
+            // No self-connections
+            if (connection.source === connection.target) return false;
+
+            // No exact duplicate edges (same source+target+handles)
             const sourceHandle = 'sourceHandle' in connection ? connection.sourceHandle : null;
-
-            const sourceUsed = edges.some(e =>
+            const targetHandle = 'targetHandle' in connection ? connection.targetHandle : null;
+            const isDuplicate = edges.some(e =>
                 e.source === connection.source &&
-                e.sourceHandle === sourceHandle
-            );
-
-            // Check if target handle is already used
-            const targetUsed = edges.some(e =>
                 e.target === connection.target &&
+                e.sourceHandle === sourceHandle &&
                 e.targetHandle === targetHandle
             );
 
-            // Allow if it's the SAME edge (reconnecting to same handle - unlikely in this call but safe)
-            // But validation runs before connection is made.
-
-            // If reconnecting, we need to ignore the edge being reconnected?
-            // ReactFlow handles 'reconnect' separate from 'connect' usually?
-            // Actually, isValidConnection is called for both.
-
-            // Note: edges state includes the edge being modified? 
-            // If reconnecting, the edge is still in 'edges'.
-
-            // We need to know if we are reconnecting (ignoring the current edge)
-            // Ideally we'd filter out the edge being dragged.
-            // But we don't have the ID of the edge being reconnected easily here unless we track it.
-
-            // Strict Mode: "No deberia ir un tubo al mismo punto"
-            return !sourceUsed && !targetUsed;
+            return !isDuplicate;
         },
         [edges]
     );
@@ -313,26 +296,48 @@ export default function NetworkDesigner({
     const onConnect: OnConnect = useCallback(
         async (connection: Connection) => {
             const currentProj = useProjectStore.getState().currentProject
-            if (connection.source && connection.target && currentProj) {
-                // 1. Create Tramo on Server
-                const result = await createTramo({
-                    proyecto_id: currentProj.id,
-                    nudo_origen_id: connection.source,
-                    nudo_destino_id: connection.target,
-                    codigo: undefined // Auto-generate
-                })
+            if (!connection.source || !connection.target || !currentProj) return;
 
-                if (!result.success) {
-                    toast.error("Error creating pipe: " + result.message)
-                    return
-                }
+            // 1. Create tramo on server (SINGLE creation path)
+            const result = await createTramo({
+                proyecto_id: currentProj.id,
+                nudo_origen_id: connection.source,
+                nudo_destino_id: connection.target,
+                source_handle: connection.sourceHandle || undefined,
+                target_handle: connection.targetHandle || undefined,
+                longitud: 100, // Default length
+            });
 
-                // 2. Add to Store & Visuals
-                // @ts-ignore - Temporary until prop type is updated
-                onConnectProp?.(connection.source, connection.target, connection.sourceHandle, connection.targetHandle)
+            if (!result.success || !result.data?.tramo) {
+                toast.error("Error al crear tramo: " + (result.message || 'Error desconocido'));
+                return;
             }
+
+            const tramo = result.data.tramo;
+
+            // 2. Add to Zustand store
+            useProjectStore.getState().addTramo(tramo);
+
+            // 3. Add edge to local ReactFlow state (visual)
+            const newEdge: Edge = {
+                id: tramo.id,
+                source: tramo.nudo_origen_id,
+                target: tramo.nudo_destino_id,
+                sourceHandle: tramo.source_handle || connection.sourceHandle,
+                targetHandle: tramo.target_handle || connection.targetHandle,
+                type: 'pipe',
+                data: {
+                    codigo: tramo.codigo,
+                    longitud: tramo.longitud,
+                    diametro: tramo.diametro_interior,
+                    material: tramo.material,
+                },
+            };
+            setEdges(eds => addEdge(newEdge, eds));
+
+            toast.success(`Tramo ${tramo.codigo} creado`);
         },
-        [onConnectProp] // removed currentProject dep since we read from store
+        [] // No dependencies needed — reads from store directly
     )
 
     // RECONNECTION HANDLERS
@@ -410,37 +415,38 @@ export default function NetworkDesigner({
     );
 
     // DELETION HANDLERS
+    // DELETION: Use server actions only — store.removeNudo/removeTramo would double-call API
     const onNodesDelete = useCallback(async (currNodes: Node[]) => {
-        // Optimistic update handled by ReactFlow/Store? 
-        // No, we need to tell store to remove them?
-        // Actually reactflow's onNodesChange usually handles the visual removal if we wire it up.
-        // But we need to sync with DB.
-
+        const store = useProjectStore.getState();
         for (const node of currNodes) {
-            const nudoId = node.id
-            // Call Server
-            toast.promise(deleteNudo(nudoId), {
-                loading: 'Eliminando nudo...',
-                success: 'Nudo eliminado',
-                error: 'Error al eliminar nudo'
-            })
-            // Store removal is handled by onNodesChange -> setNodes?
-            // But we need to remove from ProjectStore 'nudos' array too!
-            useProjectStore.getState().removeNudo(nudoId)
+            const nudoId = node.id;
+            // Remove from store (optimistic, this does NOT call API since we use server action)
+            store.setElements(
+                store.nudos.filter(n => n.id !== nudoId),
+                store.tramos.filter(t => t.nudo_origen_id !== nudoId && t.nudo_destino_id !== nudoId)
+            );
+            // Call server action (handles cascade delete of connected tramos)
+            deleteNudo(nudoId).then(res => {
+                if (!res.success) toast.error('Error al eliminar nudo: ' + res.message);
+            });
         }
-    }, [])
+    }, []);
 
     const onEdgesDelete = useCallback(async (currEdges: Edge[]) => {
+        const store = useProjectStore.getState();
         for (const edge of currEdges) {
-            const tramoId = edge.id
-            toast.promise(deleteTramo(tramoId), {
-                loading: 'Eliminando tramo...',
-                success: 'Tramo eliminado',
-                error: 'Error al eliminar tramo'
-            })
-            useProjectStore.getState().removeTramo(tramoId)
+            const tramoId = edge.id;
+            // Remove from store (optimistic)
+            store.setElements(
+                store.nudos,
+                store.tramos.filter(t => t.id !== tramoId)
+            );
+            // Call server action
+            deleteTramo(tramoId).then(res => {
+                if (!res.success) toast.error('Error al eliminar tramo: ' + res.message);
+            });
         }
-    }, [])
+    }, []);
 
     // Handle edge click → select in store
     const handleEdgeClick = useCallback(

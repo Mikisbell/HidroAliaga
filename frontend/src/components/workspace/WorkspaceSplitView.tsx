@@ -12,7 +12,6 @@ interface WorkspaceSplitViewProps {
     nudos: Nudo[]
     tramos: Tramo[]
     onNodeDragStop?: (id: string, x: number, y: number) => void
-    onConnect?: (sourceId: string, targetId: string) => void
     onNodeClick?: (nudo: Nudo) => void
     onAddNode?: (x: number, y: number, tipo?: string) => void
 }
@@ -21,7 +20,6 @@ export function WorkspaceSplitView({
     nudos,
     tramos,
     onNodeDragStop,
-    onConnect,
     onNodeClick,
     onAddNode
 }: WorkspaceSplitViewProps) {
@@ -74,7 +72,6 @@ export function WorkspaceSplitView({
                         nudos={nudos}
                         tramos={tramos}
                         onNodeDragStop={onNodeDragStop}
-                        onConnect={onConnect}
                         onNodeClick={onNodeClick}
                         onAddNode={onAddNode}
                     />
