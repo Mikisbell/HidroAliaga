@@ -37,8 +37,8 @@ export function useScenarioDiff(): ScenarioDiff {
 
         // Parent Snapshot
         // If parent is the base scenario, and we are editing it? No, if we are in child, parent is static snapshot.
-        const parentNodes = parentScenario.snapshot.nudos || [];
-        const parentLinks = parentScenario.snapshot.tramos || [];
+        const parentNodes = parentScenario.snapshot?.nudos || [];
+        const parentLinks = parentScenario.snapshot?.tramos || [];
 
         const nodeChanges: Record<string, ChangeType> = {};
         const linkChanges: Record<string, ChangeType> = {};
@@ -109,10 +109,7 @@ function areNodesDifferent(a: Nudo, b: Nudo): boolean {
     // List of fields that constitute a "hydraulic/design" change
     const fields: (keyof Nudo)[] = [
         'nombre', 'tipo', 'elevacion', 'demanda_base', 'patron_demanda_id',
-        'cota_terreno', 'coordenadas'
-        // Note: Coordinates might change if moved using drag. 
-        // If we only care about hydraulic properties, remove 'coordenadas'.
-        // But for "Designer Override", position change IS a change.
+        'cota_terreno'
     ];
 
     for (const key of fields) {
@@ -124,9 +121,9 @@ function areNodesDifferent(a: Nudo, b: Nudo): boolean {
 
 function areLinksDifferent(a: Tramo, b: Tramo): boolean {
     const fields: (keyof Tramo)[] = [
-        'nombre', 'tipo', 'diametro_interior', 'longitud', 'material',
-        'coef_hazen_williams', 'coef_darcy_weisbach', 'coef_chezy_manning',
-        'curva_bomba_id', 'estado_inicial', 'consigna_valvula', 'tipo_valvula'
+        'diametro_interior', 'longitud', 'material',
+        'coef_hazen_williams',
+        'estado_inicial', 'tipo_valvula'
     ];
 
     for (const key of fields) {
