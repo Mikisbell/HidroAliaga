@@ -51,6 +51,7 @@ interface ProjectState {
     reorderTramos: (newOrder: string[]) => void;
     addTramo: (tramo: Tramo) => void;
     removeTramo: (id: string) => void;
+    replaceTramo: (tempId: string, realTramo: Tramo) => void;
     updateTramo: (tramo: Tramo) => void;
     updateProjectSettings: (settings: import('@/types/models').ProjectSettings) => void;
     setLoading: (loading: boolean) => void;
@@ -327,6 +328,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             import("sonner").then(({ toast }) => toast.error("Error al eliminar el tramo"));
         }
     },
+
+    replaceTramo: (tempId, realTramo) => set((state) => ({
+        tramos: state.tramos.map(t => t.id === tempId ? realTramo : t)
+    })),
 
     updateTramo: async (tramo) => {
         const previousTramos = get().tramos;

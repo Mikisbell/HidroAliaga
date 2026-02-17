@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ReactFlowProvider } from "@xyflow/react"
 import { useProjectStore } from "@/store/project-store"
 import { Nudo, Tramo, Calculo } from "@/types/models"
@@ -55,7 +55,9 @@ export function EditorCanvas({
     const isGridOpen = useProjectStore(state => state.isGridOpen)
     const setGridOpen = useProjectStore(state => state.setGridOpen)
 
-    // Store state
+    // Store Actions
+    const setElements = useProjectStore(state => state.setElements)
+    const setProject = useProjectStore(state => state.setProject)
     const activeComponentType = useProjectStore(state => state.activeComponentType)
     const setActiveTool = useProjectStore(state => state.setActiveTool)
     const setActiveComponentType = useProjectStore(state => state.setActiveComponentType)
@@ -64,11 +66,19 @@ export function EditorCanvas({
     const replaceNudo = useProjectStore(state => state.replaceNudo)
     const addTramo = useProjectStore(state => state.addTramo)
     const removeTramo = useProjectStore(state => state.removeTramo)
-    const storeNudos = useProjectStore(state => state.nudos)
-    const storeTramos = useProjectStore(state => state.tramos)
+    const replaceTramo = useProjectStore(state => state.replaceTramo)
 
-    const nudos = storeNudos.length > 0 ? storeNudos : serverNudos
-    const tramos = storeTramos.length > 0 ? storeTramos : serverTramos
+    // Store State
+    const nudos = useProjectStore(state => state.nudos)
+    const tramos = useProjectStore(state => state.tramos)
+
+    // Initialize Store
+    useEffect(() => {
+        if (proyecto.id) {
+            setProject(proyecto)
+            setElements(serverNudos, serverTramos)
+        }
+    }, [proyecto.id, serverNudos, serverTramos, setProject, setElements])
 
     // Tab handler
     const handleTabChange = (tab: string) => {
@@ -100,7 +110,7 @@ export function EditorCanvas({
         const tempTramo: Tramo = {
             id: tempId,
             proyecto_id: proyecto.id,
-            codigo: `T-${storeNudos.length + 1}`,
+            codigo: `T-${nudos.length + 1}`,
             nudo_origen_id: sourceId,
             nudo_destino_id: targetId,
             source_handle: sourceHandle || undefined,
@@ -123,8 +133,12 @@ export function EditorCanvas({
                 target_handle: targetHandle || undefined,
                 longitud: length,
             })
-            if (!result.success) throw new Error(result.message)
-            toast.success("Tramo creado")
+            if (result.success && result.data?.tramo) {
+                replaceTramo(tempId, result.data.tramo)
+                toast.success("Tramo creado")
+            } else {
+                throw new Error(result.message || "Error creating tramo")
+            }
         } catch (error) {
             removeTramo(tempId)
             toast.error(error instanceof Error ? error.message : "Error al crear tramo")
@@ -137,7 +151,7 @@ export function EditorCanvas({
         const typeToCreate = (tipo || activeComponentType || 'union') as Nudo['tipo']
 
         const tempId = `temp-${Date.now()}`
-        const nudoCount = storeNudos.length
+        const nudoCount = nudos.length
         const tempNudo: Nudo = {
             id: tempId,
             proyecto_id: proyecto.id,
