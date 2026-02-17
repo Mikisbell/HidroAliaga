@@ -3,9 +3,10 @@
 import { useProjectStore } from "@/store/project-store"
 import { useReactFlow } from "@xyflow/react"
 import { useUndoRedo } from "@/hooks/useUndoRedo"
+import { Calculo } from "@/types/models"
 import {
     Maximize2, ZoomIn, ZoomOut, Undo2, Redo2,
-    MousePointer2, Table2
+    MousePointer2, Table2, CheckCircle, XCircle, Minus
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -13,9 +14,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface EditorFooterBarProps {
     onToggleTable: () => void
     isTableOpen: boolean
+    ultimoCalculo?: Calculo
 }
 
-export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarProps) {
+export function EditorFooterBar({ onToggleTable, isTableOpen, ultimoCalculo }: EditorFooterBarProps) {
     const activeTool = useProjectStore(state => state.activeTool)
     const activeComponentType = useProjectStore(state => state.activeComponentType)
     const nudos = useProjectStore(state => state.nudos)
@@ -39,13 +41,31 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
         return '↖ Seleccionar'
     })()
 
+    // Convergence info
+    const convergenceEl = (() => {
+        if (!ultimoCalculo) return (
+            <span className="flex items-center gap-1 text-muted-foreground/50">
+                <Minus className="w-3 h-3" /> Sin cálculo
+            </span>
+        )
+        if (ultimoCalculo.convergencia) return (
+            <span className="flex items-center gap-1 text-green-400 font-medium">
+                <CheckCircle className="w-3 h-3" /> OK
+            </span>
+        )
+        return (
+            <span className="flex items-center gap-1 text-amber-400 font-medium">
+                <XCircle className="w-3 h-3" /> No conv.
+            </span>
+        )
+    })()
+
     return (
         <div className="absolute bottom-0 left-0 right-0 z-[1000] flex items-center justify-between h-9 px-2 bg-background/95 backdrop-blur-md border-t border-border/40 select-none">
 
-            {/* === LEFT: Canvas controls (n8n: fit, zoom+, zoom-, undo, redo) === */}
+            {/* === LEFT: Canvas controls === */}
             <div className="flex items-center gap-0.5">
                 <TooltipProvider delayDuration={0}>
-                    {/* Fit View */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -58,7 +78,6 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                         <TooltipContent side="top">Ajustar Vista</TooltipContent>
                     </Tooltip>
 
-                    {/* Zoom In */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -71,7 +90,6 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                         <TooltipContent side="top">Acercar</TooltipContent>
                     </Tooltip>
 
-                    {/* Zoom Out */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -86,7 +104,6 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
 
                     <div className="w-px h-4 bg-border/50 mx-1" />
 
-                    {/* Undo */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -94,9 +111,7 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                                 disabled={!canUndo}
                                 className={cn(
                                     "p-1.5 rounded-md transition-colors",
-                                    canUndo
-                                        ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                        : "text-muted-foreground/30 cursor-not-allowed"
+                                    canUndo ? "text-muted-foreground hover:text-foreground hover:bg-muted" : "text-muted-foreground/30 cursor-not-allowed"
                                 )}
                             >
                                 <Undo2 className="w-3.5 h-3.5" />
@@ -105,7 +120,6 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                         <TooltipContent side="top">Deshacer (Ctrl+Z)</TooltipContent>
                     </Tooltip>
 
-                    {/* Redo */}
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -113,9 +127,7 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                                 disabled={!canRedo}
                                 className={cn(
                                     "p-1.5 rounded-md transition-colors",
-                                    canRedo
-                                        ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                        : "text-muted-foreground/30 cursor-not-allowed"
+                                    canRedo ? "text-muted-foreground hover:text-foreground hover:bg-muted" : "text-muted-foreground/30 cursor-not-allowed"
                                 )}
                             >
                                 <Redo2 className="w-3.5 h-3.5" />
@@ -126,22 +138,33 @@ export function EditorFooterBar({ onToggleTable, isTableOpen }: EditorFooterBarP
                 </TooltipProvider>
             </div>
 
-            {/* === CENTER: Active tool + network info (n8n: "Session c40a0... Logs") === */}
+            {/* === CENTER: Tool + Stats (unified) === */}
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                     <MousePointer2 className="w-3 h-3" />
                     <span className="font-medium">{toolLabel}</span>
                 </span>
-                <span className="text-muted-foreground/40">|</span>
+                <span className="text-muted-foreground/30">|</span>
                 <span>
-                    <span className="font-semibold text-foreground">{nudos.length}</span> nudos
+                    <span className="font-semibold text-blue-400">{nudos.length}</span> nudos
                 </span>
                 <span>
-                    <span className="font-semibold text-foreground">{tramos.length}</span> tramos
+                    <span className="font-semibold text-cyan-400">{tramos.length}</span> tramos
                 </span>
+                <span className="text-muted-foreground/30">|</span>
+                {convergenceEl}
+                {ultimoCalculo && ultimoCalculo.presion_minima != null && (
+                    <>
+                        <span className="text-muted-foreground/30">|</span>
+                        <span className="hidden md:inline">
+                            P: <span className="font-mono font-medium text-foreground">{ultimoCalculo.presion_minima?.toFixed(1)}–{ultimoCalculo.presion_maxima?.toFixed(1)}</span>
+                            <span className="text-muted-foreground/50 ml-0.5">mca</span>
+                        </span>
+                    </>
+                )}
             </div>
 
-            {/* === RIGHT: Table toggle (n8n: "Open Chat" button) === */}
+            {/* === RIGHT: Table toggle === */}
             <button
                 onClick={onToggleTable}
                 className={cn(

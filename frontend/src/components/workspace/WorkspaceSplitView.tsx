@@ -5,7 +5,6 @@ import { useProjectStore } from "@/store/project-store"
 import { cn } from "@/lib/utils"
 
 import NetworkDesigner from "@/components/designer/NetworkDesigner"
-import { MapBottomPalette } from "@/components/map/MapBottomPalette"
 import { HydraulicTablePanel } from "./HydraulicTablePanel"
 import { Nudo, Tramo } from "@/types/models"
 
@@ -70,7 +69,7 @@ export function WorkspaceSplitView({
                 className={cn("bg-background transition-[height] duration-0 relative min-h-0")}
             >
                 <div className="flex-1 relative w-full h-full">
-                    <MapBottomPalette />
+
                     <NetworkDesigner
                         nudos={nudos}
                         tramos={tramos}

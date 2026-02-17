@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { ReactFlowProvider } from "@xyflow/react"
 import { useProjectStore } from "@/store/project-store"
 import { Nudo, Tramo, Calculo } from "@/types/models"
-import { cn } from "@/lib/utils"
 
 import { EditorTopBar } from "./EditorTopBar"
 import { EditorFooterBar } from "./EditorFooterBar"
 import { EditorSideTools } from "./EditorSideTools"
 import { EditorSidePanel } from "./EditorSidePanel"
-import { EditorStatsBar } from "./EditorStatsBar"
+import { EditorNodePalette } from "./EditorNodePalette"
+import PropertyInspector from "../designer/inspector/PropertyInspector" // Import path fix
 import { ValidationPanel } from "@/components/designer/ValidationPanel"
 
 import dynamic from "next/dynamic"
@@ -70,7 +70,7 @@ export function EditorCanvas({
     const nudos = storeNudos.length > 0 ? storeNudos : serverNudos
     const tramos = storeTramos.length > 0 ? storeTramos : serverTramos
 
-    // Tab handler — certain tabs auto-open the side panel
+    // Tab handler
     const handleTabChange = (tab: string) => {
         setActiveTab(tab)
         if (tab === "resultados" || tab === "validacion") {
@@ -78,7 +78,7 @@ export function EditorCanvas({
         }
     }
 
-    // ========== Handlers (same logic as DesignerWrapper) ==========
+    // ========== Handlers ==========
     const handleNodeDragStop = async (id: string, x: number, y: number) => {
         updateNudoCoordinates(id, y / 1000, x / 1000).catch(err => {
             console.error("Failed to save node position:", err)
@@ -171,7 +171,7 @@ export function EditorCanvas({
     return (
         <div className="relative w-full h-screen overflow-hidden bg-background">
             <ReactFlowProvider>
-                {/* ===== TOP BAR: Breadcrumb + Center Tabs + Right Actions ===== */}
+                {/* 1. TOP BAR */}
                 <EditorTopBar
                     proyecto={proyecto}
                     nudos={nudos}
@@ -182,30 +182,33 @@ export function EditorCanvas({
                     onToggleSidePanel={() => setSidePanelOpen(prev => !prev)}
                 />
 
-                {/* ===== MAIN CANVAS AREA (between top bar & footer) ===== */}
+                {/* 2. MAIN CANVAS AREA */}
                 <div className="absolute inset-0 pt-12 pb-9">
                     <WorkspaceSplitView
                         nudos={nudos}
                         tramos={tramos}
                         onNodeDragStop={handleNodeDragStop}
                         onConnect={handleConnect}
-                        onNodeClick={() => { }}
+                        onNodeClick={() => { }} // Inspector handles selection automatically via store
                         onAddNode={handleAddNode}
                     />
                 </div>
 
-                {/* ===== RIGHT SIDE TOOLS (n8n: +, Search, Copy, Layout, AI) ===== */}
-                <EditorSideTools />
+                {/* 3. LEFT: Node Palette (draggable) */}
+                <EditorNodePalette />
 
-                {/* ===== FLOATING STATS (bottom-left, above footer) ===== */}
-                <div className="absolute bottom-12 left-4 z-[500]">
-                    <EditorStatsBar ultimoCalculo={ultimoCalculo} />
+                {/* 4. RIGHT: Tools + Inspector + SidePanel */}
+                <div className="absolute top-16 right-4 z-[500] flex flex-col gap-4 items-end pointer-events-none">
+                    {/* Make tools pointer-events-auto */}
+                    <div className="pointer-events-auto">
+                        <EditorSideTools />
+                    </div>
                 </div>
 
-                {/* ===== VALIDATION PANEL ===== */}
-                <ValidationPanel />
+                {/* 5. PROPERTY INSPECTOR (Slide-in on selection) */}
+                <PropertyInspector />
 
-                {/* ===== COLLAPSIBLE SIDE PANEL ===== */}
+                {/* 6. SIDE PANEL (Results/Config) - Collapsible */}
                 <EditorSidePanel
                     open={sidePanelOpen}
                     onClose={() => setSidePanelOpen(false)}
@@ -214,10 +217,14 @@ export function EditorCanvas({
                     ultimoCalculo={ultimoCalculo}
                 />
 
-                {/* ===== FOOTER BAR (n8n: zoom controls + info + Open Chat → Tabla) ===== */}
+                {/* 7. VALIDATION PANEL (Floating) */}
+                <ValidationPanel />
+
+                {/* 8. FOOTER BAR (Zoom + Stats + Table Toggle) */}
                 <EditorFooterBar
                     onToggleTable={() => setGridOpen(!isGridOpen)}
                     isTableOpen={isGridOpen}
+                    ultimoCalculo={ultimoCalculo}
                 />
             </ReactFlowProvider>
         </div>
