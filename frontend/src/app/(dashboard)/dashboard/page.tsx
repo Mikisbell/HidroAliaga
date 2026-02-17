@@ -1,300 +1,200 @@
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Plus, ArrowRight, Zap, List, FileText, MoreHorizontal } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
-import { cn } from "@/lib/utils"
 import { BRAND } from "@/lib/constants"
-import { AnimatedWaves } from "@/components/animated-waves"
-import { AnimatedGrid } from "@/components/animated-grid"
-import { AnimatedSection } from "@/components/animated-section"
-import { AnimatedCounter } from "@/components/animated-counter"
+import { Badge } from "@/components/ui/badge"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser()
+  const userName = user?.user_metadata?.full_name?.split(' ')[0] || "User"
   const userId = user?.id
 
-  // Default values for unauthenticated state
-  let totalProyectos = 0
-  let ultimosProyectos: any[] = []
-  let totalCalculos = 0
+  let recentProjects: any[] = []
 
   if (userId) {
-    // All queries filtered by the authenticated user
-    const { count: pc } = await supabase
-      .from("proyectos")
-      .select("*", { count: "exact", head: true })
-      .eq("usuario_id", userId)
-    totalProyectos = pc || 0
-
-    const { data: up } = await supabase
+    const { data } = await supabase
       .from("proyectos")
       .select("id, nombre, ambito, tipo_red, estado, updated_at")
       .eq("usuario_id", userId)
       .order("updated_at", { ascending: false })
       .limit(5)
-    ultimosProyectos = up || []
-
-    // Get user's project IDs to filter calculos
-    const projectIds = ultimosProyectos.map((p: any) => p.id)
-    if (projectIds.length > 0) {
-      const { count } = await supabase
-        .from("calculos")
-        .select("*", { count: "exact", head: true })
-        .in("proyecto_id", projectIds)
-      totalCalculos = count || 0
-    }
+    recentProjects = data || []
   }
 
   return (
-    <div className="relative p-6 md:p-8 space-y-8 max-w-7xl">
-      {/* Animated Background Effects */}
-      <AnimatedGrid />
-      <AnimatedWaves />
-      
-      {/* Header */}
-      <AnimatedSection className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-1">
-            Panel de Control
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            <span className="text-gradient">{BRAND.name}</span>
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {BRAND.shortDescription}
-          </p>
+    <div className="p-8 md:p-12 max-w-7xl mx-auto space-y-12">
+
+      {/* Header Section */}
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground">
+          Welcome, {userName}!
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          What would you like to build today?
+        </p>
+      </div>
+
+      {/* Templates Grid */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Start with a template</h2>
+          <Link href="/proyectos/nuevo" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
+            See all templates <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
-        <Link href="/proyectos/nuevo">
-          <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
-            + Nuevo Proyecto
-          </Button>
-        </Link>
-      </AnimatedSection>
 
-      {/* Stats */}
-      <AnimatedSection delay={100}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card className="stat-card stat-card-blue bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Proyectos</p>
-              <p className="text-3xl font-bold mt-2 text-blue-600 dark:text-blue-400">
-                <AnimatedCounter value={totalProyectos || 0} />
-              </p>
-              <p className="text-xs text-muted-foreground/60 mt-1">redes diseñadas</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Template Card 1 - Basic Urban */}
+          <Link href="/proyectos/nuevo?template=urban" className="block h-full">
+            <Card className="h-full hover:shadow-lg transition-all duration-200 border-border/50 bg-card hover:border-primary/50 cursor-pointer group">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Basic Urban Network</h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    Quick start for small urban grids. Includes basic demand patterns and reservoir configuration.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                    5 min setup
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card className="stat-card stat-card-green bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cálculos</p>
-              <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-400">
-                <AnimatedCounter value={totalCalculos || 0} />
-              </p>
-              <p className="text-xs text-muted-foreground/60 mt-1">simulaciones hidráulicas</p>
-            </CardContent>
-          </Card>
+          {/* Template Card 2 - Rural Gravity */}
+          <Link href="/proyectos/nuevo?template=rural" className="block h-full">
+            <Card className="h-full hover:shadow-lg transition-all duration-200 border-border/50 bg-card hover:border-primary/50 cursor-pointer group">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Rural Gravity System</h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    Designed for rural water supply. Gravity flow optimization with pressure reducing valves.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                    10 min setup
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
 
-        <Card className="stat-card stat-card-amber bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Norma</p>
-            <p className="text-3xl font-bold mt-2 text-amber-600 dark:text-amber-400">
-              OS.050
-            </p>
-            <p className="text-xs text-muted-foreground/60 mt-1">RNE · RM 107-2025</p>
-          </CardContent>
-        </Card>
-
-        <Card className="stat-card stat-card-purple bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Motor</p>
-            <p className="text-3xl font-bold mt-2 text-purple-600 dark:text-purple-400">
-              Hardy Cross
-            </p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Hazen-Williams</p>
-          </CardContent>
-        </Card>
-
-          <Card className="stat-card stat-card-cyan bg-card/80 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">IA</p>
-              <p className="text-3xl font-bold mt-2 text-cyan-600 dark:text-cyan-400">
-                AG + LLM
-              </p>
-              <p className="text-xs text-muted-foreground/60 mt-1">Optimizador + Copiloto</p>
-            </CardContent>
-          </Card>
+          {/* Template Card 3 - Pump Station */}
+          <Link href="/proyectos/nuevo?template=pump" className="block h-full">
+            <Card className="h-full hover:shadow-lg transition-all duration-200 border-border/50 bg-card hover:border-primary/50 cursor-pointer group">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Pumping Station Automation</h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    Simulate pump curves and efficiency. Includes automated pump control logic templates.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                    Advanced
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
-      </AnimatedSection>
 
-      {/* Capacidades del Sistema */}
-      <AnimatedSection delay={200}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-2xl">
-              🔬
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">Motor Hidráulico Híbrido</h3>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Redes cerradas (Hardy Cross), abiertas (balance de masa) y mixtas con tolerancia 10⁻⁷.
-                Transparencia académica con tabla de iteraciones.
-              </p>
-            </div>
-            <div className="flex gap-1.5 flex-wrap">
-              <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400 px-2">Mallas</Badge>
-              <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400 px-2">Ramales</Badge>
-              <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400 px-2">Mixtas</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-2xl">
-              🗺️
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">GIS + Cotas Automáticas</h3>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Trazado con Leaflet, obtención de cotas por DEM, y mapa de calor de presiones
-                y velocidades en la red.
-              </p>
-            </div>
-            <div className="flex gap-1.5 flex-wrap">
-              <Badge variant="outline" className="text-xs border-green-500/30 text-green-400 px-2">Leaflet</Badge>
-              <Badge variant="outline" className="text-xs border-green-500/30 text-green-400 px-2">DEM</Badge>
-              <Badge variant="outline" className="text-xs border-green-500/30 text-green-400 px-2">PostGIS</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-5 space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-2xl">
-              🧬
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">Optimización + Copiloto IA</h3>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Algoritmo Genético para diámetros óptimos y copiloto normativo basado en LLM
-                para consultas técnicas en tiempo real.
-              </p>
-            </div>
-            <div className="flex gap-1.5 flex-wrap">
-              <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400 px-2">AG</Badge>
-              <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400 px-2">LLM</Badge>
-              <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400 px-2">RAG</Badge>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex justify-center pt-8">
+          <span className="text-muted-foreground text-sm mr-2">or</span>
+          <Link href="/proyectos/nuevo">
+            <Button variant="outline" className="gap-2 border-primary/50 text-primary hover:bg-primary/10 hover:text-primary">
+              <Plus className="w-4 h-4" />
+              Start from scratch
+            </Button>
+          </Link>
         </div>
-      </AnimatedSection>
+      </div>
 
-      {/* Últimos Proyectos */}
-      <AnimatedSection delay={300}>
-        <Card className="glass-card border border-border/20 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Proyectos Recientes</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Últimas redes diseñadas</p>
-            </div>
-            <Link href="/proyectos">
-              <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary transition-all duration-200">
-                Ver todos →
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {ultimosProyectos && ultimosProyectos.length > 0 ? (
-            <div className="space-y-2">
-              {ultimosProyectos.map((proyecto) => (
-                <Link
-                  key={proyecto.id}
-                  href={`/proyectos/${proyecto.id}`}
-                  className="flex items-center justify-between p-4 rounded-xl border border-border/20 hover:border-primary/30 hover:bg-accent/20 transition-all duration-200 group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "status-dot",
-                      proyecto.estado === 'borrador' ? "status-dot-draft" : "status-dot-active"
-                    )} />
-                    <div>
-                      <p className="font-medium text-sm group-hover:text-primary transition-colors">{proyecto.nombre}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="outline" className="text-xs h-5 px-2 border-border/30">
-                          {proyecto.ambito}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground/50">
-                          Red {proyecto.tipo_red}
-                        </span>
+      {/* Recent Activity Section */}
+      <div className="space-y-4 pt-8 border-t border-border/40">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Your recent workflows</h2>
+          <Link href="/proyectos" className="text-muted-foreground text-sm hover:text-foreground">
+            View all
+          </Link>
+        </div>
+
+        <Card className="border-border/50 bg-card/50 overflow-hidden">
+          <CardContent className="p-0">
+            {recentProjects.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 p-4 text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted/30">
+                  <div className="col-span-8 md:col-span-5">Name</div>
+                  <div className="hidden md:block md:col-span-2">Type</div>
+                  <div className="hidden md:block md:col-span-2">Status</div>
+                  <div className="hidden md:block md:col-span-2">Last Modified</div>
+                  <div className="col-span-4 md:col-span-1"></div>
+                </div>
+
+                {recentProjects.map((project) => (
+                  <div key={project.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/50 transition-colors group">
+                    <div className="col-span-8 md:col-span-5 font-medium text-foreground flex items-center gap-3">
+                      <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <Zap className="w-4 h-4" />
                       </div>
+                      <Link href={`/proyectos/${project.id}`} className="hover:underline hover:text-primary truncate">
+                        {project.nombre}
+                      </Link>
+                    </div>
+                    <div className="hidden md:block md:col-span-2 text-sm text-muted-foreground truncate">
+                      {project.tipo_red}
+                    </div>
+                    <div className="hidden md:block md:col-span-2">
+                      <Badge variant="outline" className="text-xs border-border text-muted-foreground">
+                        {project.estado || 'Active'}
+                      </Badge>
+                    </div>
+                    <div className="hidden md:block md:col-span-2 text-sm text-muted-foreground">
+                      {new Date(project.updated_at).toLocaleDateString()}
+                    </div>
+                    <div className="col-span-4 md:col-span-1 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
-                  <span className="text-xs text-muted-foreground/50">
-                    {new Date(proyecto.updated_at).toLocaleDateString("es-PE")}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 text-muted-foreground">
-              <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-3xl mx-auto mb-4">
-                💧
+                ))}
               </div>
-              <p className="font-medium">Sin proyectos aún</p>
-              <p className="text-sm mt-1 text-muted-foreground/60">Comienza diseñando tu primera red de agua potable</p>
-              <Link href="/proyectos/nuevo">
-                <Button className="btn-primary text-white rounded-xl h-11 md:h-12 px-6 md:px-8 font-semibold hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-200">
-                  Crear Primer Proyecto
-                </Button>
-              </Link>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      </AnimatedSection>
+            ) : (
+              <div className="p-12 text-center text-muted-foreground">
+                <p>No recent workflows found.</p>
+                <Link href="/proyectos/nuevo" className="underline hover:text-foreground mt-2 block">
+                  Create your first workflow
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Normativa Quick Reference */}
-      <AnimatedSection delay={300}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-blue-500/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-          <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">P. Dinámica Mín</p>
-          <p className="text-xl md:text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">10 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
-          <p className="text-[10px] text-muted-foreground/40 mt-0.5">Urbano · OS.050</p>
-          <div className="mt-3 h-1.5 rounded-full bg-muted-foreground/10 overflow-hidden">
-            <div className="h-full rounded-full bg-blue-500 transition-all duration-500" style={{ width: '20%' }} />
-          </div>
-        </div>
-        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-amber-500/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-          <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">P. Estática Máx</p>
-          <p className="text-xl md:text-2xl font-bold mt-1 text-amber-600 dark:text-amber-400">50 <span className="text-xs font-normal text-muted-foreground">m.c.a.</span></p>
-          <p className="text-[10px] text-muted-foreground/40 mt-0.5">Ambos ámbitos</p>
-          <div className="mt-3 h-1.5 rounded-full bg-muted-foreground/10 overflow-hidden">
-            <div className="h-full rounded-full bg-amber-500 transition-all duration-500" style={{ width: '83%' }} />
-          </div>
-        </div>
-        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-green-500/30 hover:shadow-lg transition-all duration-300">
-          <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Vel. Rango</p>
-          <p className="text-xl md:text-2xl font-bold mt-1 text-green-600 dark:text-green-400">0.6–3.0 <span className="text-xs font-normal text-muted-foreground">m/s</span></p>
-          <p className="text-[10px] text-muted-foreground/40 mt-0.5">Ambos ámbitos</p>
-          <div className="mt-3 h-1.5 rounded-full bg-muted-foreground/10 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-500" style={{ width: '100%' }} />
-          </div>
-        </div>
-        <div className="p-4 md:p-5 rounded-xl glass-card border border-border/20 text-center group hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
-          <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Ø Mín Urbano</p>
-          <p className="text-xl md:text-2xl font-bold mt-1 text-purple-600 dark:text-purple-400">75 <span className="text-xs font-normal text-muted-foreground">mm</span></p>
-          <p className="text-[10px] text-muted-foreground/40 mt-0.5">3" · OS.050</p>
-        </div>
-        </div>
-      </AnimatedSection>
     </div>
   )
 }

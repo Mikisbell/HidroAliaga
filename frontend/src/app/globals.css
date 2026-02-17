@@ -83,37 +83,48 @@
 }
 
 .dark {
-  --background: oklch(0.14 0.02 250);
-  --foreground: oklch(0.95 0.01 250);
-  --card: oklch(0.18 0.02 250);
-  --card-foreground: oklch(0.95 0.01 250);
-  --popover: oklch(0.18 0.02 250);
-  --popover-foreground: oklch(0.95 0.01 250);
-  --primary: oklch(0.60 0.18 230); /* Azul profesional más brillante */
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.22 0.03 250);
-  --secondary-foreground: oklch(0.95 0.01 250);
-  --muted: oklch(0.22 0.03 250);
-  --muted-foreground: oklch(0.75 0.03 250);
-  --accent: oklch(0.22 0.03 250);
-  --accent-foreground: oklch(0.95 0.01 250);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.30 0.03 250);
-  --input: oklch(0.24 0.03 250);
-  --ring: oklch(0.60 0.18 230);
-  --chart-1: oklch(0.60 0.18 230);
-  --chart-2: oklch(0.65 0.15 230);
-  --chart-3: oklch(0.70 0.12 230);
-  --chart-4: oklch(0.55 0.20 230);
-  --chart-5: oklch(0.75 0.10 230);
-  --sidebar: oklch(0.16 0.02 250);
-  --sidebar-foreground: oklch(0.95 0.01 250);
-  --sidebar-primary: oklch(0.60 0.18 230);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.22 0.03 250);
-  --sidebar-accent-foreground: oklch(0.95 0.01 250);
-  --sidebar-border: oklch(0.30 0.03 250);
-  --sidebar-ring: oklch(0.60 0.18 230);
+  --background: #111318; /* n8n Main Dark */
+  --foreground: #ffffff;
+  
+  --card: #1c1f26; /* n8n Card Dark */
+  --card-foreground: #ffffff;
+  
+  --popover: #1c1f26;
+  --popover-foreground: #ffffff;
+  
+  --primary: #ff6d5a; /* n8n Orange Accent */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #2d3240;
+  --secondary-foreground: #ffffff;
+  
+  --muted: #2d3240;
+  --muted-foreground: #a1aab7;
+  
+  --accent: #2d3240;
+  --accent-foreground: #ffffff;
+  
+  --destructive: #ff4d4d;
+  --destructive-foreground: #ffffff;
+  
+  --border: #2d3240;
+  --input: #2d3240;
+  --ring: #ff6d5a;
+  
+  --chart-1: #ff6d5a;
+  --chart-2: #4d82f3; /* Blue */
+  --chart-3: #2ecc71; /* Green */
+  --chart-4: #f1c40f; /* Yellow */
+  --chart-5: #9b59b6; /* Purple */
+  
+  --sidebar: #0b0d11; /* n8n Sidebar Dark (Darker than Main) */
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ff6d5a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c1f26;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #2d3240;
+  --sidebar-ring: #ff6d5a;
 }
 
 @layer base {
