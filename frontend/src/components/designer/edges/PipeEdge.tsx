@@ -6,8 +6,10 @@ import {
     EdgeLabelRenderer,
     getStraightPath,
     type EdgeProps,
-    useReactFlow
+    useReactFlow,
+    useStore
 } from '@xyflow/react'
+import { getEdgeParams } from './utils'
 import { updateTramo } from '@/app/actions/tramos'
 import { toast } from 'sonner'
 import { Check } from 'lucide-react'
@@ -24,6 +26,8 @@ export interface PipeEdgeData {
 
 function PipeEdgeComponent({
     id,
+    source,
+    target,
     sourceX,
     sourceY,
     targetX,
@@ -46,29 +50,24 @@ function PipeEdgeComponent({
 
     // Validation Status Color
     const statusColor = (() => {
-        if (!simulationAlerts || simulationAlerts.length === 0) return '#22c55e'; // Green default/ok
-
+        if (!simulationAlerts || simulationAlerts.length === 0) return '#22c55e';
         const myAlerts = simulationAlerts.filter(a => a.elementId === id);
         const hasError = myAlerts.some(a => a.level === 'error');
         const hasWarning = myAlerts.some(a => a.level === 'warning');
-
-        if (hasError) return '#ef4444'; // Red
-        if (hasWarning) return '#f59e0b'; // Amber
-        return '#22c55e'; // Green
+        if (hasError) return '#ef4444';
+        if (hasWarning) return '#f59e0b';
+        return '#22c55e';
     })();
 
-    // Fallback logic for normal simulation view if no alerts/validation executed yet
-    // Uses velocity as proxy if available, otherwise gray/blue
     const finalColor = (() => {
         if (simulationAlerts && simulationAlerts.length > 0) return statusColor;
         if (result) {
-            // Legacy/Simple Velocity check if no validation run
             const v = result.velocity;
             if (v < 0.6) return '#3b82f6';
             if (v > 3.0) return '#ef4444';
             return '#22c55e';
         }
-        return selected ? '#3b82f6' : '#64748b'; // Default/Selected
+        return selected ? '#3b82f6' : '#64748b';
     })();
 
     const edgeStyle = {
@@ -78,15 +77,33 @@ function PipeEdgeComponent({
         stroke: finalColor
     };
 
+    // --- FLOATING EDGE LOGIC ---
+    // Get nodes from internal store to calculate border intersection points
+    const sourceNode = useStore(useCallback((store: any) => store.nodeLookup.get(source), [source]));
+    const targetNode = useStore(useCallback((store: any) => store.nodeLookup.get(target), [target]));
+
+    let sx = sourceX;
+    let sy = sourceY;
+    let tx = targetX;
+    let ty = targetY;
+
+    if (sourceNode && targetNode) {
+        const params = getEdgeParams(sourceNode, targetNode);
+        sx = params.sx;
+        sy = params.sy;
+        tx = params.tx;
+        ty = params.ty;
+    }
+
     const [edgePath, labelX, labelY] = getStraightPath({
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
+        sourceX: sx,
+        sourceY: sy,
+        targetX: tx,
+        targetY: ty,
     })
 
     // Calculate rotation angle in degrees
-    const angleRad = Math.atan2(targetY - sourceY, targetX - sourceX);
+    const angleRad = Math.atan2(ty - sy, tx - sx);
     let angleDeg = angleRad * (180 / Math.PI);
 
     // Keep text readable (don't let it be upside down)
@@ -141,7 +158,7 @@ function PipeEdgeComponent({
             handleSave()
         } else if (e.key === 'Escape') {
             setIsEditing(false)
-            setEditValue(edgeData?.longitud?.toString() || "") // Revert to original
+            setEditValue(edgeData?.longitud?.toString() || "")
         }
     }
 
@@ -149,9 +166,9 @@ function PipeEdgeComponent({
         <>
             <BaseEdge path={edgePath} style={edgeStyle} />
 
-            {/* Visual Markers for Start/End — Small (r=1.5) as requested */}
-            <circle cx={sourceX} cy={sourceY} r={1.5} fill="#22c55e" />
-            <circle cx={targetX} cy={targetY} r={1.5} fill="#3b82f6" />
+            {/* Visual Markers for Start/End */}
+            <circle cx={sx} cy={sy} r={1.5} fill="#22c55e" />
+            <circle cx={tx} cy={ty} r={1.5} fill="#3b82f6" />
 
             <EdgeLabelRenderer>
                 <div
@@ -162,13 +179,7 @@ function PipeEdgeComponent({
                         transformOrigin: 'center center'
                     }}
                 >
-                    {/* 
-                      Layout:
-                      [Length Label]  <-- Above
-                          |           <-- Gap for line (transparent)
-                      [Households]    <-- Below
-                    */}
-                    <div className="flex flex-col items-center select-none gap-1"> {/* gap-2 ensures space for the line */}
+                    <div className="flex flex-col items-center select-none gap-1">
 
                         {/* --- TOP: Length Label --- */}
                         {
@@ -192,7 +203,7 @@ function PipeEdgeComponent({
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center gap-0.5" style={{ transform: 'translateY(2px)' }}> {/* Slight nudge down towards line? No, up. Flex puts it top. */}
+                                <div className="flex flex-col items-center gap-0.5" style={{ transform: 'translateY(2px)' }}>
                                     <div
                                         className="group flex items-center px-1 py-0 rounded hover:bg-white/50 cursor-pointer transition-all"
                                         onClick={() => setIsEditing(true)}
@@ -205,8 +216,6 @@ function PipeEdgeComponent({
                                 </div>
                             )
                         }
-
-                        {/* --- GAP (Invisible, handled by flex gap) --- */}
 
                         {/* --- BOTTOM: Household Count & Result --- */}
                         <div
@@ -233,7 +242,7 @@ function PipeEdgeComponent({
                             <span className="text-[7px] font-bold text-purple-700">🏠 {typeof edgeData?.numero_viviendas === 'number' ? edgeData.numero_viviendas : 0}</span>
                         </div>
 
-                        {/* Simulation Result (If exists, place it below households or alongside?) */}
+                        {/* Simulation Result */}
                         {
                             result && (
                                 <div className="bg-white/90 px-1 py-0 rounded border text-[8px] font-mono shadow-sm whitespace-nowrap text-slate-600 mt-0.5"
@@ -244,9 +253,9 @@ function PipeEdgeComponent({
                             )
                         }
 
-                    </div >
-                </div >
-            </EdgeLabelRenderer >
+                    </div>
+                </div>
+            </EdgeLabelRenderer>
         </>
     )
 }

@@ -193,7 +193,6 @@ export default function NetworkDesigner({
     // ========== KEYBOARD SHORTCUTS (N8N-inspired) ==========
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Skip if user is typing in an input/textarea
             const tag = (e.target as HTMLElement)?.tagName
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
@@ -550,7 +549,7 @@ export default function NetworkDesigner({
                 onDrop={handleDrop}
                 onInit={(instance) => { reactFlowRef.current = instance }}
                 nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
+                edgeTypes={edgeTypes} // Register custom types
                 fitView
                 fitViewOptions={{ padding: 0.3 }}
                 snapToGrid
@@ -559,6 +558,7 @@ export default function NetworkDesigner({
                 deleteKeyCode={['Delete', 'Backspace']}
                 connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
                 defaultEdgeOptions={{ type: 'pipe' }}
+                connectionLineType={1} // ConnectionLineType.Straight = 1 (using enum value or import)
                 proOptions={{ hideAttribution: true }}
                 panOnDrag={activeTool === 'select'}
                 panOnScroll={true}
