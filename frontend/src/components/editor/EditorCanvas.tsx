@@ -112,7 +112,7 @@ export function EditorCanvas({
             numero_viviendas: 0,
             altura_agua: 0,
         } as Nudo
-        addNudo(tempNudo)
+        addNudo(tempNudo, { skipApi: true })
         setActiveTool('select')
         setActiveComponentType(null)
 

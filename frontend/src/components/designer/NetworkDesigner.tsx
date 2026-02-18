@@ -315,8 +315,8 @@ export default function NetworkDesigner({
 
             const tramo = result.data.tramo;
 
-            // 2. Add to Zustand store
-            useProjectStore.getState().addTramo(tramo);
+            // 2. Add to Zustand store (skip API call since we just did it)
+            useProjectStore.getState().addTramo(tramo, { skipApi: true });
 
             // 3. Add edge to local ReactFlow state (visual)
             const newEdge: Edge = {

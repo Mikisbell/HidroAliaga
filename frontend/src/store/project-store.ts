@@ -44,12 +44,12 @@ interface ProjectState {
     // Actions
     setProject: (project: Project) => void;
     setElements: (nudos: Nudo[], tramos: Tramo[]) => void; // Batch update
-    addNudo: (nudo: Nudo) => void;
+    addNudo: (nudo: Nudo, options?: { skipApi?: boolean }) => void;
     removeNudo: (id: string) => void;
     replaceNudo: (tempId: string, realNudo: Nudo) => void;
     updateNudo: (nudo: Nudo) => void;
     reorderTramos: (newOrder: string[]) => void;
-    addTramo: (tramo: Tramo) => void;
+    addTramo: (tramo: Tramo, options?: { skipApi?: boolean }) => void;
     removeTramo: (id: string) => void;
     replaceTramo: (tempId: string, realTramo: Tramo) => void;
     updateTramo: (tramo: Tramo) => void;
@@ -221,9 +221,11 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     },
     setElements: (nudos, tramos) => set({ nudos, tramos }),
 
-    addNudo: async (nudo) => {
+    addNudo: async (nudo, options) => {
         // Optimistic Update
         set((state) => ({ nudos: [...state.nudos, nudo] }));
+        if (options?.skipApi) return;
+
         const { currentProject, activeScenarioId } = get();
         if (activeScenarioId) return;
 
@@ -292,8 +294,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         }
     },
 
-    addTramo: async (tramo) => {
+    addTramo: async (tramo, options) => {
         set((state) => ({ tramos: [...state.tramos, tramo] }));
+        if (options?.skipApi) return;
+
         const { currentProject, activeScenarioId } = get();
         if (activeScenarioId) return;
 
